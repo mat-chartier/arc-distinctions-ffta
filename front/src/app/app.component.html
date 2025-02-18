@@ -2,17 +2,10 @@
   <div class="content">
       <h1>{{ title }}</h1>
   </div>
-  <div>
-    <p-fileupload #fu 
-      mode="advanced" 
-      url="http://localhost:3000/import"
-      chooseLabel="Choose" 
-      chooseIcon="pi pi-upload" 
-      name="arc" 
-      accept="text/*" 
-      maxFileSize="1000000"
-      (onUpload)="onUpload($event)"/>
-  </div>
+  <ul>
+    <li><a routerLink="/results-upload" routerLinkActive="active" ariaCurrentWhenActive="page">Importer un fichier de résultats</a></li>
+    <li><a routerLink="/archers-list" routerLinkActive="active" ariaCurrentWhenActive="page">Liste des archerès et archers</a></li>
+  </ul>
 
 </main>
 

@@ -1,0 +1,7 @@
+<table>
+    <tr *ngFor="let archer of archers">
+        <td><a routerLink="/archer/{{archer.licenceId}}" routerLinkActive="active" ariaCurrentWhenActive="page">{{archer.licenceId}}</a></td>
+        <td>{{archer.firstname}}</td>
+        <td>{{archer.lastname}}</td>
+    </tr>
+</table>
