@@ -1,22 +1,39 @@
-import express, { Request, Response } from "express";
-import multer from "multer";
 import cors from "cors";
+import express from "express";
+import multer from "multer";
+import dbconnection from "./db/connect";
+import { archerManager } from "./model/archer-manager";
+import { archerRepo } from "./db/archerRepo";
+import { resultatRepo } from "./db/resultatRepo";
 
-// configures dotenv to work in your application
 const app = express();
 app.use(cors());
 
 const PORT = 3000;
 const upload = multer({ dest: "uploads/" });
 
-app.post("/import", upload.single("arc"), function (req, res, next) {
-  // req.file is the `avatar` file
-  // req.body will hold the text fields, if there were any
-  console.log(req.file, req.body);
+app.post("/import", upload.single("arc"), async (req, res, next) => {
+  await archerManager.import(req.file!.path);
+  res.send({ status: "File uploaded successfully" });
+});
+
+app.get("/archers", async (req, res) => {
+  res.send(await archerRepo.getAll());
+});
+
+app.get("/archers/max-score", async (req, res) => {
+  res.send(await resultatRepo.getBestResults());
 });
 
 app
-  .listen(PORT, () => {
+  .listen(PORT, async () => {
+    console.log("Server starting, testing connection...");
+    try {
+      await dbconnection.authenticate();
+      console.log("Connection has been established successfully.");
+    } catch (error) {
+      console.error("Unable to connect to the database:", error);
+    }
     console.log("Server running at PORT: ", PORT);
   })
   .on("error", (error) => {
