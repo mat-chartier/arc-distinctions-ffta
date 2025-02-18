@@ -1,0 +1,28 @@
+<h2>
+  {{ archerDetails.prenom }} {{ archerDetails.nom }} ({{archerDetails.noLicence}})
+</h2>
+<h3>Distinctions 18m</h3>
+<p-table
+  [value]="archerDetails.Distinctions"
+  [paginator]="true"
+  [rows]="50"
+  [rowsPerPageOptions]="[50, 100, 200]"
+  sortField="Resultat.dateDebutConcours" [sortOrder]="1"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Disctinction</th>
+      <th pSortableColumn="Resultat.dateDebutConcours">Date <p-sortIcon field="Resultat.dateDebutConcours"/></th>
+      <th>Score</th>
+      <th>Statut</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-distinction>
+    <tr>
+      <td>{{ distinction.nom }} - {{ distinction.Resultat.arme }}</td>
+      <td>{{ distinction.Resultat.dateDebutConcours | date : "dd MMM yy" }}</td>
+      <td>{{ distinction.Resultat.score }}</td>
+      <td>{{ distinction.statut }}</td>
+    </tr>
+  </ng-template>
+</p-table>

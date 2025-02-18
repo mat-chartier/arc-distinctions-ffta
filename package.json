@@ -1,0 +1,6 @@
+{
+    "scripts": {
+        "backend:start:persist": "cd backend && npm run db:run:persist && npm run dev",
+        "frontend:start": "cd front && npm start"
+    }
+}

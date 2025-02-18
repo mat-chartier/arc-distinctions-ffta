@@ -8,6 +8,12 @@ class ArcherRepo {
     return await Archer.create(archer);
   }
 
+  async getArcherDetails(arg0: number): Promise<Archer | null> {
+    return await Archer.findByPk(arg0, {
+      include: { model: Distinction, include: [Resultat] },
+    });
+  }
+
   async getByNoLicence(noLicence: string): Promise<Archer | null> {
     return await Archer.findOne({ where: { noLicence } });
   }

@@ -1,0 +1,31 @@
+import { Component, inject, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { TableModule } from 'primeng/table';
+
+@Component({
+  selector: 'app-archer-details',
+  imports: [CommonModule, TableModule],
+  templateUrl: './archer-details.component.html',
+  styleUrl: './archer-details.component.scss',
+})
+export class ArcherDetailsComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+
+  archerDetails: any = {};
+
+  ngOnInit(): void {
+    this.route.params.subscribe((params) => {
+      fetch('http://localhost:3000/archer/' + params['id'] + '/details')
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          this.archerDetails = data;
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    });
+  }
+}
