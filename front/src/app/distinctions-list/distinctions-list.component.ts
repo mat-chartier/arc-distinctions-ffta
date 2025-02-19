@@ -10,13 +10,20 @@ import { TableModule } from 'primeng/table';
   styleUrl: './distinctions-list.component.scss'
 })
 export class DistinctionsListComponent {
-  distinctionsWithArcher!: DistinctionWithArcher[]
-  ngOnInit(): void {
-    let archer = new Archer("0909451J","Matthieu","Chartier");
-    this.distinctionsWithArcher = [
-      new DistinctionWithArcher(new Distinction ("Rouge", new Date(2024, 11, 23), 541,DistinctionStatus.A_DONNER), archer),
-      new DistinctionWithArcher(new Distinction("Jaune", new Date(2024, 12, 8), 546,  DistinctionStatus.A_COMMANDER), archer)
-    ];
+  distinctionsWithArcher: any;
+
+  ngOnInit() {
+    // Get personal bests
+    fetch('http://localhost:3000/archers/distinctions').then((response) => {
+      return response.json();
+    }
+    ).then((data) => {
+      this.distinctionsWithArcher = data;
+    }
+    ).catch((error) => {
+      console.error('Error:', error);
+    }
+    );  
   }
 }
 
