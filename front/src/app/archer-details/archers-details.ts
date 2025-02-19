@@ -1,11 +1,11 @@
 export class Archer {
-  licenceId: string;
-  firstname: string;
-  lastname: string;
-  constructor(licenceId: string, firstname: string, lastname: string) {
-    this.licenceId = licenceId;
-    this.firstname = firstname;
-    this.lastname = lastname;
+  noLicence: string;
+  nom: string;
+  prenom: string;
+  constructor(noLicence: string, prenom: string, nom: string) {
+    this.noLicence = noLicence;
+    this.prenom = prenom;
+    this.nom = nom;
   }
 }
 

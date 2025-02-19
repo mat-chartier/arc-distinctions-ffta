@@ -1,7 +1,16 @@
-<table>
-    <tr *ngFor="let archer of archers">
-        <td><a routerLink="/archer/{{archer.licenceId}}" routerLinkActive="active" ariaCurrentWhenActive="page">{{archer.licenceId}}</a></td>
-        <td>{{archer.firstname}}</td>
-        <td>{{archer.lastname}}</td>
-    </tr>
-</table>
+<p-table [value]="archers" [paginator]="true" [rows]="50" [rowsPerPageOptions]="[50,100,200]">
+    <ng-template #header>
+        <tr>
+            <th>Numéro de licence</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-archer>
+        <tr>
+            <td><a routerLink="/archer/{{archer.noLicence}}" routerLinkActive="active" ariaCurrentWhenActive="page">{{archer.noLicence}}</a></td>
+            <td>{{archer.prenom}}</td>
+            <td>{{archer.nom}}</td>
+        </tr>
+    </ng-template>
+</p-table>

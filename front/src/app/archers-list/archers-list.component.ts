@@ -1,22 +1,23 @@
 import { NgFor } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { first } from 'rxjs';
+import { Archer } from '../archer-details/archers-details';
+import { TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-archers-list',
-  imports: [NgFor, RouterLink, RouterLinkActive],
+  imports: [NgFor, RouterLink, RouterLinkActive, TableModule],
   templateUrl: './archers-list.component.html',
   styleUrl: './archers-list.component.scss'
 })
 export class ArchersListComponent {
- archers!: { licenceId: string; lastname: string; firstname: string; }[];
+ archers!: Archer[];
 
  ngOnInit(): void {
-    console.log("activated");
-    this.archers = [
-      {licenceId: "0909451J", lastname: "Chartier", firstname: "Matthieu"},
-      {licenceId: "654321", lastname: "Durand", firstname: "Pierre"},
-     ];
+    fetch('http://localhost:3000/archers').then((response) => {
+      return response.json();
+    }).then((archers) => {
+      this.archers = archers;
+    });
   }
 }

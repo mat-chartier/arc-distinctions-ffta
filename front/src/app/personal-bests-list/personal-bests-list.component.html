@@ -1,0 +1,24 @@
+<h2>Meilleurs résultats des archers</h2>
+
+<p-table [value]="personalBests" [paginator]="true" [rows]="50" [rowsPerPageOptions]="[50,100,200]">
+    <ng-template #header>
+        <tr>
+            <th>Id</th>
+            <th>Arme</th>
+            <th>Catégorie</th>
+            <th>Distance</th>
+            <th>Blason</th>
+            <th>Score</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-personalBest>
+        <tr>
+            <td>{{ personalBest.archerId }}</td>
+            <td>{{ personalBest.arme }}</td>
+            <td>{{ personalBest.categorie }}</td>
+            <td>{{ personalBest.distance }}</td>
+            <td>{{ personalBest.blason }}</td>
+            <td>{{ personalBest.max }}</td>
+        </tr>
+    </ng-template>
+</p-table>
