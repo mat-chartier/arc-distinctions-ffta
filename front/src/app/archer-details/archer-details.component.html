@@ -1,1 +1,27 @@
-<p>archer-details works! {{licenceId}}</p>
+<h2>{{archerDetails.archer.firstname}} {{archerDetails.archer.lastname}} ({{archerDetails.archer.licenceId}})</h2>
+<h3>Distinctions 18m</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Disctinction</th>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr colspan="3">Classique</tr>
+        <tr *ngFor="let distinction of archerDetails.distinctions_18m_cl">
+            <td>{{distinction.name}}</td>
+            <td>{{distinction.date | date:'dd MMM yy'}}</td>
+            <td>{{distinction.score}}</td>
+            <td>{{distinction.status}}</td>
+        </tr>
+        <tr colspan="3">Poulie</tr>
+        <tr *ngFor="let distinction of archerDetails.distinctions_18m_co">
+            <td>{{distinction.name}}</td>
+            <td>{{distinction.date | date:'dd MMM yy'}}</td>
+            <td>{{distinction.score}}</td>
+            <td>{{distinction.status}}</td>
+        </tr>
+    </tbody>
+</table>

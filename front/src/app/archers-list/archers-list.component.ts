@@ -10,8 +10,13 @@ import { first } from 'rxjs';
   styleUrl: './archers-list.component.scss'
 })
 export class ArchersListComponent {
- archers = [
-  {licenceId: "0909451J", lastname: "Chartier", firstname: "Matthieu"},
-  {licenceId: "654321", lastname: "Durand", firstname: "Pierre"},
- ];
+ archers!: { licenceId: string; lastname: string; firstname: string; }[];
+
+ ngOnInit(): void {
+    console.log("activated");
+    this.archers = [
+      {licenceId: "0909451J", lastname: "Chartier", firstname: "Matthieu"},
+      {licenceId: "654321", lastname: "Durand", firstname: "Pierre"},
+     ];
+  }
 }

@@ -1,0 +1,17 @@
+<h2>Liste des distinctions à commander ou à remettre aux archers</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Archer</th>
+            <th>Distinction</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let d of distinctionsWithArcher">
+            <td>{{d.archer.firstname}} {{d.archer.lastname}} ({{d.archer.licenceId}})</td>
+            <td>{{d.distinction.name}}({{d.distinction.arme}}) : {{d.distinction.score}} le {{d.distinction.date | date:'dd/MM/yyyy'}}</td>
+            <td>{{d.distinction.status}}</td>
+        </tr>
+    </tbody>
+</table>
