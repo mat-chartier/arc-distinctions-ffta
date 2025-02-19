@@ -9,6 +9,7 @@ interface ResultatAttributes {
   score: number;
   distance: number;
   blason: string;
+  saison: number
 }
 
 @Table({
@@ -31,10 +32,16 @@ export class Resultat extends Model implements ResultatAttributes {
   archerId!: number;
 
   @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+  })
+  saison!: number;
+
+  @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  arme!: string;
+  arme!: "CL" | "CO" | "BB";
 
   @Column({
     type: DataType.STRING,
@@ -85,6 +92,12 @@ export class BestResultat extends Model implements ResultatAttributes {
   })
   archerId!: number;
 
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+  })
+  saison!: number;
+  
   @Column({
     type: DataType.STRING,
     allowNull: false,

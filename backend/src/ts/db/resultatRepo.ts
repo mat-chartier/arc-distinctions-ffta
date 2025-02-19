@@ -12,13 +12,14 @@ class ResultatRepo {
       | "blason"
       | "dateDebutConcours"
       | "numDepart"
+      | "saison"
     >
   ): Promise<Resultat> {
     return await Resultat.create(resultat);
   }
 
   async getBestResults() {
-    return dbconnection.query(
+    return await dbconnection.query(
       `
           SELECT archer_id, arme, categorie, distance, blason,
             MAX(score)

@@ -5,6 +5,7 @@ import dbconnection from "./db/connect";
 import { archerManager } from "./model/archer-manager";
 import { archerRepo } from "./db/archerRepo";
 import { resultatRepo } from "./db/resultatRepo";
+import { distinctionRepo } from "./db/distinctionRepo";
 
 const app = express();
 app.use(cors());
@@ -23,6 +24,10 @@ app.get("/archers", async (req, res) => {
 
 app.get("/archers/max-score", async (req, res) => {
   res.send(await resultatRepo.getBestResults());
+});
+
+app.get("/archers/distinctions", async (req, res) => {
+  res.send(await distinctionRepo.getAllWithResultat());
 });
 
 app
