@@ -1,5 +1,5 @@
-import dbconnection from "./connect";
-import { BestResultat, Resultat } from "./resultat";
+import { literal, Sequelize } from "sequelize";
+import { Resultat } from "./resultat";
 class ResultatRepo {
   async create(
     resultat: Pick<
@@ -19,15 +19,18 @@ class ResultatRepo {
   }
 
   async getBestResults() {
-    return await dbconnection.query(
-      `
-          SELECT archer_id, arme, categorie, distance, blason,
-            MAX(score)
-          FROM resultat
-          GROUP BY archer_id, arme, categorie, distance, blason
-      `,
-      { model: BestResultat, mapToModel: true }
-    );
+    return await Resultat.findAll({
+      attributes: [
+        "archer_id",
+        "arme",
+        "categorie",
+        "distance",
+        "blason",
+        [Sequelize.fn("MAX", Sequelize.col("score")), "score"],
+      ],
+      group: ["archer_id", "arme", "categorie", "distance", "blason"],
+      raw: true,
+    });
   }
 }
 

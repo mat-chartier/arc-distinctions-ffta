@@ -1,33 +1,16 @@
 import { QueryTypes } from "sequelize";
 import dbconnection from "./connect";
 import { Distinction } from "./distinction";
-import { BestResultat, Resultat } from "./resultat";
+import { Resultat } from "./resultat";
+import { Archer } from "./archer";
 class DistinctionRepo {
+  async updateStatus(id: number, statut: string) {
+    return await Distinction.update({ statut }, { where: { id } });
+  }
   async getAllWithResultat(): Promise<Distinction[]> {
-    return await dbconnection.query(
-      `
-        SELECT d.id, d.archer_id as "archerId", d.nom, d.resultat_id as "resultatId", d.statut,
-          r.archer_id as "resultat.archerId",
-          r.arme as "resultat.arme",
-          r.categorie as "resultat.categorie",
-          r.distance as "resultat.distance",
-          r.score as "resultat.score",
-          r.blason as "resultat.blason",
-          r.date_debut_concours as "resultat.dateDebutConcours",
-          r.num_depart as "resultat.numDepart",
-          r.saison as "resultat.saison",
-          a.no_licence as "archer.noLicence",
-          a.nom as "archer.nom",
-          a.prenom as "archer.prenom"
-        FROM arcdistinctions.distinction d
-        JOIN arcdistinctions.resultat r ON d.resultat_id = r.id
-        JOIN arcdistinctions.archer a ON r.archer_id = a.id
-      `,
-      {
-        nest: true,
-        type: QueryTypes.SELECT,
-      }
-    );
+    return await Distinction.findAll({
+      include: [Archer, Resultat],
+    });
   }
 
   async populateFromResultat(saison: number) {

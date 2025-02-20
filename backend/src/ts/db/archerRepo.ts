@@ -1,4 +1,6 @@
 import { Archer } from "./archer";
+import { Distinction } from "./distinction";
+import { Resultat } from "./resultat";
 class ArcherRepo {
   async create(
     archer: Pick<Archer, "nom" | "prenom" | "noLicence">
@@ -11,7 +13,9 @@ class ArcherRepo {
   }
 
   async getAll(): Promise<Archer[]> {
-    return await Archer.findAll();
+    return await Archer.findAll({
+      include: { model: Distinction, include: [Resultat] },
+    });
   }
 }
 

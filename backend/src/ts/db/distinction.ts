@@ -29,10 +29,14 @@ export class Distinction extends Model {
   nom!: string;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  statut!: string;
+
+  @Column({
     type: DataType.BIGINT,
     allowNull: false,
   })
   resultatId!: number;
-
-  resultat?: Resultat;
 }
