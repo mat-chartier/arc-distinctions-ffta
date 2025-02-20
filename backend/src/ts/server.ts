@@ -22,6 +22,7 @@ app.post("/import", upload.single("arc"), async (req, res, next) => {
 app.post("/archers/distinction/:id/status", async (req, res, next) => {
   const input = req.body as { status: string };
   await distinctionRepo.updateStatus(parseInt(req.params.id), input.status);
+  res.send({ status: "Status updated successfully" });
 });
 
 app.get("/archers", async (req, res) => {
