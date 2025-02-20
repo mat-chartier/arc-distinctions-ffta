@@ -1,10 +1,9 @@
-import { NgFor } from '@angular/common';
 import { Component } from '@angular/core';
 import { TableModule } from 'primeng/table';
 
 @Component({
   selector: 'app-personal-bests-list',
-  imports: [NgFor, TableModule],
+  imports: [TableModule],
   templateUrl: './personal-bests-list.component.html',
   styleUrl: './personal-bests-list.component.scss'
 })

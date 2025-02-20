@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { Menubar, MenubarModule } from 'primeng/menubar';
+import { Menubar } from 'primeng/menubar';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Menubar, CommonModule],
+  imports: [RouterOutlet, RouterLink, Menubar, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
