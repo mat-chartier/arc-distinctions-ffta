@@ -9,6 +9,7 @@ import { distinctionRepo } from "./db/distinctionRepo";
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const PORT = 3000;
 const upload = multer({ dest: "uploads/" });
@@ -16,6 +17,11 @@ const upload = multer({ dest: "uploads/" });
 app.post("/import", upload.single("arc"), async (req, res, next) => {
   await archerManager.import(req.file!.path);
   res.send({ status: "File uploaded successfully" });
+});
+
+app.post("/archers/distinction/:id/status", async (req, res, next) => {
+  const input = req.body as { status: string };
+  await distinctionRepo.updateStatus(parseInt(req.params.id), input.status);
 });
 
 app.get("/archers", async (req, res) => {

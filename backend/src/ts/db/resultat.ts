@@ -1,3 +1,4 @@
+import { Archer } from "./archer";
 import sequelize from "./connect";
 
 import { Table, Column, Model, HasMany, DataType } from "sequelize-typescript";
@@ -9,7 +10,7 @@ interface ResultatAttributes {
   score: number;
   distance: number;
   blason: string;
-  saison: number
+  saison: number;
 }
 
 @Table({
@@ -78,53 +79,4 @@ export class Resultat extends Model implements ResultatAttributes {
     allowNull: false,
   })
   numDepart!: number;
-}
-
-@Table({
-  underscored: true,
-  timestamps: false,
-})
-export class BestResultat extends Model implements ResultatAttributes {
-  @Column({
-    type: DataType.BIGINT,
-    allowNull: false,
-    primaryKey: true,
-  })
-  archerId!: number;
-
-  @Column({
-    type: DataType.BIGINT,
-    allowNull: false,
-  })
-  saison!: number;
-  
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  arme!: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  categorie!: string;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  score!: number;
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  distance!: number;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  blason!: string;
 }
