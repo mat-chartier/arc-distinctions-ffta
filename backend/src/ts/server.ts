@@ -6,6 +6,7 @@ import { archerManager } from "./model/archer-manager";
 import { archerRepo } from "./db/archerRepo";
 import { resultatRepo } from "./db/resultatRepo";
 import { distinctionRepo } from "./db/distinctionRepo";
+import 'dotenv/config';
 
 const app = express();
 app.use(cors());
@@ -37,9 +38,18 @@ app.get("/archers/distinctions", async (req, res) => {
   res.send(await distinctionRepo.getAllWithResultat());
 });
 
+app.get("/distinctions/to-order", async (req, res) => {
+  res.send(await distinctionRepo.getToOrder());
+});
+
+app.get("/archer/:id/details", async (req, res) => {
+  res.send(await archerRepo.getArcherDetails(parseInt(req.params.id)));
+});
+
 app
   .listen(PORT, async () => {
     console.log("Server starting, testing connection...");
+    console.log("Env", process.env.DB_USER);
     try {
       await dbconnection.authenticate();
       console.log("Connection has been established successfully.");

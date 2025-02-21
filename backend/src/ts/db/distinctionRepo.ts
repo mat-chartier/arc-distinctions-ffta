@@ -13,6 +13,13 @@ class DistinctionRepo {
     });
   }
 
+  async getToOrder(): Promise<Distinction[]> {
+    return await Distinction.findAll({
+      where: { statut: "A commander" },
+      include: [Resultat],
+    });
+  }
+
   async populateFromResultat(saison: number) {
     return await dbconnection.query(
       `

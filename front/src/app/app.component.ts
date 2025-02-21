@@ -43,13 +43,17 @@ export class AppComponent {
         ]
       },
       {
-        label: 'Distinctions',
+        label: 'Distinctions Salle',
         icon: 'pi pi-crown',
         items: [
           {
             label: 'Liste des distinctions',
             icon: 'pi pi-list',
             routerLink: '/distinctions-list'
+          }, {
+            label: 'Distinctions à commander',
+            icon: 'pi pi-shopping-cart',
+            routerLink: '/distinctions-to-order'
           }
         ]
       }

@@ -1,5 +1,8 @@
-<h2>Liste des distinctions à commander ou à remettre aux archers</h2>
+<h2>Liste des distinctions à commander ou à remettre aux archers
+    - Edition : <p-toggleswitch [(ngModel)]="editMode" />
+</h2>
 <p-table
+  #distinctionsTable
   [value]="distinctionsWithArcher"
   [paginator]="true"
   [rows]="50"
@@ -8,6 +11,9 @@
   showGridlines
   stripedRows
   [globalFilterFields]="['d.statut']"
+  stateStorage="session"
+  stateKey="distinctions-list-session"
+
 >
   <ng-template #header>
     <tr>
@@ -62,7 +68,8 @@
           [options]="statuts"
           [(ngModel)]="d.statut"
           [style]="{ width: '100%' }"
-          (onChange)="onStatutChange(d, $event)"
+          (onChange)="onStatutChange(d, $event, distinctionsTable)"
+          [disabled]="!editMode"
         ></p-select>
       </td>
     </tr>
