@@ -34,11 +34,6 @@ export class AppComponent {
             label: 'Liste des archers',
             icon: 'pi pi-list',
             routerLink: '/archers-list'
-          },
-          {
-            label: 'Liste des meilleurs résultats',
-            icon: 'pi pi-list',
-            routerLink: '/personal-bests-list'
           }
         ]
       },
