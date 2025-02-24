@@ -1,0 +1,33 @@
+<p-table
+  [value]="archers"
+  [paginator]="true"
+  [rows]="50"
+  [rowsPerPageOptions]="[50, 100, 200]"
+  sortMode="multiple"
+  showGridlines
+  stripedRows
+  stateStorage="session"
+  stateKey="archers-list-session"
+>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="nom">Nom <p-sortIcon field="nom" /></th>
+      <th pSortableColumn="prenom">Prénom <p-sortIcon field="prenom" /></th>
+      <th>Numéro de licence</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-archer>
+    <tr>
+      <td>{{ archer.nom }}</td>
+      <td>{{ archer.prenom }}</td>
+      <td>
+        <a
+          routerLink="/archer/{{ archer.id }}"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          >{{ archer.noLicence }}</a
+        >
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

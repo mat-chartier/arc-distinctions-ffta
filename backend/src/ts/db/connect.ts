@@ -2,8 +2,10 @@ import { Sequelize } from "sequelize-typescript";
 import { Archer } from "./archer";
 import { Distinction } from "./distinction";
 import { Resultat } from "./resultat";
+import { ArcDistinctionsConfig } from "../config";
+
 const dbconnection = new Sequelize(
-  "postgres://arcdistinctions:arcdistinctions@localhost:5432/arcdistinctions",
+  ArcDistinctionsConfig.dbConnectionUrl,
   {
     models: [Archer, Resultat, Distinction],
   }

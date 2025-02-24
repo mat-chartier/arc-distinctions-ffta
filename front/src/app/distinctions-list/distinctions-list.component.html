@@ -1,0 +1,77 @@
+<h2>Liste des distinctions à commander ou à remettre aux archers
+    - Edition : <p-toggleswitch [(ngModel)]="editMode" />
+</h2>
+<p-table
+  #distinctionsTable
+  [value]="distinctionsWithArcher"
+  [paginator]="true"
+  [rows]="50"
+  [rowsPerPageOptions]="[50, 100, 200]"
+  sortMode="multiple"
+  showGridlines
+  stripedRows
+  [globalFilterFields]="['d.statut']"
+  stateStorage="session"
+  stateKey="distinctions-list-session"
+
+>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="Archer.nom">
+        Archer <p-sortIcon field="Archer.nom" />
+      </th>
+      <th pSortableColumn="Resultat.saison">
+        Saison <p-sortIcon field="Resultat.saison" />
+      </th>
+      <th>Distinction</th>
+      <th>Statut</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th style="z-index: 1000">
+        <p-columnFilter field="statut" matchMode="in" [showMenu]="false">
+          <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+            <p-multiSelect
+              appendTo="body"
+              [ngModel]="value"
+              [options]="statuts"
+              placeholder="Tous"
+              (onChange)="filter($event.value)"
+            >
+              <ng-template let-option pTemplate="item">
+                <div class="inline-block vertical-align-middle">
+                  <span class="ml-1 mt-1">
+                    {{ option }}
+                  </span>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </ng-template>
+        </p-columnFilter>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-d>
+    <tr>
+      <td>
+        {{ d.Archer.nom }} {{ d.Archer.prenom }} ({{ d.Archer.noLicence }})
+      </td>
+      <td>{{ d.Resultat.saison }}</td>
+      <td>
+        {{ d.nom }}({{ d.Resultat.arme }}) : {{ d.Resultat.score }} le
+        {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" }}
+      </td>
+      <td>
+        <p-select
+          [options]="statuts"
+          [(ngModel)]="d.statut"
+          [style]="{ width: '100%' }"
+          (onChange)="onStatutChange(d, $event, distinctionsTable)"
+          [disabled]="!editMode"
+        ></p-select>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

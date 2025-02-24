@@ -9,9 +9,16 @@ if [[ $1 == "" ]]; then
 fi
 
 docker container rm -fv postgresql-arc-distinctions
+
+PG_ENV="-e POSTGRES_DB=arcdistinctions"
+PG_ENV="$PG_ENV -e POSTGRES_PASSWORD=postgres"
+PG_ENV="$PG_ENV -e LC_ALL=en_US.UTF-8"
+PG_ENV="$PG_ENV -e LC_CTYPE=en_US.UTF-8"
+
 PG_VOLUMES="-v $PWD/files/root/scripts:/root/scripts/"
 if [[ $1 != "VOLATILE" ]] && [[ $1 != "VOLATILE_FILE" ]]; then
-    PG_VOLUMES="$PG_VOLUMES -v $1:/var/lib/postgresql/data/"
+    PG_VOLUMES="$PG_VOLUMES -v $1:/var/lib/postgresql/data:Z"
+    PG_ENV="$PG_ENV -e PGDATA=/var/lib/postgresql/data/pgdata"
 fi
 if [[ $1 == "VOLATILE_FILE" ]]; then
     VOLUME_TAR="$(realpath $2)-volume-arc-distinctions.tar"
@@ -30,19 +37,17 @@ if [[ $1 == "VOLATILE_FILE" ]]; then
     fi
     PG_VOLUMES="$PG_VOLUMES -v $VOLUME_DIR:/var/lib/postgresql/data/"
 fi
-PG_ENV="-e POSTGRES_DB=arcdistinctions"
-PG_ENV="$PG_ENV -e POSTGRES_PASSWORD=postgres"
-PG_ENV="$PG_ENV -e LC_ALL=en_US.UTF-8"
-PG_ENV="$PG_ENV -e LC_CTYPE=en_US.UTF-8"
 
-docker run --shm-size=256M -p 5432:5432 -e TZ=Europe/Amsterdam --name postgresql-arc-distinctions --network=host $PG_VOLUMES $PG_ENV -d postgis/postgis:17-3.5
+docker run --shm-size=256M -p 5432:5432 -e TZ=Europe/Amsterdam --name postgresql-arc-distinctions --network=host $PG_VOLUMES $PG_ENV -d  postgres:16.2
 
 waitForPostgres () {
   echo "Waiting for Postgres to be ready..."
   docker exec postgresql-arc-distinctions /root/scripts/wait-for-db.sh postgres 'select 1'
   echo "... Postgres is ready!"
 }
-docker exec postgresql-arc-distinctions /root/scripts/init-db.sh /tmp/arc-distinctions.sql
+if [[ $1 == "VOLATILE" ]] || [[ $1 == "VOLATILE_FILE" ]]; then
+  docker exec postgresql-arc-distinctions /root/scripts/init-db.sh /tmp/arc-distinctions.sql
+fi
 
 if [[ $1 == "VOLATILE" ]]; then
 	docker exec postgresql-arc-distinctions bash -c "ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime && dpkg-reconfigure --frontend noninteractive tzdata"

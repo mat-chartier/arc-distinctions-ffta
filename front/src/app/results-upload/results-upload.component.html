@@ -1,0 +1,12 @@
+<p-fileupload #fu 
+      mode="advanced" 
+      url="http://localhost:3000/import"
+      chooseLabel="Choose" 
+      chooseIcon="pi pi-upload" 
+      name="arc" 
+      accept="text/*" 
+      (onUpload)="onUpload($event)"
+      (onBeforeUpload)="onBeforeUpload($event)"
+      (onSend)="onSend($event)"
+      (onError)="onError($event)"
+      />

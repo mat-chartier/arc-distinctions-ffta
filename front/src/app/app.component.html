@@ -1,0 +1,17 @@
+<main class="main">
+  <div class="content">
+      <h1>{{ title }}</h1>
+  </div>
+  <p-menubar [model]="items">
+    <ng-template  #item let-item>
+      <ng-container>
+          <a [routerLink]="item.routerLink" class="p-menubar-item-link">
+              <span [class]="item.icon"></span>
+              <span class="ml-2">{{ item.label }}</span>
+          </a>
+      </ng-container>
+    </ng-template>
+  </p-menubar>
+</main>
+
+<router-outlet />
