@@ -5,21 +5,22 @@ import { TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { SelectModule } from 'primeng/select';
 import { MultiSelect, MultiSelectModule } from 'primeng/multiselect';
+import { ApisService } from '../services/apis-service';
 
 @Component({
   selector: 'app-archers-list',
   imports: [RouterLink, RouterLinkActive, TableModule],
   templateUrl: './archers-list.component.html',
-  styleUrl: './archers-list.component.scss'
+  styleUrl: './archers-list.component.scss',
 })
 export class ArchersListComponent {
- archers!: Archer[];
+  constructor(private apisService: ApisService) {}
+  archers!: Archer[];
 
- ngOnInit(): void {
-    fetch('http://localhost:3000/archers').then((response) => {
-      return response.json();
-    }).then((archers) => {
-      this.archers = archers;
-    });
+  ngOnInit(): void {
+    this.apisService.get('http://localhost:3000/archers')
+      .then((archers) => {
+        this.archers = archers;
+      });
   }
 }

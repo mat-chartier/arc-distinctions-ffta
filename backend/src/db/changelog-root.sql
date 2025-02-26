@@ -5,6 +5,8 @@ CREATE TABLE arcdistinctions.archer (id bigserial primary key not null);
 alter table archer add column no_licence text not null unique;
 alter table archer add nom text not null;
 alter table archer add prenom text not null;
+alter table archer add password text;
+alter table archer add role text;
 
 CREATE table arcdistinctions.resultat(id bigserial primary key not null);
 alter table resultat add column archer_id bigint not null references arcdistinctions.archer(id);

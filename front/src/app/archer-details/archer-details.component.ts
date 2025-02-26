@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
+import { ApisService } from '../services/apis-service';
 
 @Component({
   selector: 'app-archer-details',
@@ -11,21 +12,14 @@ import { TableModule } from 'primeng/table';
 })
 export class ArcherDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private apisService = inject(ApisService);
 
   archerDetails: any = {};
 
   ngOnInit(): void {
-    this.route.params.subscribe((params) => {
-      fetch('http://localhost:3000/archer/' + params['id'] + '/details')
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          this.archerDetails = data;
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+    this.route.params.subscribe(async (params) => {
+      const url = 'http://localhost:3000/archer/' + params['id'] + '/details';
+      this.archerDetails = await this.apisService.get(url);
     });
   }
 }
