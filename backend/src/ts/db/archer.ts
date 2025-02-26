@@ -32,4 +32,16 @@ export class Archer extends Model {
     allowNull: false,
   })
   prenom!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  password!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  role!: string;
 }

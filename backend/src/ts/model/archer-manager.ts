@@ -19,11 +19,9 @@ class ArcherManager {
       }
       let archer = await archerRepo.getByNoLicence(noLicence);
       if (!archer) {
-        console.log("Creating archer", noLicence);
         const prenom = row[4] as string;
         const nom = row[3] as string;
         archer = await archerRepo.create({ prenom, nom, noLicence });
-        console.log("Added new archer with licence number: ", noLicence);
       }
       const formule = row[24] as string;
       var result: any = {
