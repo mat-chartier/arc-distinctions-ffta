@@ -20,7 +20,7 @@ export class DistinctionsListComponent {
   statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
 
   ngOnInit() {
-    const url = 'http://localhost:3000/archers/distinctions';
+    const url = 'archers/distinctions';
     this.apisService.get(url).then((data) => {
       this.distinctionsWithArcher = data;
     });
@@ -29,7 +29,7 @@ export class DistinctionsListComponent {
   onStatutChange(item: any, event: any, distinctionsTable: Table) {
     item.statut = event.value;
     let url =
-      'http://localhost:3000/archers/distinction/' + item.id + '/status';
+      'archers/distinction/' + item.id + '/status';
 
     this.apisService.post(url, { status: item.statut }).then(() => {
       distinctionsTable._filter();

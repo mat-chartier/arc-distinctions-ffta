@@ -13,7 +13,7 @@ export class DistinctionsToOrderComponent {
   apisService = inject(ApisService);
   distinctionsToOrder: any[] = [];
   ngOnInit() {
-    const url = 'http://localhost:3000/distinctions/to-order';
+    const url = 'distinctions/to-order';
     this.apisService.get(url).then((data) => {
         // map reduce data counting the number of distinctions to order grouped by the distinction name
         const distinctions = data.reduce((acc: any, curr: any) => {

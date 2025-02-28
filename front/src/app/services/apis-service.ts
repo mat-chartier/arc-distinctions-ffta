@@ -18,7 +18,7 @@ export class ApisService {
     const isLoggedIn = user?.token;
     if (isLoggedIn) {
       authHeader = {
-        'Authorization': `Bearer ${user.token}`,
+        Authorization: `Bearer ${user.token}`,
       };
     }
     const requestOptions = {
@@ -26,6 +26,7 @@ export class ApisService {
       headers: { ...jsonHeader, ...authHeader },
       body: JSON.stringify(input),
     };
+    url = 'apis/' + url;
     return fetch(url, requestOptions)
       .then((response) => {
         if (response.status === 200) {
@@ -46,15 +47,17 @@ export class ApisService {
     const user = this.authenticationService.userValue;
     const isLoggedIn = user?.token;
     if (isLoggedIn) {
-        authHeader = {
-        'Authorization': `Bearer ${user.token}`,
+      authHeader = {
+        Authorization: `Bearer ${user.token}`,
       };
     }
 
     const requestOptions = {
-        method: 'GET',
-        headers: {...authHeader },
-      }
+      method: 'GET',
+      headers: { ...authHeader },
+    };
+    url = 'apis/' + url;
+
     return fetch(url, requestOptions)
       .then((response) => {
         if (response.status === 200) {
