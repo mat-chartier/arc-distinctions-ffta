@@ -24,7 +24,7 @@ export class AuthenticationService {
 
   async login(noLicence: string, password: string): Promise<User | null> {
 
-    let url = 'http://localhost:3000/users/authenticate';
+    let url = 'apis/users/authenticate';
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

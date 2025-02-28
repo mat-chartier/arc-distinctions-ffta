@@ -18,7 +18,7 @@ export class ArchersListComponent {
   archers!: Archer[];
 
   ngOnInit(): void {
-    this.apisService.get('http://localhost:3000/archers')
+    this.apisService.get('archers')
       .then((archers) => {
         this.archers = archers;
       });

@@ -18,7 +18,7 @@ export class ArcherDetailsComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.params.subscribe(async (params) => {
-      const url = 'http://localhost:3000/archer/' + params['id'] + '/details';
+      const url = 'archer/' + params['id'] + '/details';
       this.archerDetails = await this.apisService.get(url);
     });
   }
