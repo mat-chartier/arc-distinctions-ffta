@@ -4,7 +4,6 @@ import multer from "multer";
 import dbconnection from "./db/connect";
 import { archerManager } from "./model/archer-manager";
 import { archerRepo } from "./db/archerRepo";
-import { resultatRepo } from "./db/resultatRepo";
 import { distinctionRepo } from "./db/distinctionRepo";
 import "dotenv/config";
 import EncryptionUtils from "./model/encryption-utils";
@@ -65,12 +64,6 @@ app.get("/archers", async (req, res) => {
   if (await checkRole(ADMIN_ROLE, req, res)) {
     const archers = await archerRepo.getAll();
     res.send(archers);
-  }
-});
-
-app.get("/archers/max-score", async (req, res) => {
-  if (await checkRole(ADMIN_ROLE, req, res)) {
-    res.send(await resultatRepo.getBestResults());
   }
 });
 

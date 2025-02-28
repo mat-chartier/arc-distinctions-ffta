@@ -42,7 +42,7 @@ class ArcherManager {
         }
         resultatRepo.create(result);
       } else if (formule === "2X25M + 2X18M") {
-        let score:number = Number(row[31] as number) + Number(row[32] as number);
+        let score:number = Number(row[29] as number) + Number(row[30] as number);
         const result_25 = {
           ...result,
           score: score,
@@ -50,7 +50,7 @@ class ArcherManager {
           blason: '60'
         }
         resultatRepo.create(result_25);
-        score = Number(row[33] as number) + Number(row[34] as number);
+        score = Number(row[31] as number) + Number(row[32] as number);
         const result_18 = {
           ...result,
           score: score,

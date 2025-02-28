@@ -26,3 +26,42 @@
     </tr>
   </ng-template>
 </p-table>
+<h3>Résultats</h3>
+<p-table
+  [value]="archerDetails.Resultats"
+  [paginator]="true"
+  [rows]="50"
+  [rowsPerPageOptions]="[50, 100, 200]"
+  sortField="dateDebutConcours" [sortOrder]="1"
+  sortMode="multiple"
+  showGridlines
+  stripedRows
+  stateStorage="session"
+  stateKey="archer-details-session"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Saison</th>
+      <th pSortableColumn="dateDebutConcours">Date <p-sortIcon field="dateDebutConcours"/></th>
+      <th pSortableColumn="arme">Arme <p-sortIcon field="arme"/></th>
+      <th>Catégorie</th>
+      <th>Distance</th>
+      <th>Blason</th>
+      <th>Départ</th>
+      <th pSortableColumn="score" >Score <p-sortIcon field="score"/></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-resultat>
+    <tr>
+      <td>{{ resultat.saison }}</td>
+      <td>{{ resultat.dateDebutConcours | date : "dd MMM yy" }}</td>
+      <td>{{ resultat.arme }}</td>
+      <td>{{ resultat.categorie }}</td>
+      <td>{{ resultat.distance }}</td>
+      <td>{{ resultat.blason }}</td>
+      <td>{{ resultat.numDepart }}</td>
+      <td>{{ resultat.score }}</td>
+    </tr>
+  </ng-template>
+  
+</p-table>

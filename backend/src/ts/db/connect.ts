@@ -14,8 +14,8 @@ const dbconnection = new Sequelize(
 Archer.hasMany(Distinction, { foreignKey: "archerId"});
 Distinction.belongsTo(Archer);
 
-Archer.hasMany(Distinction, { foreignKey: "archerId"});
-Distinction.belongsTo(Archer);
+Archer.hasMany(Resultat, { foreignKey: "archerId"});
+Resultat.belongsTo(Archer);
 
 Resultat.hasOne(Distinction, {foreignKey: "resultatId"});
 Distinction.belongsTo(Resultat);

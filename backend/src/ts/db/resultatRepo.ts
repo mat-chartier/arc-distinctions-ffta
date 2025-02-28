@@ -17,21 +17,6 @@ class ResultatRepo {
   ): Promise<Resultat> {
     return await Resultat.create(resultat);
   }
-
-  async getBestResults() {
-    return await Resultat.findAll({
-      attributes: [
-        "archer_id",
-        "arme",
-        "categorie",
-        "distance",
-        "blason",
-        [Sequelize.fn("MAX", Sequelize.col("score")), "score"],
-      ],
-      group: ["archer_id", "arme", "categorie", "distance", "blason"],
-      raw: true,
-    });
-  }
 }
 
 export const resultatRepo = new ResultatRepo();

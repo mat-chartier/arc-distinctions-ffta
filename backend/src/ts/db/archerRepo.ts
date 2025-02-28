@@ -18,7 +18,7 @@ class ArcherRepo {
 
   async getArcherDetails(arg0: number): Promise<Archer | null> {
     return await Archer.findByPk(arg0, {
-      include: { model: Distinction, include: [Resultat] },
+      include: [{ model: Distinction, include: [Resultat] }, {model : Resultat}],
     });
   }
 
