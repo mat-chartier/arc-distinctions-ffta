@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Injectable } from '@angular/core';
 import { FileUploadModule } from 'primeng/fileupload';
 
 @Component({
@@ -7,23 +7,9 @@ import { FileUploadModule } from 'primeng/fileupload';
   templateUrl: './results-upload.component.html',
   styleUrl: './results-upload.component.scss'
 })
+@Injectable({
+  providedIn: 'root',
+})
 export class ResultsUploadComponent {
-  onUpload(event: any) {
-    console.log("uploaded");
-    for (let file of event.files) {
-      console.log(file);
-    }
-  }
 
-  onBeforeUpload(event: any) {
-    console.log("beforeUpload");
-  }
-
-  onSend(event: any) {
-    console.log("send");
-  }
-  
-  onError(event: any) {
-    console.log(event);
-  }
 }

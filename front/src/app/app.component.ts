@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
-import { User } from './model/user';
 import { AuthenticationService } from './services/authentication.service';
 import { Archer } from './archer-details/archers-details';
 @Component({

@@ -6,18 +6,24 @@ import { routes } from './app.routes';
 
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  provideHttpClient,
+  withInterceptorsFromDi,
+} from '@angular/common/http';
+import { AuthInterceptor } from './services/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     provideHttpClient(withInterceptorsFromDi()),
-    provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
-    providePrimeNG({ 
+    providePrimeNG({
       theme: {
-        preset: Aura
-      }
-    })
-  ]
+        preset: Aura,
+      },
+    }),
+  ],
 };
