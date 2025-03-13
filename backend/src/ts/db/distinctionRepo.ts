@@ -4,9 +4,15 @@ import { Distinction } from "./distinction";
 import { Resultat } from "./resultat";
 import { Archer } from "./archer";
 class DistinctionRepo {
+
+  async delete(id: number) {
+    return await Distinction.destroy({ where: { id } });
+  }
+
   async updateStatus(id: number, statut: string) {
     return await Distinction.update({ statut }, { where: { id } });
   }
+  
   async getAllWithResultat(): Promise<Distinction[]> {
     return await Distinction.findAll({
       include: [Archer, Resultat],
@@ -16,7 +22,7 @@ class DistinctionRepo {
   async getToOrder(): Promise<Distinction[]> {
     return await Distinction.findAll({
       where: { statut: "A commander" },
-      include: [Resultat],
+      include: [Resultat, Archer],
     });
   }
 

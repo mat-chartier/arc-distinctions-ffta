@@ -6,22 +6,28 @@ import { Table, TableModule } from 'primeng/table';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ApisService } from '../services/apis-service';
+import { ButtonModule } from 'primeng/button';
 @Component({
   selector: 'app-distinctions-list',
-  imports: [CommonModule, TableModule, FormsModule, SelectModule, MultiSelectModule,ToggleSwitch],
+  imports: [CommonModule, TableModule, FormsModule, SelectModule, MultiSelectModule,ToggleSwitch, ButtonModule],
   templateUrl: './distinctions-list.component.html',
   styleUrl: './distinctions-list.component.scss',
 })
 export class DistinctionsListComponent {
   editMode = false;
+  deleteMode = false;
   distinctionsWithArcher: any;
   apisService = inject(ApisService);
+  url = 'archers/distinctions';
 
   statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
 
   ngOnInit() {
-    const url = 'archers/distinctions';
-    this.apisService.get(url).then((data) => {
+    this.fetchData();
+  }
+  
+  fetchData() {
+    this.apisService.get(this.url).then((data) => {
       this.distinctionsWithArcher = data;
     });
   }
@@ -32,6 +38,14 @@ export class DistinctionsListComponent {
       'archers/distinction/' + item.id + '/status';
 
     this.apisService.post(url, { status: item.statut }).then(() => {
+      distinctionsTable._filter();
+    });
+  }
+
+  onRemove(item: any, distinctionsTable: Table) {
+    let url = 'archers/distinction/' + item.id + "/delete";
+    this.apisService.post(url, {}).then(() => {
+      this.fetchData();
       distinctionsTable._filter();
     });
   }

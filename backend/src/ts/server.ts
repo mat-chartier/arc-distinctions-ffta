@@ -60,6 +60,13 @@ app.post("/archers/distinction/:id/status", async (req, res, next) => {
   }
 });
 
+app.post("/archers/distinction/:id/delete", async (req, res, next) => {
+  if (await checkRole(ADMIN_ROLE, req, res)) {
+    await distinctionRepo.delete(parseInt(req.params.id));
+    res.send({ status: "Distinction deleted successfully !" });
+  }
+});
+
 app.get("/archers", async (req, res) => {
   if (await checkRole(ADMIN_ROLE, req, res)) {
     const archers = await archerRepo.getAll();

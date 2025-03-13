@@ -1,5 +1,6 @@
 <h2>Liste des distinctions à commander ou à remettre aux archers
     - Edition : <p-toggleswitch [(ngModel)]="editMode" />
+    <span *ngIf="editMode"> - Suppression : <p-toggleswitch [(ngModel)]="deleteMode" /> </span>
 </h2>
 <p-table
   #distinctionsTable
@@ -67,10 +68,15 @@
         <p-select
           [options]="statuts"
           [(ngModel)]="d.statut"
-          [style]="{ width: '100%' }"
+          [style]="{ width: '90%' }"
           (onChange)="onStatutChange(d, $event, distinctionsTable)"
           [disabled]="!editMode"
         ></p-select>
+        <p-button
+          [disabled]="!editMode"
+          *ngIf="editMode && deleteMode"
+          (onClick)="onRemove(d, distinctionsTable)"
+          >X</p-button>
       </td>
     </tr>
   </ng-template>
