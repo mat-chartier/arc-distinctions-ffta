@@ -26,6 +26,26 @@ class DistinctionRepo {
     });
   }
 
+  async create(distinction: Pick<Distinction, "archerId" | "resultatId" | "statut" | "nom">) {
+    return await Distinction.create(distinction);
+  }
+
+  async getDistinction(archerId: number, nom: string, arme: string, discipline: string): Promise<Distinction | null> {
+    return await Distinction.findOne({include: [{model: Resultat, where: {arme, discipline}}], where: { archerId, nom} });
+  }
+
+  async isDistinctionEligible(archerId: number, discipline: string, noms: string[]): Promise<boolean> {
+    return await Distinction.findOne({
+      where: {
+        archerId,
+        nom: noms,
+      },
+      include: [{ model: Resultat, where: { discipline } }],
+    }).then((distinction) => {
+      return distinction === null;
+    });
+  }
+
   async populateFromResultat(saison: number) {
     return await dbconnection.query(
       `
@@ -40,7 +60,7 @@ class DistinctionRepo {
                     WHEN score between 545 and 555 then 'Jaune'
                     WHEN score between 530 and 544 then 'Rouge'
                     WHEN score between 515 and 529 then 'Bleu'
-                    WHEN score between 500 and 514 then 'Noir'
+                    WHEN score between 500 and 514 then 'Noire'
                     WHEN score between 480 and 499 then 'Blanc'
                     WHEN score between 455 and 479 then 'Vert (Promo)'
                 ELSE null

@@ -8,6 +8,7 @@ const dbconnection = new Sequelize(
   ArcDistinctionsConfig.dbConnectionUrl,
   {
     models: [Archer, Resultat, Distinction],
+    logging: false,
   }
 );
 

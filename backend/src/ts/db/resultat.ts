@@ -11,6 +11,7 @@ interface ResultatAttributes {
   distance: number;
   blason: string;
   saison: number;
+  discipline: string;
 }
 
 @Table({
@@ -79,4 +80,10 @@ export class Resultat extends Model implements ResultatAttributes {
     allowNull: false,
   })
   numDepart!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  discipline!: string;
 }
