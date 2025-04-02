@@ -39,8 +39,9 @@ class DistinctionRepo {
       where: {
         archerId,
         nom: noms,
+        discipline,
       },
-      include: [{ model: Resultat, where: { discipline } }],
+      include: [{ model: Resultat}],
     }).then((distinction) => {
       return distinction === null;
     });

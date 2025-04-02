@@ -7,6 +7,7 @@ import { distinctionRepo } from "../db/distinctionRepo";
 import { ResultRaw } from "./result-raw";
 import { Resultat } from "../db/resultat";
 import { distinctionsManager } from "./distinctions-manager";
+import { Archer } from "../db/archer";
 
 class ArcherManager {
   async import2(file: PathLike) {
@@ -41,11 +42,11 @@ class ArcherManager {
       return 0;
     });
 
-    for (let i = 0; i < rawResults.length; i++) {
-      const resultRaw = rawResults[i];
+    // replace with foreach
+    for (const resultRaw of rawResults) {
       switch (resultRaw.discipline) {
         case "T":
-          // await this.importTAE(row);
+          await this.importTAE(resultRaw);
           break;
         case "S":
           await this.importSalle(resultRaw);
@@ -65,27 +66,18 @@ class ArcherManager {
     }
   }
 
-  async importSalle(resultRaw: ResultRaw) {
-    const noLicence = resultRaw.licence;
-    let archer = await archerRepo.getByNoLicence(noLicence);
-    if (!archer) {
-      const nom = resultRaw.nom;
-      const prenom = resultRaw.prenom;
-      archer = await archerRepo.create({ prenom, nom, noLicence });
-    }
-    const formule = resultRaw.formuleTir;
-    var result: any = {
-      archerId: archer.id!,
-      distance: resultRaw.distance,
-      dateDebutConcours: parseISO(resultRaw.dateDebutConcours),
-      arme: resultRaw.arme as "CO" | "CL" | "BB",
-      blason: resultRaw.blason,
-      categorie: resultRaw.categorie,
-      numDepart: resultRaw.numDepart,
-      saison: resultRaw.saison,
-      discipline: resultRaw.discipline,
-    };
+  async importTAE(resultRaw: ResultRaw) {
+    const archer = await this.getOrCreateArcher(resultRaw);
+    let result = this.getResultFromResultRawForArcher(resultRaw, archer.id!);
+    result.score = resultRaw.score;
+    await this.saveResult(result);
+  }
 
+  async importSalle(resultRaw: ResultRaw) {
+    const archer = await this.getOrCreateArcher(resultRaw);
+    let result = this.getResultFromResultRawForArcher(resultRaw, archer.id!);
+
+    const formule = resultRaw.formuleTir;
     if (formule === "2X18M") {
       result = {
         ...result,
@@ -110,6 +102,31 @@ class ArcherManager {
       };
       await this.saveResult(result_18);
     }
+  }
+
+  getResultFromResultRawForArcher(resultRaw: ResultRaw, archerId: number): any {
+    return {
+      archerId: archerId,
+      distance: resultRaw.distance,
+      dateDebutConcours: parseISO(resultRaw.dateDebutConcours),
+      arme: resultRaw.arme as "CO" | "CL" | "BB",
+      blason: resultRaw.blason,
+      categorie: resultRaw.categorie,
+      numDepart: resultRaw.numDepart,
+      saison: resultRaw.saison,
+      discipline: resultRaw.discipline,
+    };
+  }
+
+  async getOrCreateArcher(resultRaw: ResultRaw): Promise<Archer> {
+    const noLicence = resultRaw.licence;
+    let archer = await archerRepo.getByNoLicence(noLicence);
+    if (!archer) {
+      const nom = resultRaw.nom;
+      const prenom = resultRaw.prenom;
+      archer = await archerRepo.create({ prenom, nom, noLicence });
+    }
+    return archer;
   }
 
   async saveResult(result: Resultat) {

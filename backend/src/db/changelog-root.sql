@@ -33,5 +33,11 @@ alter table arcdistinctions.resultat add column discipline text not null default
 alter table arcdistinctions.resultat alter column discipline drop default;
 alter table arcdistinctions.resultat add column creation_date timestamp not null default now();
 
+alter table arcdistinctions.distinction add column distance numeric not null default 18;
+alter table arcdistinctions.distinction alter column distance drop default;
+
+alter table arcdistinctions.distinction add column discipline text not null default 'Salle';
+alter table arcdistinctions.distinction alter column discipline drop default;
+
 -- Create a unique index on all columns of resultat table
 create unique index resultat_unique_index on arcdistinctions.resultat (archer_id, arme, score, categorie, distance, blason, num_depart, date_debut_concours, saison, discipline);
