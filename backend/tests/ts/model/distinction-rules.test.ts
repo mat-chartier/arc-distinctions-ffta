@@ -127,7 +127,7 @@ describe.each([
 
 describe("DistinctionRules.getSameOrBetter", () => {
   test("should return the correct distinctions for a given name, discipline and arme", () => {
-    expect(distinctionRules.getSameOrBetter("Vert (Promo)", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Vert (Promo)", "Salle", "CL")).toEqual([
       "Vert (Promo)",
       "Blanc",
       "Noir",
@@ -138,7 +138,7 @@ describe("DistinctionRules.getSameOrBetter", () => {
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("Blanc", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Blanc", "Salle", "CL")).toEqual([
       "Blanc",
       "Noir",
       "Bleu",
@@ -148,7 +148,7 @@ describe("DistinctionRules.getSameOrBetter", () => {
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("Noir", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Noir", "Salle", "CL")).toEqual([
       "Noir",
       "Bleu",
       "Rouge",
@@ -157,7 +157,7 @@ describe("DistinctionRules.getSameOrBetter", () => {
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("Bleu", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Bleu", "Salle", "CL")).toEqual([
       "Bleu",
       "Rouge",
       "Jaune",
@@ -165,35 +165,34 @@ describe("DistinctionRules.getSameOrBetter", () => {
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("Rouge", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Rouge", "Salle", "CL")).toEqual([
       "Rouge",
       "Jaune",
       "1 étoile",
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("Jaune", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("Jaune", "Salle", "CL")).toEqual([
       "Jaune",
       "1 étoile",
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("1 étoile", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("1 étoile", "Salle", "CL")).toEqual([
       "1 étoile",
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("2 étoiles", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("2 étoiles", "Salle", "CL")).toEqual([
       "2 étoiles",
       "3 étoiles",
     ]);
-    expect(distinctionRules.getSameOrBetter("3 étoiles", "S")).toEqual([
+    expect(distinctionRules.getSameOrBetter("3 étoiles", "Salle", "CL")).toEqual([
       "3 étoiles",
     ]);
   });
 });
 
-// tests for getTAEDistinctionTemplate
 describe.each([
   [20, "U11", "80", "", "TAEDI"],
   [20, "U13", "80", "", "TAEDN"],
@@ -215,7 +214,8 @@ describe.each([
         blason,
         arme,
       } as Resultat);
-      expect(result.discipline).toBe(expectedDiscipline);
+      expect(result).toBeDefined();
+      expect(result!.discipline).toBe(expectedDiscipline);
     });
   }
 );

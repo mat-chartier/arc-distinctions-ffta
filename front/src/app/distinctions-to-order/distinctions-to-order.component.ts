@@ -29,7 +29,6 @@ export class DistinctionsToOrderComponent {
       let dataFilteredCOTAEDI: any[] = [];
       let dataFilteredCOTAEDN: any[] = [];
       data.forEach((resultat: any) => {
-        console.log('resultat', resultat.discipline);
         if (resultat.discipline === 'Salle') {
           if (
             resultat.Resultat.arme === 'CL' ||

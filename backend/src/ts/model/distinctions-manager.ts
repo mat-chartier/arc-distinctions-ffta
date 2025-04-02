@@ -29,9 +29,6 @@ class DistinctionsManager {
             resultatId: result.id!,
             statut: "A commander",
           });
-          console.log(
-            `Distinction ${JSON.stringify(distinctionForResult)} created`
-          );
         }
       }
     }

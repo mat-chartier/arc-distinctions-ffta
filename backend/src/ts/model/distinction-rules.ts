@@ -85,8 +85,6 @@ class DistinctionRules {
       return null;
     }
 
-    console.log(`getTAEDistinctionTemplate: ${JSON.stringify(d)}`);
-
     switch (d.discipline) {
       case "TAEDI":
         return this.getTAEDIDistinction(resultat, d);
