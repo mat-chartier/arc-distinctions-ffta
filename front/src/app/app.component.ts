@@ -43,7 +43,7 @@ export class AppComponent {
         ],
       },
       {
-        label: 'Distinctions Salle',
+        label: 'Distinctions',
         icon: 'pi pi-crown',
         items: [
           {
