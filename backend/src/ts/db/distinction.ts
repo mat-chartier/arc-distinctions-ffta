@@ -1,7 +1,6 @@
 import sequelize from "./connect";
 
 import { Table, Column, Model, HasMany, DataType } from "sequelize-typescript";
-import { Resultat } from "./resultat";
 
 @Table({
   tableName: "distinction",

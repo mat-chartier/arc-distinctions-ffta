@@ -13,11 +13,45 @@ class DistinctionRules {
     "2 étoiles",
     "3 étoiles",
   ];
+  DISTINCTIONS_TAE_DN_CO = [
+    "1 Archer (argent)",
+    "2 Archers (argent)",
+    "3 Archers (argent)",
+    "4 Archers (argent)",
+    "Archer d'or (argent)",
+  ];
+  DISTINCTIONS_TAE_DN_CL = [
+    "1 Archer (or)",
+    "2 Archers (or)",
+    "3 Archers (or)",
+    "4 Archers (or)",
+    "Archer d'or (or)",
+  ];
 
-  getSameOrBetter(nom: string, discipline: string): string[] {
-    return this.DISTINCTIONS_S_TAE.slice(
-      this.DISTINCTIONS_S_TAE.findIndex((distinction) => distinction === nom)
-    );
+  getSameOrBetter(
+    nom: string,
+    discipline: string,
+    arme: string
+  ): string[] | null {
+    if (discipline === "Salle" || discipline === "TAEDI") {
+      return this.DISTINCTIONS_S_TAE.slice(
+        this.DISTINCTIONS_S_TAE.findIndex((distinction) => distinction === nom)
+      );
+    } else if (discipline === "TAEDN") {
+      if (arme === "CO") {
+        return this.DISTINCTIONS_TAE_DN_CO.slice(
+          this.DISTINCTIONS_TAE_DN_CO.findIndex(
+            (distinction) => distinction === nom
+          )
+        );
+      }
+      return this.DISTINCTIONS_TAE_DN_CL.slice(
+        this.DISTINCTIONS_TAE_DN_CL.findIndex(
+          (distinction) => distinction === nom
+        )
+      );
+    }
+    return null;
   }
 
   getDistinction(resultat: Resultat): Distinction | null {
@@ -47,6 +81,11 @@ class DistinctionRules {
   }
   getTAEDistinction(resultat: Resultat): Distinction | null {
     const d = this.getTAEDistinctionTemplate(resultat);
+    if (d === null) {
+      return null;
+    }
+
+    console.log(`getTAEDistinctionTemplate: ${JSON.stringify(d)}`);
 
     switch (d.discipline) {
       case "TAEDI":
@@ -57,6 +96,7 @@ class DistinctionRules {
         return null;
     }
   }
+
   getTAEDIDistinction(
     resultat: Resultat,
     distinction: Distinction
@@ -166,11 +206,11 @@ class DistinctionRules {
     return null;
   }
 
-  getTAEDistinctionTemplate(resultat: Resultat): Distinction {
+  getTAEDistinctionTemplate(resultat: Resultat): Distinction | null {
     const distinction = {
-      distance: resultat.distance,
+      distance: Number.parseInt("" + resultat.distance),
     };
-    switch (resultat.distance) {
+    switch (distinction.distance) {
       case 20:
         if (resultat.categorie === "U11") {
           return { ...distinction, discipline: "TAEDI" } as Distinction;
@@ -193,8 +233,14 @@ class DistinctionRules {
         return { ...distinction, discipline: "TAEDN" } as Distinction;
       case 60:
       case 70:
-      default:
         return { ...distinction, discipline: "TAEDI" } as Distinction;
+      default:
+        console.log(
+          `Distance ${
+            resultat.distance
+          } not supported => type=${typeof resultat.distance}`
+        );
+        return null;
     }
   }
 
@@ -206,9 +252,7 @@ class DistinctionRules {
         return this.getSalleCLDistinction(resultat);
     }
   }
-  getSalleCLDistinction(
-    resultat: Resultat
-  ): Distinction | null {
+  getSalleCLDistinction(resultat: Resultat): Distinction | null {
     const score = resultat.score;
     let nomDistinction = null;
     if (score >= 455 && score < 480) {
@@ -240,9 +284,7 @@ class DistinctionRules {
     } as Distinction;
   }
 
-  getSalleCODistinction(
-    resultat: Resultat
-  ): Distinction | null {
+  getSalleCODistinction(resultat: Resultat): Distinction | null {
     const score = resultat.score;
     let nomDistinction = null;
 

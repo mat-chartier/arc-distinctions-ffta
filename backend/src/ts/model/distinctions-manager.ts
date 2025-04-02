@@ -11,23 +11,28 @@ class DistinctionsManager {
     if (distinctionForResult !== null) {
       const distinctionNames = distinctionRules.getSameOrBetter(
         distinctionForResult.nom,
+        distinctionForResult.discipline,
         result.arme
       );
 
-      const isEligible = await distinctionRepo.isDistinctionEligible(
-        result.archerId,
-        distinctionForResult.discipline,
-        distinctionNames
-      );
+      if (distinctionNames !== null) {
+        const isEligible = await distinctionRepo.isDistinctionEligible(
+          result.archerId,
+          distinctionForResult.discipline,
+          distinctionNames
+        );
 
-      if (isEligible) {
-        await distinctionRepo.create({
-          ...distinctionForResult,
-          archerId: result.archerId,
-          resultatId: result.id!,
-          statut: "A commander",
-        });
-        console.log(`Distinction ${distinctionForResult} created`);
+        if (isEligible) {
+          await distinctionRepo.create({
+            ...distinctionForResult,
+            archerId: result.archerId,
+            resultatId: result.id!,
+            statut: "A commander",
+          });
+          console.log(
+            `Distinction ${JSON.stringify(distinctionForResult)} created`
+          );
+        }
       }
     }
   }

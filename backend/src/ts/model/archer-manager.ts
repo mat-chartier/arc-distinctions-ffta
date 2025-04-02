@@ -133,7 +133,6 @@ class ArcherManager {
     const existingResult = await resultatRepo.getByExactMatch(result);
     if (!existingResult) {
       result = await resultatRepo.create(result);
-      console.log(`Resultat created ${result.score}`);
       await distinctionsManager.record(result);
     }
   }
