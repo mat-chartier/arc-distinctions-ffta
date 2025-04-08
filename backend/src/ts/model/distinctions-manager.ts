@@ -19,7 +19,8 @@ class DistinctionsManager {
         const isEligible = await distinctionRepo.isDistinctionEligible(
           result.archerId,
           distinctionForResult.discipline,
-          distinctionNames
+          distinctionNames,
+          result.distance
         );
 
         if (isEligible) {

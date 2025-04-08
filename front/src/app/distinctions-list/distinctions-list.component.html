@@ -1,8 +1,12 @@
 <h2>Liste des distinctions à commander ou à remettre aux archers
-    - Edition : <p-toggleswitch [(ngModel)]="editMode" />
-    <span *ngIf="editMode"> - Suppression : <p-toggleswitch [(ngModel)]="deleteMode" /> </span>
 </h2>
-<p-table
+<div style="display: flex; align-items: center;">
+  <div style="margin-bottom: 6px; margin-right: 0.5rem;">Edition </div>
+  <p-toggleswitch [(ngModel)]="editMode" />
+  <div *ngIf="editMode" style="margin-bottom: 6px; margin-left: 1rem; margin-right: 0.5rem;">Suppression </div>
+  <p-toggleswitch [(ngModel)]="deleteMode" *ngIf="editMode"/> 
+</div>
+  <p-table
   #distinctionsTable
   [value]="distinctionsWithArcher"
   [paginator]="true"
@@ -24,14 +28,54 @@
       <th pSortableColumn="Resultat.saison">
         Saison <p-sortIcon field="Resultat.saison" />
       </th>
-      <th>Distinction</th>
-      <th>Statut</th>
+      <th pSortableColumn="discipline">Distinction <p-sortIcon field="discipline"/></th>
+      <th style="width: 270px;">Statut</th>
     </tr>
     <tr>
       <th></th>
-      <th></th>
-      <th></th>
       <th style="z-index: 1000">
+        <p-columnFilter field="Resultat.saison" matchMode="in" [showMenu]="false">
+          <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+            <p-multiSelect
+              appendTo="body"
+              [ngModel]="value"
+              [options]="saisons"
+              placeholder="Tous"
+              (onChange)="filter($event.value)"
+            >
+              <ng-template let-option pTemplate="item">
+                <div class="inline-block vertical-align-middle">
+                  <span class="ml-1 mt-1">
+                    {{ option }}
+                  </span>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </ng-template>
+        </p-columnFilter>
+      </th>
+      <th>
+        <p-columnFilter field="discipline" matchMode="in" [showMenu]="false">
+          <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+            <p-multiSelect
+              appendTo="body"
+              [ngModel]="value"
+              [options]="disciplines"
+              placeholder="Toutes"
+              (onChange)="filter($event.value)"
+            >
+              <ng-template let-option pTemplate="item">
+                <div class="inline-block vertical-align-middle">
+                  <span class="ml-1 mt-1">
+                    {{ option }}
+                  </span>
+                </div>
+              </ng-template>
+            </p-multiSelect>
+          </ng-template>
+        </p-columnFilter>
+      </th>
+      <th style="z-index: 1000; width: 270px;">
         <p-columnFilter field="statut" matchMode="in" [showMenu]="false">
           <ng-template pTemplate="filter" let-value let-filter="filterCallback">
             <p-multiSelect
@@ -64,11 +108,11 @@
         {{d.discipline}} - {{ d.nom }} - {{d.distance}} ({{ d.Resultat.arme }}) : {{ d.Resultat.score }} le
         {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" }}
       </td>
-      <td>
+      <td style="display: flex; align-items: center; width: 270px;">
         <p-select
           [options]="statuts"
           [(ngModel)]="d.statut"
-          [style]="{ width: '90%' }"
+          [style]="{ width: '180px' }"
           (onChange)="onStatutChange(d, $event, distinctionsTable)"
           [disabled]="!editMode"
         ></p-select>

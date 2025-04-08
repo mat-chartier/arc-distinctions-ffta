@@ -34,14 +34,14 @@ class DistinctionRepo {
     return await Distinction.findOne({include: [{model: Resultat, where: {arme, discipline}}], where: { archerId, nom} });
   }
 
-  async isDistinctionEligible(archerId: number, discipline: string, noms: string[]): Promise<boolean> {
+  async isDistinctionEligible(archerId: number, discipline: string, noms: string[], distance: number): Promise<boolean> {
     return await Distinction.findOne({
       where: {
         archerId,
         nom: noms,
         discipline,
       },
-      include: [{ model: Resultat}],
+      include: [{ model: Resultat, where: { distance } }],
     }).then((distinction) => {
       return distinction === null;
     });

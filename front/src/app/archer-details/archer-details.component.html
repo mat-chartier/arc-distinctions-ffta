@@ -55,7 +55,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-resultat>
-    <tr>
+    <tr [attr.data-result-id]="resultat.id">
       <td>{{ resultat.saison }}</td>
       <td>{{ resultat.dateDebutConcours | date : "dd MMM yy" }}</td>
       <td>{{ resultat.arme }}</td>
