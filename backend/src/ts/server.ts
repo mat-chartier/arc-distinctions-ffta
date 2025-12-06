@@ -8,6 +8,7 @@ import { distinctionRepo } from "./db/distinctionRepo";
 import "dotenv/config";
 import EncryptionUtils from "./model/encryption-utils";
 import { authorizationManager } from "./model/authorization-manager";
+import fs from 'fs/promises';
 
 const app = express();
 app.use(cors());
@@ -46,9 +47,13 @@ async function checkRole(role: string, req: any, res: any): Promise<boolean> {
 }
 
 app.post("/import", upload.single("arc"), async (req, res, next) => {
-  if (await checkRole(ADMIN_ROLE, req, res)) {
-    await archerManager.import2(req.file!.path);
-    res.send({ status: "File uploaded successfully" });
+  try {
+    if (await checkRole(ADMIN_ROLE, req, res)) {
+      await archerManager.import2(req.file!.path);
+      res.send({ status: "File uploaded successfully" });
+    }
+  } finally {
+    await fs.unlink(req.file!.path);
   }
 });
 
