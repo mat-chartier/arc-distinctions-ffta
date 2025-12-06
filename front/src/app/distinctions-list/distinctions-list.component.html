@@ -1,5 +1,12 @@
-<h2>Liste des distinctions à commander ou à remettre aux archers
-</h2>
+<h2>Liste des distinctions à commander ou à remettre aux archers</h2>
+
+<div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+  <p-button 
+    icon="pi pi-download" 
+    label="Exporter en CSV" 
+    (onClick)="exportDistinctionsCSV()"
+  />
+</div>
 <div style="display: flex; align-items: center;">
   <div style="margin-bottom: 6px; margin-right: 0.5rem;">Edition </div>
   <p-toggleswitch [(ngModel)]="editMode" />
