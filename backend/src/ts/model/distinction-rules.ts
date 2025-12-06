@@ -275,6 +275,9 @@ class DistinctionRules {
         nomDistinction = "3 étoiles";
       }
     }
+    if (nomDistinction === null) {
+      return null; // no distinction found
+    }
     return {
       nom: nomDistinction,
       distance: resultat.distance,
@@ -309,6 +312,9 @@ class DistinctionRules {
           nomDistinction = "3 étoiles";
         }
       }
+    }
+    if (nomDistinction === null) {
+      return null; // no distinction found
     }
     return {
       nom: nomDistinction,
