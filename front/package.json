@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "deploy": "ng build && ../node_modules/.bin/firebase deploy --only hosting",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -20,6 +21,7 @@
     "@angular/router": "^19.1.0",
     "@primeng/themes": "^19.0.6",
     "cors": "^2.8.5",
+    "firebase": "^12.9.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.0.6",
     "rxjs": "~7.8.0",

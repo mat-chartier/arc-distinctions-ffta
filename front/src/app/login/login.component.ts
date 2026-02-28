@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { AuthenticationService } from '../services/authentication.service';
+import { AuthenticationService } from '../services/auth_service_firebase';
 import { CommonModule } from '@angular/common';
 
 @Component({

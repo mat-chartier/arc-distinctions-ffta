@@ -1,33 +1,78 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import { ApisService } from '../services/apis-service';
+import { AppStore } from '../services/app.store';
+
+interface DistinctionToOrder {
+  key: string;
+  value: {
+    count: number;
+    data: string[];
+  };
+}
 
 @Component({
   selector: 'app-distinctions-to-order',
-  imports: [TableModule],
+  standalone: true,
+  imports: [CommonModule, TableModule],
   templateUrl: './distinctions-to-order.component.html',
   styleUrl: './distinctions-to-order.component.scss',
 })
-export class DistinctionsToOrderComponent {
-  apisService = inject(ApisService);
-  distinctionsCLBBToOrder: any[] = [];
-  distinctionsCOToOrder: any[] = [];
-  distinctionsCLBBTAEDIToOrder: any[] = [];
-  distinctionsCOTAEDIToOrder: any[] = [];
-  distinctionsCLBBTAEDNToOrder: any[] = [];
-  distinctionsCOTAEDNToOrder: any[] = [];
-  ngOnInit() {
-    const url = 'distinctions/to-order';
-    this.apisService.get(url).then((data) => {
-      // map reduce data counting the number of distinctions to order grouped by the distinction name
-      // and also keeping the list of archer names for each distinction (stored in curr.archer.name)
+export class DistinctionsToOrderComponent implements OnInit {
+  firestoreService = inject(AppStore);
+  
+  distinctionsCLBBToOrder: DistinctionToOrder[] = [];
+  distinctionsCOToOrder: DistinctionToOrder[] = [];
+  distinctionsCLBBTAEDIToOrder: DistinctionToOrder[] = [];
+  distinctionsCOTAEDIToOrder: DistinctionToOrder[] = [];
+  distinctionsCLBBTAEDNToOrder: DistinctionToOrder[] = [];
+  distinctionsCOTAEDNToOrder: DistinctionToOrder[] = [];
+  
+  loading = true;
+  error: string = '';
 
+  async ngOnInit() {
+    try {
+      this.loading = true;
+      this.error = '';
+
+      // Récupérer les distinctions avec statut "À commander"
+      const distinctions = await this.firestoreService.getDistinctionsToOrder();
+      
+      // Récupérer tous les archers et résultats pour les jointures
+      const archers = await this.firestoreService.getArchers();
+      const resultats = await this.firestoreService.getResultats();
+      
+      // Créer des maps pour accès rapide
+      const archersMap = new Map(archers.map(a => [a.id, a]));
+      const resultatsMap = new Map(resultats.map(r => [r.id, r]));
+      
+      // Joindre les données
+      const data = distinctions
+        .map((d: any) => {
+          const archer = archersMap.get(d.archerId);
+          const resultat = resultatsMap.get(d.resultatId);
+          
+          if (!archer || !resultat) {
+            return null;
+          }
+          
+          return {
+            ...d,
+            Archer: archer,
+            Resultat: resultat
+          };
+        })
+        .filter((d): d is any => d !== null);
+
+      // Filtrer par discipline et arme
       let dataFilteredCLBBSalle: any[] = [];
       let dataFilteredCOSalle: any[] = [];
       let dataFilteredCLBBTAEDI: any[] = [];
       let dataFilteredCLBBTAEDN: any[] = [];
       let dataFilteredCOTAEDI: any[] = [];
       let dataFilteredCOTAEDN: any[] = [];
+
       data.forEach((resultat: any) => {
         if (resultat.discipline === 'Salle') {
           if (
@@ -77,13 +122,21 @@ export class DistinctionsToOrderComponent {
       this.distinctionsCOTAEDNToOrder = this.getDistinctionsToOrder(
         dataFilteredCOTAEDN
       );
-    });
-  }
-  getDistinctionsCLBBToOrder(dataFilteredCLBBSalle: any[]): any {
-    let distinctionsToOrder: any[] = this.getDistinctionsToOrder(dataFilteredCLBBSalle);
 
-    // sort distincstionsToOrder by arme first (CL, CO),
-    // and then in this order: Vert, Blanc, Noir, Bleu, Rouge, Jaune, 1 étoile, 2 étoiles, 3 étoiles
+      console.log('Distinctions à commander chargées');
+
+    } catch (error: any) {
+      console.error('Erreur lors du chargement des distinctions à commander:', error);
+      this.error = 'Erreur lors du chargement des distinctions';
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  getDistinctionsCLBBToOrder(dataFilteredCLBBSalle: any[]): DistinctionToOrder[] {
+    let distinctionsToOrder: DistinctionToOrder[] = this.getDistinctionsToOrder(dataFilteredCLBBSalle);
+    
+    // Tri par arme puis par ordre des distinctions
     distinctionsToOrder.sort((a, b) => {
       const armeA = a.key.split(' - ')[1];
       const armeB = b.key.split(' - ')[1];
@@ -112,7 +165,7 @@ export class DistinctionsToOrderComponent {
     return distinctionsToOrder;
   }
 
-  getDistinctionsToOrder(distinctions: any[]): any {
+  getDistinctionsToOrder(distinctions: any[]): DistinctionToOrder[] {
     let distinctionsToOrder = distinctions.reduce((acc: any, curr: any) => {
       let nom = curr.nom;
       if (curr.discipline === 'TAEDI') {
@@ -128,9 +181,9 @@ export class DistinctionsToOrderComponent {
       return acc;
     }, {});
 
-    // convert the object to an array of key-value pairs
+    // Convertir l'objet en tableau de paires clé-valeur
     return Object.entries(distinctionsToOrder).map(
-      ([key, value]) => ({ key, value })
+      ([key, value]) => ({ key, value } as DistinctionToOrder)
     );
   }
 }

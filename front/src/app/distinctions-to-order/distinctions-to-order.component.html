@@ -1,121 +1,174 @@
-<h2>Liste des distinctions commander</h2>
-<h3>Salle Classique</h3>
-<p-table
-  #distinctionsCLBBToOrderTable
-  [value]="distinctionsCLBBToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions Salle Arc Classique</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<h3>Salle Compound</h3>
-<p-table
-  #distinctionsCOToOrderTable
-  [value]="distinctionsCOToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions Salle Arc à Poulies</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<h3>TAE DI Classique</h3>
-<p-table
-  #distinctionsCLBBTAEDIToOrderTable
-  [value]="distinctionsCLBBTAEDIToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions TAE DI Classique</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<h3>TAE DI Compound</h3>
-<p-table
-  #distinctionsCOTAEDIToOrderTable
-  [value]="distinctionsCOTAEDIToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions TAE DI Compound</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<h3>TAE DN Classique</h3>
-<p-table
-  #distinctionsCLBBTAEDNToOrderTable
-  [value]="distinctionsCLBBTAEDNToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions TAE DN Classique</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<h3>TAE DN Compound</h3>
-<p-table
-  #distinctionsCOTAEDNToOrderTable
-  [value]="distinctionsCOTAEDNToOrder"
-  showGridlines
-  stripedRows
->
-  <ng-template #header>
-    <tr>
-      <th>Distinctions TAE DN Compound</th>
-      <th>Quantité à commander</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-item>
-    <tr>
-      <td>{{ item.key }}</td>
-      <td>{{ item.value.count }} : {{ item.value.data }}</td>
-    </tr>
-  </ng-template>
-</p-table>
+<div class="container mt-4">
+  <h2>Liste des distinctions à commander</h2>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Contenu -->
+  <div *ngIf="!loading && !error">
+    <h3>Salle Classique</h3>
+    <p-table
+      #distinctionsCLBBToOrderTable
+      [value]="distinctionsCLBBToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions Salle Arc Classique</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <h3 class="mt-4">Salle Compound</h3>
+    <p-table
+      #distinctionsCOToOrderTable
+      [value]="distinctionsCOToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions Salle Arc à Poulies</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <h3 class="mt-4">TAE DI Classique</h3>
+    <p-table
+      #distinctionsCLBBTAEDIToOrderTable
+      [value]="distinctionsCLBBTAEDIToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions TAE DI Classique</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <h3 class="mt-4">TAE DI Compound</h3>
+    <p-table
+      #distinctionsCOTAEDIToOrderTable
+      [value]="distinctionsCOTAEDIToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions TAE DI Compound</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <h3 class="mt-4">TAE DN Classique</h3>
+    <p-table
+      #distinctionsCLBBTAEDNToOrderTable
+      [value]="distinctionsCLBBTAEDNToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions TAE DN Classique</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <h3 class="mt-4">TAE DN Compound</h3>
+    <p-table
+      #distinctionsCOTAEDNToOrderTable
+      [value]="distinctionsCOTAEDNToOrder"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Distinctions TAE DN Compound</th>
+          <th>Quantité à commander</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.key }}</td>
+          <td>{{ item.value.count }} : {{ item.value.data }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction à commander</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

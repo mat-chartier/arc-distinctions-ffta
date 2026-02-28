@@ -4,13 +4,14 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 
-import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
+
 import {
   HTTP_INTERCEPTORS,
   provideHttpClient,
   withInterceptorsFromDi,
 } from '@angular/common/http';
+import Aura from '@primeng/themes/aura';
+import { providePrimeNG } from 'primeng/config';
 import { AuthInterceptor } from './services/auth-interceptor';
 
 export const appConfig: ApplicationConfig = {

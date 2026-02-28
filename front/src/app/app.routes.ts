@@ -4,7 +4,7 @@ import { ResultsUploadComponent } from './results-upload/results-upload.componen
 import { ArchersListComponent } from './archers-list/archers-list.component';
 import { DistinctionsListComponent } from './distinctions-list/distinctions-list.component';
 import { DistinctionsToOrderComponent } from './distinctions-to-order/distinctions-to-order.component';
-import { AuthGuardService } from './services/authguard.service';
+import { AuthGuardService } from './services/authguard_firebase';
 import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
 import { HomeComponent } from './home/home.component';
