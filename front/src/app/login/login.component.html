@@ -4,10 +4,10 @@
         <div class="card-body">
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                 <div class="mb-3">
-                    <label class="form-label">Licence</label>
+                    <label class="form-label">Email</label>
                     <input type="text" formControlName="licence" class="form-control" [ngClass]="{ 'is-invalid': submitted && f['licence'].errors }" />
                     <div *ngIf="submitted && f['licence'].errors" class="invalid-feedback">
-                        <div *ngIf="f['licence'].errors['required']">Veuillez saisir votre numéro de licence</div>
+                        <div *ngIf="f['licence'].errors['required']">Veuillez saisir votre email</div>
                     </div>
                 </div>
                 <div class="mb-3">

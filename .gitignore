@@ -1,0 +1,7 @@
+/.project
+node_modules
+package-lock.json
+
+# Firebase
+*-service-account-key.json
+front/.firebase/

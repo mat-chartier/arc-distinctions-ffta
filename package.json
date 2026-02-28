@@ -1,6 +1,12 @@
 {
     "scripts": {
         "backend:start:persist": "cd backend && npm run db:run:persist && npm run dev",
-        "frontend:start": "cd front && npm start"
+        "frontend:start": "cd front && npm start",
+        "frontend:deploy": "npm run --prefix front deploy"
+    },
+    "devDependencies": {
+        "firebase-admin": "^13.6.1",
+        "firebase-tools": "^14.27.0",
+        "pg": "^8.18.0"
     }
 }

@@ -4,9 +4,15 @@ import { Distinction } from "./distinction";
 import { Resultat } from "./resultat";
 import { Archer } from "./archer";
 class DistinctionRepo {
+
+  async delete(id: number) {
+    return await Distinction.destroy({ where: { id } });
+  }
+
   async updateStatus(id: number, statut: string) {
     return await Distinction.update({ statut }, { where: { id } });
   }
+  
   async getAllWithResultat(): Promise<Distinction[]> {
     return await Distinction.findAll({
       include: [Archer, Resultat],
@@ -16,7 +22,28 @@ class DistinctionRepo {
   async getToOrder(): Promise<Distinction[]> {
     return await Distinction.findAll({
       where: { statut: "A commander" },
-      include: [Resultat],
+      include: [Resultat, Archer],
+    });
+  }
+
+  async create(distinction: Pick<Distinction, "archerId" | "resultatId" | "statut" | "nom">) {
+    return await Distinction.create(distinction);
+  }
+
+  async getDistinction(archerId: number, nom: string, arme: string, discipline: string): Promise<Distinction | null> {
+    return await Distinction.findOne({include: [{model: Resultat, where: {arme, discipline}}], where: { archerId, nom} });
+  }
+
+  async isDistinctionEligible(archerId: number, discipline: string, noms: string[], distance: number): Promise<boolean> {
+    return await Distinction.findOne({
+      where: {
+        archerId,
+        nom: noms,
+        discipline,
+      },
+      include: [{ model: Resultat, where: { distance } }],
+    }).then((distinction) => {
+      return distinction === null;
     });
   }
 
@@ -34,7 +61,7 @@ class DistinctionRepo {
                     WHEN score between 545 and 555 then 'Jaune'
                     WHEN score between 530 and 544 then 'Rouge'
                     WHEN score between 515 and 529 then 'Bleu'
-                    WHEN score between 500 and 514 then 'Noir'
+                    WHEN score between 500 and 514 then 'Noire'
                     WHEN score between 480 and 499 then 'Blanc'
                     WHEN score between 455 and 479 then 'Vert (Promo)'
                 ELSE null

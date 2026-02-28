@@ -1,8 +1,266 @@
-<p-fileupload #fu 
-      mode="advanced" 
-      url="http://localhost:3000/import"
-      chooseLabel="Choose" 
-      chooseIcon="pi pi-upload" 
-      name="arc" 
-      accept="text/*" 
-      />
+<div class="container mt-4">
+  <h2>Import de résultats</h2>
+
+  <!-- ÉTAPE 1: Upload -->
+  <div *ngIf="step === 'upload'" class="card mt-3">
+    <div class="card-body">
+      <p-fileupload
+        #fu 
+        mode="advanced"
+        (onSelect)="onSelect($event)"
+        (onClear)="reset()"
+        [customUpload]="true"
+        chooseLabel="Choisir un fichier" 
+        chooseIcon="pi pi-file" 
+        [auto]="true"
+        name="arc" 
+        accept=".csv,.txt"
+        [showUploadButton]="false"
+        [showCancelButton]="false"
+      >
+        <ng-template pTemplate="content">
+          <p class="text-muted">
+            Glissez-déposez votre fichier CSV ici ou cliquez pour sélectionner.
+          </p>
+          <p class="text-muted small">
+            Format accepté : CSV avec séparateur point-virgule (;)
+          </p>
+        </ng-template>
+      </p-fileupload>
+
+      <!-- Error message -->
+      <div *ngIf="errorMessage" class="mt-3">
+        <p-message severity="error" [text]="errorMessage"></p-message>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2: Preview -->
+  <div *ngIf="step === 'preview'">
+    <!-- Statistiques -->
+    <div class="row mt-3">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-primary">{{ newArchers }}</h3>
+            <p class="mb-0">Nouveaux archers</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-success">{{ newResults }}</h3>
+            <p class="mb-0">Nouveaux résultats</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-info">{{ newDistinctions }}</h3>
+            <p class="mb-0">Nouvelles distinctions</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body">
+            <h3 class="text-warning">{{ skippedResults }}</h3>
+            <p class="mb-0">Résultats ignorés</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nouveaux archers -->
+    <div *ngIf="newArchers > 0" class="card mt-3">
+      <div class="card-header">
+        <h5>Nouveaux archers ({{ newArchers }})</h5>
+      </div>
+      <div class="card-body">
+        <p-table [value]="previewArchers" [rows]="10" [paginator]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Licence</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{ item.data.noLicence }}</td>
+              <td>{{ item.data.nom }}</td>
+              <td>{{ item.data.prenom }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Nouvelles distinctions -->
+    <div *ngIf="newDistinctions > 0" class="card mt-3">
+      <div class="card-header">
+        <h5>Nouvelles distinctions ({{ newDistinctions }})</h5>
+      </div>
+      <div class="card-body">
+        <p-table [value]="previewDistinctions" [rows]="10" [paginator]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nom Prénom</th>
+              <th>Arme</th>
+              <th>Discipline et distance</th>
+              <th>Date du concours</th>
+              <th>Score</th>
+              <th>Distinction</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{ item.data.archerNom }} {{ item.data.archerPrenom }}</td>
+              <td>{{ getArmeFromDistinction(item) }}</td>
+              <td>{{ item.data.discipline }} - {{ item.data.distance }}m</td>
+              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' }}</td>
+              <td>{{ item.data.score }}</td>
+              <td><strong>{{ item.data.nom }}</strong></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Résultats ignorés -->
+    <div *ngIf="skippedResults > 0" class="card mt-3">
+      <div class="card-header">
+        <h5>Résultats ignorés ({{ skippedResults }})</h5>
+      </div>
+      <div class="card-body">
+        <p-table 
+          [value]="getSkippedResults" 
+          [rows]="10" 
+          [paginator]="true"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nom Prénom</th>
+              <th>Arme</th>
+              <th>Discipline et distance</th>
+              <th>Date du concours</th>
+              <th>Score</th>
+              <th>Raison</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{ item.data.archerNom }} {{ item.data.archerPrenom }}</td>
+              <td>{{ item.data.arme }}</td>
+              <td>{{ item.data.discipline }} - {{ item.data.distance }}m</td>
+              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' }}</td>
+              <td>{{ item.data.score }}</td>
+              <td><span class="badge bg-warning">{{ item.reason }}</span></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="d-flex justify-content-between mt-4">
+      <p-button 
+        label="Annuler" 
+        icon="pi pi-times" 
+        severity="secondary"
+        (onClick)="cancelImport()"
+      ></p-button>
+      <p-button 
+        label="Confirmer l'import" 
+        icon="pi pi-check" 
+        severity="success"
+        (onClick)="confirmImport()"
+        [disabled]="newArchers === 0 && newResults === 0"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3: Import en cours -->
+  <div *ngIf="step === 'importing'" class="card mt-3">
+    <div class="card-body">
+      <h4 class="text-center">Import en cours...</h4>
+      <p-progressBar [value]="progress"></p-progressBar>
+      <p class="text-center mt-2">
+        {{ processedItems }} / {{ totalItems }} éléments traités
+      </p>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4: Terminé -->
+  <div *ngIf="step === 'done'" class="card mt-3">
+    <div class="card-body">
+      <p-message severity="success" [text]="successMessage"></p-message>
+      <div class="text-center mt-4">
+        <p-button 
+          label="Nouvel import" 
+          icon="pi pi-upload" 
+          (onClick)="reset()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documentation -->
+  <div class="card mt-4">
+    <div class="card-header" (click)="toggleFormatHelp()" style="cursor: pointer;">
+      <h5>
+        <i class="pi" [ngClass]="showFormatHelp ? 'pi-chevron-down' : 'pi-chevron-right'"></i>
+        Format du fichier CSV
+      </h5>
+    </div>
+    <div class="card-body" *ngIf="showFormatHelp">
+      <p>Le fichier CSV doit être au format FFTA standard (export des résultats). Les colonnes attendues sont :</p>
+      <div class="table-responsive">
+        <table class="table table-sm small">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom de la colonne</th>
+              <th>Description</th>
+              <th>Exemple</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>saison</td><td>Année de la saison</td><td>2024</td></tr>
+            <tr><td>2</td><td>discipline</td><td>Code discipline (S=Salle, T=TAE)</td><td>S</td></tr>
+            <tr><td>3</td><td>licence</td><td>Numéro de licence</td><td>123456A</td></tr>
+            <tr><td>4</td><td>nom</td><td>Nom de l'archer</td><td>DUPONT</td></tr>
+            <tr><td>5</td><td>prenom</td><td>Prénom de l'archer</td><td>Jean</td></tr>
+            <tr><td>6</td><td>horsF</td><td>Hors fédération</td><td></td></tr>
+            <tr><td>7</td><td>sexe</td><td>Sexe (M/F)</td><td>M</td></tr>
+            <tr><td>8</td><td>categorie</td><td>Catégorie d'âge</td><td>S3</td></tr>
+            <tr><td>9</td><td>categorieS</td><td>Catégorie scratch</td><td>SH</td></tr>
+            <tr><td>10</td><td>codeStructure</td><td>Code du club</td><td>0123456</td></tr>
+            <tr><td>11</td><td>nomStructure</td><td>Nom du club</td><td>ARC CLUB</td></tr>
+            <tr><td>12</td><td>arme</td><td>Type d'arme (CL/CO/BB)</td><td>CL</td></tr>
+            <tr><td>13</td><td>niveau</td><td>Niveau</td><td></td></tr>
+            <tr><td>14</td><td>score</td><td>Score total</td><td>545</td></tr>
+            <tr><td>15</td><td>paille</td><td>Nombre de pailles</td><td>10</td></tr>
+            <tr><td>16</td><td>dix</td><td>Nombre de 10</td><td>25</td></tr>
+            <tr><td>17</td><td>neuf</td><td>Nombre de 9</td><td>30</td></tr>
+            <tr><td>18</td><td>distance</td><td>Distance en mètres</td><td>18</td></tr>
+            <tr><td>19</td><td>blason</td><td>Taille du blason</td><td>40</td></tr>
+            <tr><td>20</td><td>dateDebutConcours</td><td>Date de début (format ISO)</td><td>2024-01-15</td></tr>
+            <tr><td>21</td><td>dateFinConcours</td><td>Date de fin</td><td>2024-01-15</td></tr>
+            <tr><td>22</td><td>lieuConcours</td><td>Lieu du concours</td><td>GRENOBLE</td></tr>
+            <tr><td>23</td><td>codeStructureOrga</td><td>Code club organisateur</td><td>0123456</td></tr>
+            <tr><td>24</td><td>nomStructureOrga</td><td>Nom club organisateur</td><td>ARC CLUB</td></tr>
+            <tr><td>25</td><td>formuleTir</td><td>Formule (2X18M, 2X25M + 2X18M)</td><td>2X18M</td></tr>
+            <tr><td>26-46</td><td>...</td><td>Autres colonnes FFTA</td><td></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted small mt-2">
+        <strong>Note :</strong> La première ligne (en-têtes) sera ignorée lors de l'import.
+        Le séparateur doit être un point-virgule (;).
+      </p>
+    </div>
+  </div>
+</div>

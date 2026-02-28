@@ -1,7 +1,6 @@
 import sequelize from "./connect";
 
 import { Table, Column, Model, HasMany, DataType } from "sequelize-typescript";
-import { Resultat } from "./resultat";
 
 @Table({
   tableName: "distinction",
@@ -39,4 +38,16 @@ export class Distinction extends Model {
     allowNull: false,
   })
   resultatId!: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })  
+  distance!: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  discipline!: string;
 }

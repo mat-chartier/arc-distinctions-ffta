@@ -8,6 +8,7 @@ import { distinctionRepo } from "./db/distinctionRepo";
 import "dotenv/config";
 import EncryptionUtils from "./model/encryption-utils";
 import { authorizationManager } from "./model/authorization-manager";
+import fs from 'fs/promises';
 
 const app = express();
 app.use(cors());
@@ -46,9 +47,13 @@ async function checkRole(role: string, req: any, res: any): Promise<boolean> {
 }
 
 app.post("/import", upload.single("arc"), async (req, res, next) => {
-  if (await checkRole(ADMIN_ROLE, req, res)) {
-    await archerManager.import(req.file!.path);
-    res.send({ status: "File uploaded successfully" });
+  try {
+    if (await checkRole(ADMIN_ROLE, req, res)) {
+      await archerManager.import2(req.file!.path);
+      res.send({ status: "File uploaded successfully" });
+    }
+  } finally {
+    await fs.unlink(req.file!.path);
   }
 });
 
@@ -57,6 +62,13 @@ app.post("/archers/distinction/:id/status", async (req, res, next) => {
     const input = req.body as { status: string };
     await distinctionRepo.updateStatus(parseInt(req.params.id), input.status);
     res.send({ status: "Status updated successfully !" });
+  }
+});
+
+app.post("/archers/distinction/:id/delete", async (req, res, next) => {
+  if (await checkRole(ADMIN_ROLE, req, res)) {
+    await distinctionRepo.delete(parseInt(req.params.id));
+    res.send({ status: "Distinction deleted successfully !" });
   }
 });
 
