@@ -5,3 +5,8 @@ package-lock.json
 # Firebase
 *-service-account-key.json
 front/.firebase/
+
+# Scripts locaux
+link_admin_user.js
+migration_script.js
+test-connection.js
