@@ -55,7 +55,8 @@ export class ResultsUploadComponent {
     try {
       this.reset();
       const file = event.files[0];
-      const text = await file.text();
+      const buffer = await file.arrayBuffer();
+      const text = new TextDecoder('iso-8859-1').decode(buffer);
       this.parsedResults = this.parseCSV(text);
       await this.generatePreview();
       this.step = 'preview';
@@ -236,7 +237,7 @@ export class ResultsUploadComponent {
       archerPrenom: archer.prenom
     };
 
-    const exists = existingResults.some((r: any) => {
+    const existingResult = existingResults.find((r: any) => {
       // Deux résultats sont identiques si même archer, date, départ, arme, score
       const sameArcher = r.archerId === result.archerId;
       // parseFirestoreDate gère les Timestamps Firestore, les objets {seconds,nanoseconds} et les ISO strings
@@ -249,7 +250,7 @@ export class ResultsUploadComponent {
       return sameArcher && sameDate && sameDepart && sameArme && sameScore;
     });
 
-    if (exists) {
+    if (existingResult) {
       this.previewData.push({
         type: 'resultat',
         action: 'skip',
@@ -257,6 +258,51 @@ export class ResultsUploadComponent {
         reason: 'Résultat déjà existant'
       });
       this.skippedResults++;
+
+      // Calculer les distinctions même pour les résultats déjà existants
+      // (cas de reimport après suppression manuelle des distinctions)
+      // Uniquement si c'est un vrai résultat Firestore (a un id réel)
+      if (existingResult.id) {
+        const distinction = distinctionRules.getDistinction(result);
+        if (distinction) {
+          const key = `${archer.id}_${result.arme}_${distinction.discipline}_${distinction.distance}`;
+          const existingBest = bestDistinctionsFromUpload.get(key);
+          if (!existingBest) {
+            bestDistinctionsFromUpload.set(key, {
+              archerId: archer.id,
+              nom: distinction.nom,
+              resultatId: existingResult.id,
+              statut: 'A commander',
+              distance: distinction.distance,
+              discipline: distinction.discipline,
+              rawDiscipline: result.discipline,
+              arme: result.arme,
+              archerNom: archer.nom,
+              archerPrenom: archer.prenom,
+              score: result.score,
+              dateDebutConcours: result.dateDebutConcours
+            });
+          } else {
+            const sameOrBetter = distinctionRules.getSameOrBetter(distinction.nom, distinction.discipline, result.arme);
+            if (sameOrBetter && !sameOrBetter.includes(existingBest.nom)) {
+              bestDistinctionsFromUpload.set(key, {
+                archerId: archer.id,
+                nom: distinction.nom,
+                resultatId: existingResult.id,
+                statut: 'A commander',
+                distance: distinction.distance,
+                discipline: distinction.discipline,
+                rawDiscipline: result.discipline,
+                arme: result.arme,
+                archerNom: archer.nom,
+                archerPrenom: archer.prenom,
+                score: result.score,
+                dateDebutConcours: result.dateDebutConcours
+              });
+            }
+          }
+        }
+      }
       return;
     }
 
@@ -282,6 +328,7 @@ export class ResultsUploadComponent {
           statut: 'A commander',
           distance: distinction.distance,
           discipline: distinction.discipline,
+          rawDiscipline: result.discipline,
           arme: result.arme,
           archerNom: archer.nom,
           archerPrenom: archer.prenom,
@@ -303,6 +350,7 @@ export class ResultsUploadComponent {
             statut: 'A commander',
             distance: distinction.distance,
             discipline: distinction.discipline,
+            rawDiscipline: result.discipline,
             arme: result.arme,
             archerNom: archer.nom,
             archerPrenom: archer.prenom,
@@ -372,25 +420,31 @@ export class ResultsUploadComponent {
           distinctionData.archerId = archerIdMap.get(licence) || distinctionData.archerId;
         }
 
-        // Recherche avec l'archerId ORIGINAL (temp_) car item.data n'est pas muté
-        const correspondingResultItem = itemsToCreate.find(i =>
-          i.type === 'resultat' &&
-          i.data.archerId === originalArcherId &&
-          i.data.distance === distinctionData.distance &&
-          i.data.discipline === distinctionData.discipline
-        );
+        // Si resultatId est déjà un vrai ID Firestore (résultat existant), pas besoin de lookup
+        if (distinctionData.resultatId === 'temp_result') {
+          // Recherche avec l'archerId ORIGINAL (temp_) car item.data n'est pas muté
+          const correspondingResultItem = itemsToCreate.find(i =>
+            i.type === 'resultat' &&
+            i.data.archerId === originalArcherId &&
+            i.data.distance === distinctionData.distance &&
+            i.data.arme === distinctionData.arme &&
+            i.data.score === distinctionData.score &&
+            i.data.discipline === distinctionData.rawDiscipline
+          );
 
-        if (correspondingResultItem) {
-          distinctionData.resultatId = resultatIdMap.get(JSON.stringify(correspondingResultItem.data));
-          console.log(`[Import] Distinction "${distinctionData.nom}" : resultatId=${distinctionData.resultatId} (trouvé=${!!distinctionData.resultatId})`);
-        } else {
-          console.warn(`[Import] Distinction "${distinctionData.nom}" : aucun résultat correspondant trouvé (archerId=${originalArcherId}, discipline=${distinctionData.discipline}, distance=${distinctionData.distance})`);
+          if (correspondingResultItem) {
+            distinctionData.resultatId = resultatIdMap.get(JSON.stringify(correspondingResultItem.data));
+            console.log(`[Import] Distinction "${distinctionData.nom}" : resultatId=${distinctionData.resultatId} (trouvé=${!!distinctionData.resultatId})`);
+          } else {
+            console.warn(`[Import] Distinction "${distinctionData.nom}" : aucun résultat correspondant trouvé (archerId=${originalArcherId}, discipline=${distinctionData.discipline}, distance=${distinctionData.distance})`);
+          }
         }
 
         delete distinctionData.archerNom;
         delete distinctionData.archerPrenom;
         delete distinctionData.score;
         delete distinctionData.dateDebutConcours;
+        delete distinctionData.rawDiscipline;
 
         await this.firestoreService.addDistinction(distinctionData);
 

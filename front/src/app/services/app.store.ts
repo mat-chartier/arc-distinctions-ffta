@@ -2,8 +2,6 @@ import { Injectable, inject, signal } from '@angular/core';
 import { FirestoreService } from './firestore.service';
 import { ArcherDoc, ResultatDoc, DistinctionDoc, ArcherWithResultsData } from '../model/firestore-types';
 
-const TTL_MS = 24 * 60 * 60 * 1000; // 24 heures
-
 const STORAGE_KEYS = {
   archers:      'cache:archers',
   resultats:    'cache:resultats',
@@ -45,13 +43,70 @@ export class AppStore {
   private resultatsCache    = signal<ResultatDoc[]    | null>(null);
   private distinctionsCache = signal<DistinctionDoc[] | null>(null);
 
-  // Timestamps de dernière hydratation (plain property, pas besoin d'être réactif)
+  // Timestamps de dernière hydratation (ms depuis epoch)
   private archersFetchedAt:      number | null = null;
   private resultatsFetchedAt:    number | null = null;
   private distinctionsFetchedAt: number | null = null;
 
-  private isExpired(fetchedAt: number | null): boolean {
-    return fetchedAt === null || Date.now() - fetchedAt > TTL_MS;
+  // Dernières versions serveur reçues via onSnapshot
+  private serverArchersVersion:      number = 0;
+  private serverResultatsVersion:    number = 0;
+  private serverDistinctionsVersion: number = 0;
+
+  // Promesse résolue dès le premier snapshot du listener de version
+  private ready: Promise<void>;
+  private resolveReady!: () => void;
+
+  constructor() {
+    this.ready = new Promise(resolve => { this.resolveReady = resolve; });
+    this.startCacheVersionListener();
+  }
+
+  // ── Listener version serveur ───────────────────────────────────────────────
+
+  private startCacheVersionListener(): void {
+    this.firestoreService.subscribeToCacheVersion(
+      (data) => {
+        console.log('[Cache] onSnapshot cacheVersion reçu', data);
+        if (data) {
+          const serverArchers      = parseFirestoreDate(data['archers'])?.getTime()      ?? 0;
+          const serverResultats    = parseFirestoreDate(data['resultats'])?.getTime()    ?? 0;
+          const serverDistinctions = parseFirestoreDate(data['distinctions'])?.getTime() ?? 0;
+
+          this.serverArchersVersion      = serverArchers;
+          this.serverResultatsVersion    = serverResultats;
+          this.serverDistinctionsVersion = serverDistinctions;
+
+          console.log('[Cache] comparaison archers      — server:', serverArchers,      'fetchedAt:', this.archersFetchedAt);
+          console.log('[Cache] comparaison resultats    — server:', serverResultats,    'fetchedAt:', this.resultatsFetchedAt);
+          console.log('[Cache] comparaison distinctions — server:', serverDistinctions, 'fetchedAt:', this.distinctionsFetchedAt);
+
+          if (this.archersFetchedAt !== null && serverArchers > this.archersFetchedAt) {
+            this.archersCache.set(null);
+            this.archersFetchedAt = null;
+            this.removeFromStorage(STORAGE_KEYS.archers);
+            console.log('[Cache] archers invalidé par version serveur');
+          }
+          if (this.resultatsFetchedAt !== null && serverResultats > this.resultatsFetchedAt) {
+            this.resultatsCache.set(null);
+            this.resultatsFetchedAt = null;
+            this.removeFromStorage(STORAGE_KEYS.resultats);
+            console.log('[Cache] resultats invalidé par version serveur');
+          }
+          if (this.distinctionsFetchedAt !== null && serverDistinctions > this.distinctionsFetchedAt) {
+            this.distinctionsCache.set(null);
+            this.distinctionsFetchedAt = null;
+            this.removeFromStorage(STORAGE_KEYS.distinctions);
+            console.log('[Cache] distinctions invalidé par version serveur');
+          }
+        }
+        this.resolveReady();
+      },
+      (error) => {
+        console.error('[Cache] Erreur listener version:', error);
+        this.resolveReady(); // Ne pas bloquer l'app en cas d'erreur réseau
+      }
+    );
   }
 
   // ── localStorage ──────────────────────────────────────────────────────────
@@ -83,25 +138,27 @@ export class AppStore {
   // ── Helpers internes ──────────────────────────────────────────────────────
 
   private async loadArchers(): Promise<ArcherDoc[]> {
-    let cached = this.archersCache();
+    await this.ready;
 
-    if (cached === null) {
-      const stored = this.readFromStorage<ArcherDoc>(STORAGE_KEYS.archers);
-      if (stored && !this.isExpired(stored.fetchedAt)) {
-        this.archersCache.set(stored.data);
-        this.archersFetchedAt = stored.fetchedAt;
-        cached = stored.data;
-        console.log(`[Cache HIT] archers (localStorage, ${cached.length})`);
-        return cached;
-      }
-    }
-
-    if (cached !== null && !this.isExpired(this.archersFetchedAt)) {
+    const cached = this.archersCache();
+    if (cached !== null) {
       console.log(`[Cache HIT] archers (${cached.length})`);
       return cached;
     }
 
-    console.log(`[Cache MISS] archers (${cached === null ? 'null' : 'expiré'}) → Firestore`);
+    const stored = this.readFromStorage<ArcherDoc>(STORAGE_KEYS.archers);
+    if (stored && this.serverArchersVersion <= stored.fetchedAt) {
+      this.archersCache.set(stored.data);
+      this.archersFetchedAt = stored.fetchedAt;
+      console.log(`[Cache HIT] archers (localStorage, ${stored.data.length})`);
+      return stored.data;
+    }
+    if (stored) {
+      console.log('[Cache] archers localStorage périmé vs version serveur → Firestore');
+      this.removeFromStorage(STORAGE_KEYS.archers);
+    }
+
+    console.log('[Cache MISS] archers → Firestore');
     const data = await this.firestoreService.getArchers();
     this.archersCache.set(data);
     this.archersFetchedAt = Date.now();
@@ -110,25 +167,27 @@ export class AppStore {
   }
 
   private async loadResultats(): Promise<ResultatDoc[]> {
-    let cached = this.resultatsCache();
+    await this.ready;
 
-    if (cached === null) {
-      const stored = this.readFromStorage<ResultatDoc>(STORAGE_KEYS.resultats);
-      if (stored && !this.isExpired(stored.fetchedAt)) {
-        this.resultatsCache.set(stored.data);
-        this.resultatsFetchedAt = stored.fetchedAt;
-        cached = stored.data;
-        console.log(`[Cache HIT] resultats (localStorage, ${cached.length})`);
-        return cached;
-      }
-    }
-
-    if (cached !== null && !this.isExpired(this.resultatsFetchedAt)) {
+    const cached = this.resultatsCache();
+    if (cached !== null) {
       console.log(`[Cache HIT] resultats (${cached.length})`);
       return cached;
     }
 
-    console.log(`[Cache MISS] resultats (${cached === null ? 'null' : 'expiré'}) → Firestore`);
+    const stored = this.readFromStorage<ResultatDoc>(STORAGE_KEYS.resultats);
+    if (stored && this.serverResultatsVersion <= stored.fetchedAt) {
+      this.resultatsCache.set(stored.data);
+      this.resultatsFetchedAt = stored.fetchedAt;
+      console.log(`[Cache HIT] resultats (localStorage, ${stored.data.length})`);
+      return stored.data;
+    }
+    if (stored) {
+      console.log('[Cache] resultats localStorage périmé vs version serveur → Firestore');
+      this.removeFromStorage(STORAGE_KEYS.resultats);
+    }
+
+    console.log('[Cache MISS] resultats → Firestore');
     const data = await this.firestoreService.getResultats();
     this.resultatsCache.set(data);
     this.resultatsFetchedAt = Date.now();
@@ -137,25 +196,28 @@ export class AppStore {
   }
 
   private async loadDistinctions(): Promise<DistinctionDoc[]> {
-    let cached = this.distinctionsCache();
+    await this.ready;
 
-    if (cached === null) {
-      const stored = this.readFromStorage<DistinctionDoc>(STORAGE_KEYS.distinctions);
-      if (stored && !this.isExpired(stored.fetchedAt)) {
-        this.distinctionsCache.set(stored.data);
-        this.distinctionsFetchedAt = stored.fetchedAt;
-        cached = stored.data;
-        console.log(`[Cache HIT] distinctions (localStorage, ${cached.length})`);
-        return cached;
-      }
-    }
-
-    if (cached !== null && !this.isExpired(this.distinctionsFetchedAt)) {
+    const cached = this.distinctionsCache();
+    if (cached !== null) {
       console.log(`[Cache HIT] distinctions (${cached.length})`);
       return cached;
     }
 
-    console.log(`[Cache MISS] distinctions (${cached === null ? 'null' : 'expiré'}) → Firestore`);
+    const stored = this.readFromStorage<DistinctionDoc>(STORAGE_KEYS.distinctions);
+    console.log('[Cache] distinctions localStorage fetchedAt:', stored?.fetchedAt, 'serverVersion:', this.serverDistinctionsVersion);
+    if (stored && this.serverDistinctionsVersion <= stored.fetchedAt) {
+      this.distinctionsCache.set(stored.data);
+      this.distinctionsFetchedAt = stored.fetchedAt;
+      console.log(`[Cache HIT] distinctions (localStorage, ${stored.data.length})`);
+      return stored.data;
+    }
+    if (stored) {
+      console.log('[Cache] distinctions localStorage périmé vs version serveur → Firestore');
+      this.removeFromStorage(STORAGE_KEYS.distinctions);
+    }
+
+    console.log('[Cache MISS] distinctions → Firestore');
     const data = await this.firestoreService.getDistinctions();
     this.distinctionsCache.set(data);
     this.distinctionsFetchedAt = Date.now();
@@ -163,7 +225,7 @@ export class AppStore {
     return data;
   }
 
-  // ── Invalidation globale (bouton refresh ou TTL forcé) ────────────────────
+  // ── Invalidation globale (bouton refresh) ─────────────────────────────────
 
   invalidateAll(): void {
     this.archersCache.set(null);
@@ -189,26 +251,38 @@ export class AppStore {
   }
 
   async addArcher(archerData: any) {
-    const result = await this.firestoreService.addArcher(archerData);
-    this.archersCache.set(null);
-    this.archersFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.archers);
-    return result;
+    const docRef = await this.firestoreService.addArcher(archerData);
+    const current = this.archersCache();
+    if (current !== null) {
+      const updated = [...current, { id: docRef.id, ...archerData } as ArcherDoc];
+      this.archersFetchedAt = Date.now();
+      this.archersCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.archers, updated, this.archersFetchedAt);
+    }
+    return docRef;
   }
 
   async updateArcher(id: string, archerData: any) {
     const result = await this.firestoreService.updateArcher(id, archerData);
-    this.archersCache.set(null);
-    this.archersFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.archers);
+    const current = this.archersCache();
+    if (current !== null) {
+      const updated = current.map(a => a.id === id ? { ...a, ...archerData } : a);
+      this.archersFetchedAt = Date.now();
+      this.archersCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.archers, updated, this.archersFetchedAt);
+    }
     return result;
   }
 
   async deleteArcher(id: string) {
     const result = await this.firestoreService.deleteArcher(id);
-    this.archersCache.set(null);
-    this.archersFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.archers);
+    const current = this.archersCache();
+    if (current !== null) {
+      const updated = current.filter(a => a.id !== id);
+      this.archersFetchedAt = Date.now();
+      this.archersCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.archers, updated, this.archersFetchedAt);
+    }
     return result;
   }
 
@@ -228,23 +302,38 @@ export class AppStore {
   }
 
   async addResultat(resultatData: any) {
-    const result = await this.firestoreService.addResultat(resultatData);
-    this.resultatsCache.set(null);
-    this.resultatsFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.resultats);
-    return result;
+    const docRef = await this.firestoreService.addResultat(resultatData);
+    const current = this.resultatsCache();
+    if (current !== null) {
+      const updated = [...current, { id: docRef.id, ...resultatData } as ResultatDoc];
+      this.resultatsFetchedAt = Date.now();
+      this.resultatsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.resultats, updated, this.resultatsFetchedAt);
+    }
+    return docRef;
   }
 
-  // Passthrough sans invalidation : les résultats sont immuables
   async updateResultat(id: string, resultatData: any) {
-    return this.firestoreService.updateResultat(id, resultatData);
+    const result = await this.firestoreService.updateResultat(id, resultatData);
+    const current = this.resultatsCache();
+    if (current !== null) {
+      const updated = current.map(r => r.id === id ? { ...r, ...resultatData } : r);
+      this.resultatsFetchedAt = Date.now();
+      this.resultatsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.resultats, updated, this.resultatsFetchedAt);
+    }
+    return result;
   }
 
   async deleteResultat(id: string) {
     const result = await this.firestoreService.deleteResultat(id);
-    this.resultatsCache.set(null);
-    this.resultatsFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.resultats);
+    const current = this.resultatsCache();
+    if (current !== null) {
+      const updated = current.filter(r => r.id !== id);
+      this.resultatsFetchedAt = Date.now();
+      this.resultatsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.resultats, updated, this.resultatsFetchedAt);
+    }
     return result;
   }
 
@@ -268,26 +357,38 @@ export class AppStore {
   }
 
   async addDistinction(distinctionData: any) {
-    const result = await this.firestoreService.addDistinction(distinctionData);
-    this.distinctionsCache.set(null);
-    this.distinctionsFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.distinctions);
-    return result;
+    const docRef = await this.firestoreService.addDistinction(distinctionData);
+    const current = this.distinctionsCache();
+    if (current !== null) {
+      const updated = [...current, { id: docRef.id, ...distinctionData } as DistinctionDoc];
+      this.distinctionsFetchedAt = Date.now();
+      this.distinctionsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.distinctions, updated, this.distinctionsFetchedAt);
+    }
+    return docRef;
   }
 
   async updateDistinction(id: string, distinctionData: any) {
     const result = await this.firestoreService.updateDistinction(id, distinctionData);
-    this.distinctionsCache.set(null);
-    this.distinctionsFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.distinctions);
+    const current = this.distinctionsCache();
+    if (current !== null) {
+      const updated = current.map(d => d.id === id ? { ...d, ...distinctionData } : d);
+      this.distinctionsFetchedAt = Date.now();
+      this.distinctionsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.distinctions, updated, this.distinctionsFetchedAt);
+    }
     return result;
   }
 
   async deleteDistinction(id: string) {
     const result = await this.firestoreService.deleteDistinction(id);
-    this.distinctionsCache.set(null);
-    this.distinctionsFetchedAt = null;
-    this.removeFromStorage(STORAGE_KEYS.distinctions);
+    const current = this.distinctionsCache();
+    if (current !== null) {
+      const updated = current.filter(d => d.id !== id);
+      this.distinctionsFetchedAt = Date.now();
+      this.distinctionsCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.distinctions, updated, this.distinctionsFetchedAt);
+    }
     return result;
   }
 

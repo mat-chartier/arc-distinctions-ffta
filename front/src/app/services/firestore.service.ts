@@ -8,6 +8,8 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  setDoc,
+  onSnapshot,
   query,
   where,
   orderBy,
@@ -28,6 +30,21 @@ export class FirestoreService {
     // Utiliser l'app Firebase déjà initialisée par AuthenticationService
     const app = getApp();
     this.firestore = getFirestore(app);
+  }
+
+  // ============ CACHE VERSION ============
+
+  subscribeToCacheVersion(
+    onData: (data: any) => void,
+    onError: (err: any) => void
+  ): () => void {
+    const versionRef = doc(this.firestore, 'meta', 'cacheVersion');
+    return onSnapshot(versionRef, snap => onData(snap.exists() ? snap.data() : null), onError);
+  }
+
+  private async updateCacheVersion(col: 'archers' | 'resultats' | 'distinctions'): Promise<void> {
+    const versionRef = doc(this.firestore, 'meta', 'cacheVersion');
+    await setDoc(versionRef, { [col]: Timestamp.now() }, { merge: true });
   }
 
   // ============ ARCHERS ============
@@ -55,22 +72,25 @@ export class FirestoreService {
   async addArcher(archerData: any) {
     console.log('[Firestore] ADD archer');
     const archersCol = collection(this.firestore, 'archers');
-    return await addDoc(archersCol, {
-      ...archerData,
-      createdAt: Timestamp.now()
-    });
+    const result = await addDoc(archersCol, { ...archerData, createdAt: Timestamp.now() });
+    this.updateCacheVersion('archers').catch(console.error);
+    return result;
   }
 
   async updateArcher(id: string, archerData: any) {
     console.log('[Firestore] UPDATE archer', id);
     const archerRef = doc(this.firestore, 'archers', id);
-    return await updateDoc(archerRef, archerData);
+    const result = await updateDoc(archerRef, archerData);
+    this.updateCacheVersion('archers').catch(console.error);
+    return result;
   }
 
   async deleteArcher(id: string) {
     console.log('[Firestore] DELETE archer', id);
     const archerRef = doc(this.firestore, 'archers', id);
-    return await deleteDoc(archerRef);
+    const result = await deleteDoc(archerRef);
+    this.updateCacheVersion('archers').catch(console.error);
+    return result;
   }
 
   // ============ RESULTATS ============
@@ -109,22 +129,25 @@ export class FirestoreService {
   async addResultat(resultatData: any) {
     console.log('[Firestore] ADD resultat');
     const resultatsCol = collection(this.firestore, 'resultats');
-    return await addDoc(resultatsCol, {
-      ...resultatData,
-      createdAt: Timestamp.now()
-    });
+    const result = await addDoc(resultatsCol, { ...resultatData, createdAt: Timestamp.now() });
+    this.updateCacheVersion('resultats').catch(console.error);
+    return result;
   }
 
   async updateResultat(id: string, resultatData: any) {
     console.log('[Firestore] UPDATE resultat', id);
     const resultatRef = doc(this.firestore, 'resultats', id);
-    return await updateDoc(resultatRef, resultatData);
+    const result = await updateDoc(resultatRef, resultatData);
+    this.updateCacheVersion('resultats').catch(console.error);
+    return result;
   }
 
   async deleteResultat(id: string) {
     console.log('[Firestore] DELETE resultat', id);
     const resultatRef = doc(this.firestore, 'resultats', id);
-    return await deleteDoc(resultatRef);
+    const result = await deleteDoc(resultatRef);
+    this.updateCacheVersion('resultats').catch(console.error);
+    return result;
   }
 
   // ============ DISTINCTIONS ============
@@ -162,22 +185,25 @@ export class FirestoreService {
   async addDistinction(distinctionData: any) {
     console.log('[Firestore] ADD distinction');
     const distinctionsCol = collection(this.firestore, 'distinctions');
-    return await addDoc(distinctionsCol, {
-      ...distinctionData,
-      createdAt: Timestamp.now()
-    });
+    const result = await addDoc(distinctionsCol, { ...distinctionData, createdAt: Timestamp.now() });
+    this.updateCacheVersion('distinctions').catch(console.error);
+    return result;
   }
 
   async updateDistinction(id: string, distinctionData: any) {
     console.log('[Firestore] UPDATE distinction', id);
     const distinctionRef = doc(this.firestore, 'distinctions', id);
-    return await updateDoc(distinctionRef, distinctionData);
+    const result = await updateDoc(distinctionRef, distinctionData);
+    this.updateCacheVersion('distinctions').catch(console.error);
+    return result;
   }
 
   async deleteDistinction(id: string) {
     console.log('[Firestore] DELETE distinction', id);
     const distinctionRef = doc(this.firestore, 'distinctions', id);
-    return await deleteDoc(distinctionRef);
+    const result = await deleteDoc(distinctionRef);
+    this.updateCacheVersion('distinctions').catch(console.error);
+    return result;
   }
 
   // ============ QUERIES COMPLEXES ============
