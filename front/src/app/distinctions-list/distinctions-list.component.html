@@ -127,8 +127,8 @@
           </td>
           <td>{{ d.Resultat.saison }}</td>
           <td>
-            {{d.discipline}} - {{ d.nom }} - {{d.distance}} ({{ d.Resultat.arme }}) : 
-            {{ d.Resultat.score }} le {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" }}
+            {{ getDisciplineDisplay(d) }} - {{ getNomDisplay(d) }}<ng-container *ngIf="d.distance > 0"> - {{d.distance}}m</ng-container> ({{ d.Resultat.arme }}) :
+            {{ d.Resultat.score }} le {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" : "UTC" }}
           </td>
           <td style="display: flex; align-items: center; width: 270px;">
             <p-select

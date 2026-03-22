@@ -26,6 +26,7 @@ interface Resultat {
   dateDebutConcours: Date;
   saison: number;
   discipline: string;
+  piquet?: string;
   createdAt?: any;
 }
 
@@ -37,6 +38,7 @@ interface DistinctionWithResultat {
   statut: string;
   distance: number;
   discipline: string;
+  piquet?: string;
   Resultat: Resultat;
 }
 
@@ -63,6 +65,37 @@ export class ArcherDetailsComponent implements OnInit {
   loading = true;
   error = '';
 
+  getDisciplineDisplay(d: DistinctionWithResultat): string {
+    if (d.discipline === 'CAMPAGNE_MARCASSIN' || d.discipline === 'CAMPAGNE_ECUREUIL') {
+      return `Campagne - Piquet ${d.piquet}`;
+    }
+    return d.discipline;
+  }
+
+  getNomDisplay(d: DistinctionWithResultat): string {
+    if (d.discipline === 'CAMPAGNE_MARCASSIN') return `Marcassin - ${d.nom}`;
+    if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
+    return d.nom;
+  }
+
+  getResultatDisciplineDisplay(r: Resultat): string {
+    switch (r.discipline) {
+      case 'S': return 'Salle';
+      case 'T': return 'TAE';
+      case 'C': return 'Campagne';
+      case '3': return '3D';
+      case 'N': return 'Nature';
+      default: return r.discipline;
+    }
+  }
+
+  getResultatLocationDisplay(r: Resultat): string {
+    if (r.discipline === 'C') {
+      return r.piquet ? `Piquet ${r.piquet}` : '-';
+    }
+    return r.distance ? `${r.distance}m` : '-';
+  }
+
   async ngOnInit(): Promise<void> {
     this.route.params.subscribe(async (params) => {
       try {
@@ -78,9 +111,10 @@ export class ArcherDetailsComponent implements OnInit {
         }
 
         // Convertir les Timestamps Firestore en Dates
+        const shiftDate = (d: Date | null) => d ? new Date(d.getTime() + 12 * 3600 * 1000) : null;
         const resultats = data.resultats.map((r: any) => ({
           ...r,
-          dateDebutConcours: parseFirestoreDate(r.dateDebutConcours)
+          dateDebutConcours: shiftDate(parseFirestoreDate(r.dateDebutConcours))
         })) as Resultat[];
 
         // Créer un map des résultats pour jointure rapide

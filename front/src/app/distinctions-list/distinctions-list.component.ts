@@ -7,7 +7,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
 import { AppStore, parseFirestoreDate } from '../services/app.store';
-import { ArcherDoc, ResultatDoc, DistinctionDoc } from '../model/firestore-types';
+import { ArcherDoc, ResultatDoc } from '../model/firestore-types';
 
 interface DistinctionWithArcherAndResultat {
   id: string;
@@ -47,7 +47,7 @@ export class DistinctionsListComponent implements OnInit {
 
   statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
-  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'Campagne', '3D', 'Nature'];
+  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D', 'Nature'];
 
   @ViewChild('distinctionsTable') distinctionsTable!: Table;
 
@@ -83,7 +83,8 @@ export class DistinctionsListComponent implements OnInit {
           }
           
           // Convertir le timestamp en Date
-          const dateDebutConcours = parseFirestoreDate(resultat.dateDebutConcours);
+          const rawDate = parseFirestoreDate(resultat.dateDebutConcours);
+          const dateDebutConcours = rawDate ? new Date(rawDate.getTime() + 12 * 3600 * 1000) : null;
           
           // Collecter les saisons uniques
           if (!this.saisons.includes(resultat.saison.toString())) {
@@ -152,6 +153,19 @@ export class DistinctionsListComponent implements OnInit {
       console.error('Erreur lors de la suppression:', error);
       this.error = 'Erreur lors de la suppression de la distinction';
     }
+  }
+
+  getDisciplineDisplay(d: any): string {
+    if (d.discipline === 'CAMPAGNE_MARCASSIN' || d.discipline === 'CAMPAGNE_ECUREUIL') {
+      return `Campagne - Piquet ${d.piquet}`;
+    }
+    return d.discipline;
+  }
+
+  getNomDisplay(d: any): string {
+    if (d.discipline === 'CAMPAGNE_MARCASSIN') return `Marcassin - ${d.nom}`;
+    if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
+    return d.nom;
   }
 
   exportDistinctionsCSV() {

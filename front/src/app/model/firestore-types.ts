@@ -23,6 +23,7 @@ export interface ResultatDoc {
   dateDebutConcours: any; // Timestamp Firestore
   saison: number;
   discipline: string;
+  piquet?: string;
   createdAt?: any;
 }
 
@@ -34,6 +35,7 @@ export interface DistinctionDoc {
   statut: string;
   distance: number;
   discipline: string;
+  piquet?: string;
   createdAt?: any;
 }
 
