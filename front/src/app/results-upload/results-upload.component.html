@@ -119,10 +119,39 @@
             <tr>
               <td>{{ item.data.archerNom }} {{ item.data.archerPrenom }}</td>
               <td>{{ getArmeFromDistinction(item) }}</td>
-              <td>{{ item.data.discipline }} - {{ item.data.distance }}m</td>
-              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' }}</td>
+              <td>{{ getDistinctionDisciplineDisplay(item) }}</td>
+              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' : 'UTC' }}</td>
               <td>{{ item.data.score }}</td>
-              <td><strong>{{ item.data.nom }}</strong></td>
+              <td><strong>{{ getDistinctionNomDisplay(item) }}</strong></td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Nouveaux résultats -->
+    <div *ngIf="newResults > 0" class="card mt-3">
+      <div class="card-header">
+        <h5>Nouveaux résultats ({{ newResults }})</h5>
+      </div>
+      <div class="card-body">
+        <p-table [value]="getNewResults" [rows]="10" [paginator]="true">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nom Prénom</th>
+              <th>Arme</th>
+              <th>Discipline et distance</th>
+              <th>Date du concours</th>
+              <th>Score</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td>{{ item.data.archerNom }} {{ item.data.archerPrenom }}</td>
+              <td>{{ item.data.arme }}</td>
+              <td>{{ getResultDisciplineDisplay(item) }}</td>
+              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' : 'UTC' }}</td>
+              <td>{{ item.data.score }}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -154,8 +183,8 @@
             <tr>
               <td>{{ item.data.archerNom }} {{ item.data.archerPrenom }}</td>
               <td>{{ item.data.arme }}</td>
-              <td>{{ item.data.discipline }} - {{ item.data.distance }}m</td>
-              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' }}</td>
+              <td>{{ getResultDisciplineDisplay(item) }}</td>
+              <td>{{ item.data.dateDebutConcours | date : 'dd/MM/yyyy' : 'UTC' }}</td>
               <td>{{ item.data.score }}</td>
               <td><span class="badge bg-warning">{{ item.reason }}</span></td>
             </tr>

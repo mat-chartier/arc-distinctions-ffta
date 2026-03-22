@@ -5,12 +5,14 @@ interface Resultat {
   blason: string;
   arme: string;
   categorie: string;
+  piquet?: string;
 }
 
 interface Distinction {
   nom: string;
   distance: number;
   discipline: string;
+  piquet?: string;
 }
 
 class DistinctionRules {
@@ -39,6 +41,20 @@ class DistinctionRules {
     "4 Archers (or)",
     "Archer d'or (or)",
   ];
+  DISTINCTIONS_CAMPAGNE_MARCASSIN = [
+    "Vert sur fond blanc ", 
+    "Argent sur fond vert", 
+    "Or sur fond blanc", 
+    "Or sur fond noir "
+  ];
+  DISTINCTIONS_CAMPAGNE_ECUREUIL = [
+    "Vert sur fond blanc",
+    "Argent sur fond vert",
+    "Or sur fond blanc",
+    "Or sur fond noir",
+    "Or sur fond bleu",
+    "Or sur fond rouge",
+  ];
 
   getSameOrBetter(
     nom: string,
@@ -61,6 +77,14 @@ class DistinctionRules {
         this.DISTINCTIONS_TAE_DN_CL.findIndex(
           (distinction) => distinction === nom
         )
+      );
+    } else if (discipline === "CAMPAGNE_MARCASSIN") {
+      return this.DISTINCTIONS_CAMPAGNE_MARCASSIN.slice(
+        this.DISTINCTIONS_CAMPAGNE_MARCASSIN.findIndex((d) => d === nom)
+      );
+    } else if (discipline === "CAMPAGNE_ECUREUIL") {
+      return this.DISTINCTIONS_CAMPAGNE_ECUREUIL.slice(
+        this.DISTINCTIONS_CAMPAGNE_ECUREUIL.findIndex((d) => d === nom)
       );
     }
     return null;
@@ -88,8 +112,45 @@ class DistinctionRules {
   get3DDistinction(resultat: Resultat): Distinction {
     throw new Error("Method not implemented.");
   }
-  getCampagneDistinction(resultat: Resultat): Distinction {
-    throw new Error("Method not implemented.");
+  getCampagneDistinction(resultat: Resultat): Distinction | null {
+    const { arme, categorie, score } = resultat;
+    const dist = { discipline: "CAMPAGNE", distance: 0 };
+
+    const MARCASSIN_CAT = ["U13", "U15", "U18"];
+    const ADULT_CAT = ["U21", "S1", "S2", "S3"];
+
+    const piquet = resultat.piquet;
+
+    // Marcassins : CL uniquement, U13/U15/U18
+    if (arme === "CL" && MARCASSIN_CAT.includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(score, this.DISTINCTIONS_CAMPAGNE_MARCASSIN, [160, 210, 270, 320], { ...dist, discipline: "CAMPAGNE_MARCASSIN", piquet });
+    }
+    // Écureuils CL : U21+
+    if (arme === "CL" && ADULT_CAT.includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(score, this.DISTINCTIONS_CAMPAGNE_ECUREUIL, [200, 240, 260, 300, 340, 380], { ...dist, discipline: "CAMPAGNE_ECUREUIL", piquet });
+    }
+    // Écureuils CO : U18+
+    if (arme === "CO" && [...MARCASSIN_CAT.slice(-1), ...ADULT_CAT].includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(score, this.DISTINCTIONS_CAMPAGNE_ECUREUIL, [220, 260, 280, 320, 360, 400], { ...dist, discipline: "CAMPAGNE_ECUREUIL", piquet });
+    }
+    // Écureuils BB U18
+    if (arme === "BB" && categorie === "U18") {
+      return this.getCampagneDistinctionByThresholds(score, this.DISTINCTIONS_CAMPAGNE_ECUREUIL, [160, 200, 220, 260, 300, 340], { ...dist, discipline: "CAMPAGNE_ECUREUIL", piquet });
+    }
+    // Écureuils BB adultes : U21+
+    if (arme === "BB" && ADULT_CAT.includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(score, this.DISTINCTIONS_CAMPAGNE_ECUREUIL, [180, 220, 240, 280, 320, 360], { ...dist, discipline: "CAMPAGNE_ECUREUIL", piquet });
+    }
+    return null;
+  }
+
+  private getCampagneDistinctionByThresholds(score: number, noms: string[], seuils: number[], dist: any): Distinction | null {
+    for (let i = seuils.length - 1; i >= 0; i--) {
+      if (score >= seuils[i]) {
+        return { ...dist, nom: noms[i] };
+      }
+    }
+    return null;
   }
   getTAEDistinction(resultat: Resultat): Distinction | null {
     const d = this.getTAEDistinctionTemplate(resultat);

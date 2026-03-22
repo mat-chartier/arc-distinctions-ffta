@@ -27,6 +27,10 @@ export class DistinctionsToOrderComponent implements OnInit {
   distinctionsCOTAEDIToOrder: DistinctionToOrder[] = [];
   distinctionsCLBBTAEDNToOrder: DistinctionToOrder[] = [];
   distinctionsCOTAEDNToOrder: DistinctionToOrder[] = [];
+  distinctionsCampagneMarcassinToOrder: DistinctionToOrder[] = [];
+  distinctionsCampagneEcureuilCLToOrder: DistinctionToOrder[] = [];
+  distinctionsCampagneEcureuilCOToOrder: DistinctionToOrder[] = [];
+  distinctionsCampagneEcureuilBBToOrder: DistinctionToOrder[] = [];
   
   loading = true;
   error: string = '';
@@ -72,56 +76,53 @@ export class DistinctionsToOrderComponent implements OnInit {
       let dataFilteredCLBBTAEDN: any[] = [];
       let dataFilteredCOTAEDI: any[] = [];
       let dataFilteredCOTAEDN: any[] = [];
+      let dataFilteredCampagneMarcassin: any[] = [];
+      let dataFilteredCampagneEcureuilCL: any[] = [];
+      let dataFilteredCampagneEcureuilCO: any[] = [];
+      let dataFilteredCampagneEcureuilBB: any[] = [];
 
       data.forEach((resultat: any) => {
         if (resultat.discipline === 'Salle') {
-          if (
-            resultat.Resultat.arme === 'CL' ||
-            resultat.Resultat.arme === 'BB'
-          ) {
+          if (resultat.Resultat.arme === 'CL' || resultat.Resultat.arme === 'BB') {
             dataFilteredCLBBSalle.push(resultat);
           } else {
             dataFilteredCOSalle.push(resultat);
           }
         } else if (resultat.discipline === 'TAEDI') {
-          if (
-            resultat.Resultat.arme === 'CL' ||
-            resultat.Resultat.arme === 'BB'
-          ) {
+          if (resultat.Resultat.arme === 'CL' || resultat.Resultat.arme === 'BB') {
             dataFilteredCLBBTAEDI.push(resultat);
           } else {
             dataFilteredCOTAEDI.push(resultat);
           }
         } else if (resultat.discipline === 'TAEDN') {
-          if (
-            resultat.Resultat.arme === 'CL' ||
-            resultat.Resultat.arme === 'BB'
-          ) {
+          if (resultat.Resultat.arme === 'CL' || resultat.Resultat.arme === 'BB') {
             dataFilteredCLBBTAEDN.push(resultat);
           } else {
             dataFilteredCOTAEDN.push(resultat);
           }
+        } else if (resultat.discipline === 'CAMPAGNE_MARCASSIN') {
+          dataFilteredCampagneMarcassin.push(resultat);
+        } else if (resultat.discipline === 'CAMPAGNE_ECUREUIL') {
+          if (resultat.Resultat.arme === 'CL') {
+            dataFilteredCampagneEcureuilCL.push(resultat);
+          } else if (resultat.Resultat.arme === 'CO') {
+            dataFilteredCampagneEcureuilCO.push(resultat);
+          } else if (resultat.Resultat.arme === 'BB') {
+            dataFilteredCampagneEcureuilBB.push(resultat);
+          }
         }
       });
 
-      this.distinctionsCLBBToOrder = this.getDistinctionsCLBBToOrder(
-        dataFilteredCLBBSalle
-      );
-      this.distinctionsCOToOrder = this.getDistinctionsToOrder(
-        dataFilteredCOSalle
-      );
-      this.distinctionsCLBBTAEDIToOrder = this.getDistinctionsToOrder(
-        dataFilteredCLBBTAEDI
-      );
-      this.distinctionsCOTAEDIToOrder = this.getDistinctionsToOrder(
-        dataFilteredCOTAEDI
-      );
-      this.distinctionsCLBBTAEDNToOrder = this.getDistinctionsToOrder(
-        dataFilteredCLBBTAEDN
-      );
-      this.distinctionsCOTAEDNToOrder = this.getDistinctionsToOrder(
-        dataFilteredCOTAEDN
-      );
+      this.distinctionsCLBBToOrder = this.getDistinctionsCLBBToOrder(dataFilteredCLBBSalle);
+      this.distinctionsCOToOrder = this.getDistinctionsToOrder(dataFilteredCOSalle);
+      this.distinctionsCLBBTAEDIToOrder = this.getDistinctionsToOrder(dataFilteredCLBBTAEDI);
+      this.distinctionsCOTAEDIToOrder = this.getDistinctionsToOrder(dataFilteredCOTAEDI);
+      this.distinctionsCLBBTAEDNToOrder = this.getDistinctionsToOrder(dataFilteredCLBBTAEDN);
+      this.distinctionsCOTAEDNToOrder = this.getDistinctionsToOrder(dataFilteredCOTAEDN);
+      this.distinctionsCampagneMarcassinToOrder = this.getDistinctionsToOrder(dataFilteredCampagneMarcassin);
+      this.distinctionsCampagneEcureuilCLToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilCL);
+      this.distinctionsCampagneEcureuilCOToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilCO);
+      this.distinctionsCampagneEcureuilBBToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilBB);
 
       console.log('Distinctions à commander chargées');
 

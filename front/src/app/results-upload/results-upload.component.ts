@@ -100,14 +100,19 @@ export class ResultsUploadComponent {
     }
 
     for (const [key, distinctionInfo] of bestDistinctionsFromUpload.entries()) {
-      const [archerId, arme, discipline, distance] = key.split('_');
+      const [archerId, arme, discipline, distanceOrPiquet] = key.split('|');
 
       const existingForKey = existingDistinctions.filter(d => {
-        const resultat = existingResults.find(r => r.id === d.resultatId);
+        const locationMatch = (d as any).piquet
+          ? (d as any).piquet === distanceOrPiquet
+          : d.distance === parseInt(distanceOrPiquet);
+        const armeMatch = (d as any).arme
+          ? (d as any).arme === arme
+          : existingResults.find(r => r.id === d.resultatId)?.arme === arme;
         return d.archerId === archerId &&
                d.discipline === discipline &&
-               d.distance === parseInt(distance) &&
-               resultat?.arme === arme;
+               locationMatch &&
+               armeMatch;
       });
 
       let shouldCreate = true;
@@ -211,6 +216,32 @@ export class ResultsUploadComponent {
         resultRaw, archer, existingResults, bestDistinctionsFromUpload,
         { distance: resultRaw.distance, score: resultRaw.score }
       );
+    } else if (resultRaw.discipline === 'C') {
+      const PIQUET_MAP: Record<number, string> = { 1: 'rouge', 2: 'bleu', 3: 'blanc' };
+      const piquet = PIQUET_MAP[resultRaw.distance];
+      const MAX_SINGLE_SCORE = 3 * 6 * 24; // 432
+      const isTwoDay = resultRaw.score > MAX_SINGLE_SCORE
+        || resultRaw.formuleTir?.includes('X2')
+        || resultRaw.distinction?.split(',').map(s => s.trim()).includes('A');
+      if (isTwoDay) {
+        if (resultRaw.scoreDist1 > 0) {
+          this.processResultForBestDistinction(
+            resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+            { score: resultRaw.scoreDist1, piquet }
+          );
+        }
+        if (resultRaw.scoreDist3 > 0) {
+          this.processResultForBestDistinction(
+            resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+            { score: resultRaw.scoreDist3, piquet }
+          );
+        }
+      } else {
+        this.processResultForBestDistinction(
+          resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+          { score: resultRaw.score, piquet }
+        );
+      }
     }
   }
 
@@ -229,6 +260,7 @@ export class ResultsUploadComponent {
       blason: overrides.blason || resultRaw.blason,
       categorie: resultRaw.categorie,
       numDepart: resultRaw.numDepart,
+      piquet: overrides.piquet,
       saison: resultRaw.saison,
       discipline: resultRaw.discipline,
       score: overrides.score || resultRaw.score,
@@ -242,7 +274,8 @@ export class ResultsUploadComponent {
       const sameArcher = r.archerId === result.archerId;
       // parseFirestoreDate gère les Timestamps Firestore, les objets {seconds,nanoseconds} et les ISO strings
       const rDate = parseFirestoreDate(r.dateDebutConcours);
-      const sameDate = rDate ? rDate.getTime() === result.dateDebutConcours.getTime() : false;
+      const toDay = (d: Date) => new Date(d.getTime() + 12 * 3600 * 1000).toISOString().substring(0, 10);
+      const sameDate = rDate ? toDay(rDate) === toDay(result.dateDebutConcours) : false;
       const sameDepart = r.numDepart === result.numDepart;
       const sameArme = r.arme === result.arme;
       const sameScore = r.score === result.score;
@@ -265,7 +298,7 @@ export class ResultsUploadComponent {
       if (existingResult.id) {
         const distinction = distinctionRules.getDistinction(result);
         if (distinction) {
-          const key = `${archer.id}_${result.arme}_${distinction.discipline}_${distinction.distance}`;
+          const key = `${archer.id}|${result.arme}|${distinction.discipline}|${distinction.piquet ?? distinction.distance}`;
           const existingBest = bestDistinctionsFromUpload.get(key);
           if (!existingBest) {
             bestDistinctionsFromUpload.set(key, {
@@ -275,6 +308,7 @@ export class ResultsUploadComponent {
               statut: 'A commander',
               distance: distinction.distance,
               discipline: distinction.discipline,
+              piquet: distinction.piquet,
               rawDiscipline: result.discipline,
               arme: result.arme,
               archerNom: archer.nom,
@@ -284,7 +318,9 @@ export class ResultsUploadComponent {
             });
           } else {
             const sameOrBetter = distinctionRules.getSameOrBetter(distinction.nom, distinction.discipline, result.arme);
-            if (sameOrBetter && !sameOrBetter.includes(existingBest.nom)) {
+            const newIsBetter = sameOrBetter && !sameOrBetter.includes(existingBest.nom);
+            const sameDistinctionHigherScore = distinction.nom === existingBest.nom && result.score > (existingBest.score ?? 0);
+            if (newIsBetter || sameDistinctionHigherScore) {
               bestDistinctionsFromUpload.set(key, {
                 archerId: archer.id,
                 nom: distinction.nom,
@@ -292,6 +328,7 @@ export class ResultsUploadComponent {
                 statut: 'A commander',
                 distance: distinction.distance,
                 discipline: distinction.discipline,
+                piquet: distinction.piquet,
                 rawDiscipline: result.discipline,
                 arme: result.arme,
                 archerNom: archer.nom,
@@ -317,7 +354,7 @@ export class ResultsUploadComponent {
     const distinction = distinctionRules.getDistinction(result);
 
     if (distinction) {
-      const key = `${archer.id}_${result.arme}_${distinction.discipline}_${distinction.distance}`;
+      const key = `${archer.id}|${result.arme}|${distinction.discipline}|${distinction.piquet ?? distinction.distance}`;
       const existingBest = bestDistinctionsFromUpload.get(key);
 
       if (!existingBest) {
@@ -328,6 +365,7 @@ export class ResultsUploadComponent {
           statut: 'A commander',
           distance: distinction.distance,
           discipline: distinction.discipline,
+          piquet: distinction.piquet,
           rawDiscipline: result.discipline,
           arme: result.arme,
           archerNom: archer.nom,
@@ -341,8 +379,10 @@ export class ResultsUploadComponent {
           distinction.discipline,
           result.arme
         );
+        const newIsBetter = sameOrBetter && !sameOrBetter.includes(existingBest.nom);
+        const sameDistinctionHigherScore = distinction.nom === existingBest.nom && result.score > (existingBest.score ?? 0);
 
-        if (sameOrBetter && !sameOrBetter.includes(existingBest.nom)) {
+        if (newIsBetter || sameDistinctionHigherScore) {
           bestDistinctionsFromUpload.set(key, {
             archerId: archer.id,
             nom: distinction.nom,
@@ -350,6 +390,7 @@ export class ResultsUploadComponent {
             statut: 'A commander',
             distance: distinction.distance,
             discipline: distinction.discipline,
+            piquet: distinction.piquet,
             rawDiscipline: result.discipline,
             arme: result.arme,
             archerNom: archer.nom,
@@ -423,13 +464,17 @@ export class ResultsUploadComponent {
         // Si resultatId est déjà un vrai ID Firestore (résultat existant), pas besoin de lookup
         if (distinctionData.resultatId === 'temp_result') {
           // Recherche avec l'archerId ORIGINAL (temp_) car item.data n'est pas muté
+          // Pour le campagne, matcher sur piquet (distance=0 dans la distinction, 1/2/3 dans le résultat)
+          const isCampagne = ['CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL'].includes(distinctionData.discipline);
           const correspondingResultItem = itemsToCreate.find(i =>
             i.type === 'resultat' &&
             i.data.archerId === originalArcherId &&
-            i.data.distance === distinctionData.distance &&
             i.data.arme === distinctionData.arme &&
             i.data.score === distinctionData.score &&
-            i.data.discipline === distinctionData.rawDiscipline
+            i.data.discipline === distinctionData.rawDiscipline &&
+            (isCampagne
+              ? i.data.piquet === distinctionData.piquet
+              : i.data.distance === distinctionData.distance)
           );
 
           if (correspondingResultItem) {
@@ -502,10 +547,12 @@ export class ResultsUploadComponent {
 
   parseDate(dateStr: string): Date {
     if (dateStr.includes('-')) {
+      // "YYYY-MM-DD" → UTC minuit (comportement natif de new Date pour les dates ISO)
       return new Date(dateStr);
     } else if (dateStr.includes('/')) {
+      // "dd/MM/yyyy" → UTC minuit explicite pour cohérence
       const parts = dateStr.split('/');
-      return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+      return new Date(Date.UTC(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])));
     }
     return new Date(dateStr);
   }
@@ -542,5 +589,29 @@ export class ResultsUploadComponent {
   
   getArmeFromDistinction(item: PreviewItem): string {
     return item.data.arme || '';
+  }
+
+  getResultDisciplineDisplay(item: PreviewItem): string {
+    const d = item.data;
+    if (d.discipline === 'C') {
+      return `Campagne - Piquet ${d.piquet ?? d.distance}`;
+    }
+    return `${d.discipline} - ${d.distance}m`;
+  }
+
+  getDistinctionDisciplineDisplay(item: PreviewItem): string {
+    const d = item.data;
+    if (d.discipline === 'CAMPAGNE_MARCASSIN' || d.discipline === 'CAMPAGNE_ECUREUIL') {
+      return `Campagne - Piquet ${d.piquet}`;
+    }
+    if (d.distance > 0) return `${d.discipline} - ${d.distance}m`;
+    return d.discipline;
+  }
+
+  getDistinctionNomDisplay(item: PreviewItem): string {
+    const d = item.data;
+    if (d.discipline === 'CAMPAGNE_MARCASSIN') return `Marcassin - ${d.nom}`;
+    if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
+    return d.nom;
   }
 }
