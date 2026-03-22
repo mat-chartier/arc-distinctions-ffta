@@ -6,3 +6,20 @@ body.arc-distinctions-app {
 button.p-button {
     margin: 0.5rem;
 }
+
+/* Tables: scroll horizontalement sur petits écrans */
+.p-datatable-wrapper {
+    overflow-x: auto;
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    body.arc-distinctions-app {
+        margin: 0.25rem;
+    }
+
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}

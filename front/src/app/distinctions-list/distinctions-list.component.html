@@ -44,10 +44,11 @@
       [globalFilterFields]="['statut']"
       stateStorage="session"
       stateKey="distinctions-list-session"
+      scrollable
     >
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="Archer.nom">
+          <th pSortableColumn="Archer.nom" pFrozenColumn>
             Archer <p-sortIcon field="Archer.nom" />
           </th>
           <th pSortableColumn="Resultat.saison">
@@ -56,10 +57,10 @@
           <th pSortableColumn="discipline">
             Distinction <p-sortIcon field="discipline"/>
           </th>
-          <th style="width: 270px;">Statut</th>
+          <th style="min-width: 200px;">Statut</th>
         </tr>
         <tr>
-          <th></th>
+          <th pFrozenColumn></th>
           <th style="z-index: 1000">
             <p-columnFilter field="Resultat.saison" matchMode="in" [showMenu]="false">
               <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -98,7 +99,7 @@
               </ng-template>
             </p-columnFilter>
           </th>
-          <th style="z-index: 1000; width: 270px;">
+          <th style="z-index: 1000; min-width: 200px;">
             <p-columnFilter field="statut" matchMode="in" [showMenu]="false">
               <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                 <p-multiSelect
@@ -122,7 +123,7 @@
 
       <ng-template pTemplate="body" let-d>
         <tr>
-          <td>
+          <td pFrozenColumn>
             {{ d.Archer.nom }} {{ d.Archer.prenom }} ({{ d.Archer.noLicence }})
           </td>
           <td>{{ d.Resultat.saison }}</td>
@@ -130,11 +131,11 @@
             {{ getDisciplineDisplay(d) }} - {{ getNomDisplay(d) }}<ng-container *ngIf="d.distance > 0"> - {{d.distance}}m</ng-container> ({{ d.Resultat.arme }}) :
             {{ d.Resultat.score }} le {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" : "UTC" }}
           </td>
-          <td style="display: flex; align-items: center; width: 270px;">
+          <td style="min-width: 200px;">
             <p-select
               [options]="statuts"
               [(ngModel)]="d.statut"
-              [style]="{ width: '180px' }"
+              styleClass="w-full"
               (onChange)="onStatutChange(d, $event, distinctionsTable)"
               [disabled]="!editMode"
             ></p-select>
