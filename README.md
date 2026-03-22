@@ -5,7 +5,7 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
 ## Fonctionnalités
 
 - **Import de résultats** : import de fichiers CSV au format FFTA (export officiel), avec prévisualisation avant confirmation
-- **Calcul automatique des distinctions** : détection des distinctions obtenues selon les barèmes officiels (Salle, Tir À l'Étoile intérieur/nuit, Tir Campagne Marcassins/Écureuils)
+- **Calcul automatique des distinctions** : détection des distinctions obtenues selon les barèmes officiels (Salle, TAE DI / DN, Tir Campagne)
 - **Liste des distinctions** : suivi du statut de chaque distinction (à commander, à remettre, donnée…)
 - **Distinctions à commander** : vue regroupée par type pour faciliter les commandes
 - **Fiche archer** : historique des résultats et distinctions par archer
