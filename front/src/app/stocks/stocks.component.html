@@ -33,7 +33,7 @@
 
       <input
         type="number"
-        min="1"
+        min="0"
         class="form-control"
         style="width: 6rem;"
         [(ngModel)]="newQuantite"
@@ -43,7 +43,7 @@
         icon="pi pi-plus"
         label="Ajouter au stock"
         (onClick)="addStock()"
-        [disabled]="!selectedType || newQuantite < 1"
+        [disabled]="!selectedType || newQuantite == null || newQuantite < 0"
       />
     </div>
 

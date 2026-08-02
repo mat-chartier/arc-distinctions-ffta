@@ -86,7 +86,7 @@ export class StocksComponent implements OnInit {
   }
 
   async addStock() {
-    if (!this.selectedType || this.newQuantite == null || this.newQuantite < 1) return;
+    if (!this.selectedType || this.newQuantite == null || this.newQuantite < 0) return;
     const t = this.selectedType;
     const data: any = {
       discipline: t.discipline,
