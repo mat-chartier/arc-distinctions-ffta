@@ -8,6 +8,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
 import { AppStore, parseFirestoreDate } from '../services/app.store';
 import { ArcherDoc, ResultatDoc } from '../model/firestore-types';
+import { buildStockKey } from '../model/stock-key';
 
 interface DistinctionWithArcherAndResultat {
   id: string;
@@ -45,6 +46,9 @@ export class DistinctionsListComponent implements OnInit {
   loading = true;
   error: string = '';
 
+  // Stock disponible par clé de type de distinction (#27)
+  stockByKey = new Map<string, { id: string; quantite: number }>();
+
   statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
   disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D', 'Nature'];
@@ -66,7 +70,11 @@ export class DistinctionsListComponent implements OnInit {
       // Récupérer tous les archers et résultats pour faire les jointures
       const archers = await this.firestoreService.getArchers();
       const resultats = await this.firestoreService.getResultats();
-      
+
+      // Récupérer les stocks et indexer par clé de type (#27)
+      const stocks = await this.firestoreService.getStocks();
+      this.stockByKey = new Map(stocks.map(s => [s.key, { id: s.id, quantite: s.quantite }]));
+
       // Créer des maps pour accès rapide
       const archersMap = new Map(archers.map(a => [a.id, a]));
       const resultatsMap = new Map(resultats.map(r => [r.id, r]));
@@ -120,10 +128,21 @@ export class DistinctionsListComponent implements OnInit {
       item.statut = event.value;
       
       // Mettre à jour dans Firestore
-      await this.firestoreService.updateDistinction(item.id, { 
-        statut: item.statut 
+      await this.firestoreService.updateDistinction(item.id, {
+        statut: item.statut
       });
-      
+
+      // Décrément automatique du stock au passage à « Donnée » (#27, plancher à 0)
+      if (event.value === 'Donnée') {
+        const key = this.getStockKey(item);
+        const stock = this.stockByKey.get(key);
+        if (stock && stock.quantite > 0) {
+          const quantite = stock.quantite - 1;
+          await this.firestoreService.updateStock(stock.id, { quantite });
+          stock.quantite = quantite;
+        }
+      }
+
       // Rafraîchir le filtre du tableau
       distinctionsTable._filter();
       
@@ -153,6 +172,18 @@ export class DistinctionsListComponent implements OnInit {
       console.error('Erreur lors de la suppression:', error);
       this.error = 'Erreur lors de la suppression de la distinction';
     }
+  }
+
+  private getStockKey(d: any): string {
+    return buildStockKey({
+      discipline: d.discipline,
+      nom: d.nom,
+      arme: d.Resultat?.arme,
+    });
+  }
+
+  getStockCount(d: any): number {
+    return this.stockByKey.get(this.getStockKey(d))?.quantite ?? 0;
   }
 
   getDisciplineDisplay(d: any): string {

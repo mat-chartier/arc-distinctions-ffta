@@ -1,0 +1,99 @@
+<div class="container mt-4">
+  <h2>Gestion des stocks de distinctions</h2>
+  <p class="text-muted">
+    Réserve de distinctions physiques déjà en votre possession. Le stock
+    s'incrémente ici manuellement et se décrémente automatiquement quand une
+    distinction passe à « Donnée ».
+  </p>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <!-- Ajout d'une entrée de stock -->
+    <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+      <p-select
+        [options]="typeOptions"
+        optionLabel="label"
+        [(ngModel)]="selectedType"
+        placeholder="Choisir un type de distinction…"
+        [filter]="true"
+        filterBy="label"
+        appendTo="body"
+        [style]="{ 'min-width': '22rem' }"
+        emptyMessage="Aucun type disponible (tous déjà en stock)"
+      ></p-select>
+
+      <input
+        type="number"
+        min="1"
+        class="form-control"
+        style="width: 6rem;"
+        [(ngModel)]="newQuantite"
+      />
+
+      <p-button
+        icon="pi pi-plus"
+        label="Ajouter au stock"
+        (onClick)="addStock()"
+        [disabled]="!selectedType || newQuantite < 1"
+      />
+    </div>
+
+    <!-- Table des stocks -->
+    <p-table
+      [value]="stocks"
+      [paginator]="stocks.length > 50"
+      [rows]="50"
+      sortMode="multiple"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="label">
+            Type de distinction <p-sortIcon field="label" />
+          </th>
+          <th pSortableColumn="quantite" style="width: 12rem; text-align: center;">
+            Quantité en stock <p-sortIcon field="quantite" />
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.label }}</td>
+          <td style="text-align: center;">
+            <div class="d-inline-flex align-items-center gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                (click)="changeQuantite(row, row.quantite - 1)"
+                [disabled]="row.quantite <= 0"
+              >−</button>
+              <span style="min-width: 2rem; display: inline-block;">{{ row.quantite }}</span>
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                (click)="changeQuantite(row, row.quantite + 1)"
+              >+</button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="2" class="text-center">Aucune distinction en stock</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

@@ -4,6 +4,7 @@ import { ResultsUploadComponent } from './results-upload/results-upload.componen
 import { ArchersListComponent } from './archers-list/archers-list.component';
 import { DistinctionsListComponent } from './distinctions-list/distinctions-list.component';
 import { DistinctionsToOrderComponent } from './distinctions-to-order/distinctions-to-order.component';
+import { StocksComponent } from './stocks/stocks.component';
 import { AuthGuardService } from './services/authguard_firebase';
 import { LoginComponent } from './login/login.component';
 import { NgModule } from '@angular/core';
@@ -16,6 +17,7 @@ export const routes: Routes = [
     { path: 'archers-list', component: ArchersListComponent, canActivate: [AuthGuardService]},
     { path: 'distinctions-list', component: DistinctionsListComponent, canActivate: [AuthGuardService]},
     { path: 'distinctions-to-order', component: DistinctionsToOrderComponent, canActivate: [AuthGuardService]},
+    { path: 'stocks', component: StocksComponent, canActivate: [AuthGuardService]},
     { path: '', component: HomeComponent, canActivate: [AuthGuardService]},
     { path: 'login', component: LoginComponent },
     { path: 'unauthorized', component: UnauthorizedComponent },

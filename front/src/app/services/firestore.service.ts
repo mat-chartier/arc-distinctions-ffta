@@ -19,6 +19,7 @@ import {
 } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
 import { ArcherDoc, ResultatDoc, DistinctionDoc, ArcherWithResultsData } from '../model/firestore-types';
+import { StockDoc } from '../model/stock-key';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +43,7 @@ export class FirestoreService {
     return onSnapshot(versionRef, snap => onData(snap.exists() ? snap.data() : null), onError);
   }
 
-  private async updateCacheVersion(col: 'archers' | 'resultats' | 'distinctions'): Promise<void> {
+  private async updateCacheVersion(col: 'archers' | 'resultats' | 'distinctions' | 'stocks'): Promise<void> {
     const versionRef = doc(this.firestore, 'meta', 'cacheVersion');
     await setDoc(versionRef, { [col]: Timestamp.now() }, { merge: true });
   }
@@ -214,6 +215,42 @@ export class FirestoreService {
     const distinctionRef = doc(this.firestore, 'distinctions', id);
     const result = await deleteDoc(distinctionRef);
     this.updateCacheVersion('distinctions').catch(console.error);
+    return result;
+  }
+
+  // ============ STOCKS ============
+
+  async getStocks(): Promise<StockDoc[]> {
+    console.log('[Firestore] GET stocks');
+    const stocksCol = collection(this.firestore, 'stocks');
+    const stocksSnapshot = await getDocs(stocksCol);
+    return stocksSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as StockDoc));
+  }
+
+  async addStock(stockData: any) {
+    console.log('[Firestore] ADD stock');
+    const stocksCol = collection(this.firestore, 'stocks');
+    const result = await addDoc(stocksCol, this.stripUndefined({ ...stockData, updatedAt: Timestamp.now() }));
+    this.updateCacheVersion('stocks').catch(console.error);
+    return result;
+  }
+
+  async updateStock(id: string, stockData: any) {
+    console.log('[Firestore] UPDATE stock', id);
+    const stockRef = doc(this.firestore, 'stocks', id);
+    const result = await updateDoc(stockRef, this.stripUndefined({ ...stockData, updatedAt: Timestamp.now() }));
+    this.updateCacheVersion('stocks').catch(console.error);
+    return result;
+  }
+
+  async deleteStock(id: string) {
+    console.log('[Firestore] DELETE stock', id);
+    const stockRef = doc(this.firestore, 'stocks', id);
+    const result = await deleteDoc(stockRef);
+    this.updateCacheVersion('stocks').catch(console.error);
     return result;
   }
 

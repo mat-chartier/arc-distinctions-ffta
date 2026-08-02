@@ -68,6 +68,11 @@ export class AppComponent {
             icon: 'pi pi-shopping-cart',
             routerLink: '/distinctions-to-order',
           },
+          {
+            label: 'Stocks',
+            icon: 'pi pi-box',
+            routerLink: '/stocks',
+          },
         ],
       },
       {

@@ -1,11 +1,13 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { FirestoreService } from './firestore.service';
 import { ArcherDoc, ResultatDoc, DistinctionDoc, ArcherWithResultsData } from '../model/firestore-types';
+import { StockDoc } from '../model/stock-key';
 
 const STORAGE_KEYS = {
   archers:      'cache:archers',
   resultats:    'cache:resultats',
   distinctions: 'cache:distinctions',
+  stocks:       'cache:stocks',
 } as const;
 
 // Replacer JSON : convertit les Timestamps Firestore en ISO string.
@@ -42,16 +44,19 @@ export class AppStore {
   private archersCache      = signal<ArcherDoc[]      | null>(null);
   private resultatsCache    = signal<ResultatDoc[]    | null>(null);
   private distinctionsCache = signal<DistinctionDoc[] | null>(null);
+  private stocksCache       = signal<StockDoc[]       | null>(null);
 
   // Timestamps de dernière hydratation (ms depuis epoch)
   private archersFetchedAt:      number | null = null;
   private resultatsFetchedAt:    number | null = null;
   private distinctionsFetchedAt: number | null = null;
+  private stocksFetchedAt:       number | null = null;
 
   // Dernières versions serveur reçues via onSnapshot
   private serverArchersVersion:      number = 0;
   private serverResultatsVersion:    number = 0;
   private serverDistinctionsVersion: number = 0;
+  private serverStocksVersion:       number = 0;
 
   // Promesse résolue dès le premier snapshot du listener de version
   private ready: Promise<void>;
@@ -72,10 +77,12 @@ export class AppStore {
           const serverArchers      = parseFirestoreDate(data['archers'])?.getTime()      ?? 0;
           const serverResultats    = parseFirestoreDate(data['resultats'])?.getTime()    ?? 0;
           const serverDistinctions = parseFirestoreDate(data['distinctions'])?.getTime() ?? 0;
+          const serverStocks       = parseFirestoreDate(data['stocks'])?.getTime()       ?? 0;
 
           this.serverArchersVersion      = serverArchers;
           this.serverResultatsVersion    = serverResultats;
           this.serverDistinctionsVersion = serverDistinctions;
+          this.serverStocksVersion       = serverStocks;
 
           console.log('[Cache] comparaison archers      — server:', serverArchers,      'fetchedAt:', this.archersFetchedAt);
           console.log('[Cache] comparaison resultats    — server:', serverResultats,    'fetchedAt:', this.resultatsFetchedAt);
@@ -98,6 +105,12 @@ export class AppStore {
             this.distinctionsFetchedAt = null;
             this.removeFromStorage(STORAGE_KEYS.distinctions);
             console.log('[Cache] distinctions invalidé par version serveur');
+          }
+          if (this.stocksFetchedAt !== null && serverStocks > this.stocksFetchedAt) {
+            this.stocksCache.set(null);
+            this.stocksFetchedAt = null;
+            this.removeFromStorage(STORAGE_KEYS.stocks);
+            console.log('[Cache] stocks invalidé par version serveur');
           }
         }
         this.resolveReady();
@@ -225,6 +238,35 @@ export class AppStore {
     return data;
   }
 
+  private async loadStocks(): Promise<StockDoc[]> {
+    await this.ready;
+
+    const cached = this.stocksCache();
+    if (cached !== null) {
+      console.log(`[Cache HIT] stocks (${cached.length})`);
+      return cached;
+    }
+
+    const stored = this.readFromStorage<StockDoc>(STORAGE_KEYS.stocks);
+    if (stored && this.serverStocksVersion <= stored.fetchedAt) {
+      this.stocksCache.set(stored.data);
+      this.stocksFetchedAt = stored.fetchedAt;
+      console.log(`[Cache HIT] stocks (localStorage, ${stored.data.length})`);
+      return stored.data;
+    }
+    if (stored) {
+      console.log('[Cache] stocks localStorage périmé vs version serveur → Firestore');
+      this.removeFromStorage(STORAGE_KEYS.stocks);
+    }
+
+    console.log('[Cache MISS] stocks → Firestore');
+    const data = await this.firestoreService.getStocks();
+    this.stocksCache.set(data);
+    this.stocksFetchedAt = Date.now();
+    this.writeToStorage(STORAGE_KEYS.stocks, data, this.stocksFetchedAt);
+    return data;
+  }
+
   // ── Invalidation globale (bouton refresh) ─────────────────────────────────
 
   invalidateAll(): void {
@@ -234,9 +276,12 @@ export class AppStore {
     this.resultatsFetchedAt = null;
     this.distinctionsCache.set(null);
     this.distinctionsFetchedAt = null;
+    this.stocksCache.set(null);
+    this.stocksFetchedAt = null;
     this.removeFromStorage(STORAGE_KEYS.archers);
     this.removeFromStorage(STORAGE_KEYS.resultats);
     this.removeFromStorage(STORAGE_KEYS.distinctions);
+    this.removeFromStorage(STORAGE_KEYS.stocks);
   }
 
   // ── ARCHERS ───────────────────────────────────────────────────────────────
@@ -388,6 +433,48 @@ export class AppStore {
       this.distinctionsFetchedAt = Date.now();
       this.distinctionsCache.set(updated);
       this.writeToStorage(STORAGE_KEYS.distinctions, updated, this.distinctionsFetchedAt);
+    }
+    return result;
+  }
+
+  // ── STOCKS ────────────────────────────────────────────────────────────────
+
+  async getStocks(): Promise<StockDoc[]> {
+    return this.loadStocks();
+  }
+
+  async addStock(stockData: any) {
+    const docRef = await this.firestoreService.addStock(stockData);
+    const current = this.stocksCache();
+    if (current !== null) {
+      const updated = [...current, { id: docRef.id, ...stockData } as StockDoc];
+      this.stocksFetchedAt = Date.now();
+      this.stocksCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.stocks, updated, this.stocksFetchedAt);
+    }
+    return docRef;
+  }
+
+  async updateStock(id: string, stockData: any) {
+    const result = await this.firestoreService.updateStock(id, stockData);
+    const current = this.stocksCache();
+    if (current !== null) {
+      const updated = current.map(s => s.id === id ? { ...s, ...stockData } : s);
+      this.stocksFetchedAt = Date.now();
+      this.stocksCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.stocks, updated, this.stocksFetchedAt);
+    }
+    return result;
+  }
+
+  async deleteStock(id: string) {
+    const result = await this.firestoreService.deleteStock(id);
+    const current = this.stocksCache();
+    if (current !== null) {
+      const updated = current.filter(s => s.id !== id);
+      this.stocksFetchedAt = Date.now();
+      this.stocksCache.set(updated);
+      this.writeToStorage(STORAGE_KEYS.stocks, updated, this.stocksFetchedAt);
     }
     return result;
   }
