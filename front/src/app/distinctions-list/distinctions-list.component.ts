@@ -179,6 +179,7 @@ export class DistinctionsListComponent implements OnInit {
       discipline: d.discipline,
       nom: d.nom,
       arme: d.Resultat?.arme,
+      distance: d.distance,
     });
   }
 

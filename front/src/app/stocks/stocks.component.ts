@@ -13,6 +13,7 @@ interface StockTypeOption {
   discipline: string;
   armeGroup: ArmeGroup | null;
   nom: string;
+  distance?: number;
 }
 
 interface StockRow extends StockDoc {
@@ -66,14 +67,15 @@ export class StocksComponent implements OnInit {
       const seen = new Map<string, StockTypeOption>();
       for (const d of distinctions as any[]) {
         const arme = resultatsMap.get(d.resultatId)?.arme;
-        const key = buildStockKey({ discipline: d.discipline, nom: d.nom, arme });
+        const key = buildStockKey({ discipline: d.discipline, nom: d.nom, arme, distance: d.distance });
         if (seen.has(key) || existingKeys.has(key)) continue;
         seen.set(key, {
-          label: stockTypeLabel({ discipline: d.discipline, nom: d.nom, armeGroup: armeGroup(d.discipline, arme) }),
+          label: stockTypeLabel({ discipline: d.discipline, nom: d.nom, armeGroup: armeGroup(d.discipline, arme), distance: d.distance }),
           key,
           discipline: d.discipline,
           armeGroup: armeGroup(d.discipline, arme),
           nom: d.nom,
+          distance: d.distance,
         });
       }
       this.typeOptions = [...seen.values()].sort((a, b) => a.label.localeCompare(b.label));
@@ -95,6 +97,7 @@ export class StocksComponent implements OnInit {
       key: t.key,
     };
     if (t.armeGroup) data.armeGroup = t.armeGroup;
+    if (t.discipline === 'TAEDI' && t.distance != null) data.distance = t.distance;
 
     try {
       await this.store.addStock(data);
