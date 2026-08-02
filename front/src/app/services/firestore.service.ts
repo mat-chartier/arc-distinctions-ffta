@@ -126,10 +126,21 @@ export class FirestoreService {
     return null;
   }
 
+  /** Firestore refuse les champs `undefined` : on les retire avant tout addDoc. */
+  private stripUndefined<T extends Record<string, any>>(data: T): T {
+    const clean: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== undefined) {
+        clean[key] = value;
+      }
+    }
+    return clean as T;
+  }
+
   async addResultat(resultatData: any) {
     console.log('[Firestore] ADD resultat');
     const resultatsCol = collection(this.firestore, 'resultats');
-    const result = await addDoc(resultatsCol, { ...resultatData, createdAt: Timestamp.now() });
+    const result = await addDoc(resultatsCol, this.stripUndefined({ ...resultatData, createdAt: Timestamp.now() }));
     this.updateCacheVersion('resultats').catch(console.error);
     return result;
   }
@@ -185,7 +196,7 @@ export class FirestoreService {
   async addDistinction(distinctionData: any) {
     console.log('[Firestore] ADD distinction');
     const distinctionsCol = collection(this.firestore, 'distinctions');
-    const result = await addDoc(distinctionsCol, { ...distinctionData, createdAt: Timestamp.now() });
+    const result = await addDoc(distinctionsCol, this.stripUndefined({ ...distinctionData, createdAt: Timestamp.now() }));
     this.updateCacheVersion('distinctions').catch(console.error);
     return result;
   }

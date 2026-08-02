@@ -260,7 +260,9 @@ export class ResultsUploadComponent {
       blason: overrides.blason || resultRaw.blason,
       categorie: resultRaw.categorie,
       numDepart: resultRaw.numDepart,
-      piquet: overrides.piquet,
+      // piquet ajouté ci-dessous uniquement s'il est défini (campagne),
+      // Firestore refuse les champs undefined
+      ...(overrides.piquet !== undefined ? { piquet: overrides.piquet } : {}),
       saison: resultRaw.saison,
       discipline: resultRaw.discipline,
       score: overrides.score || resultRaw.score,
