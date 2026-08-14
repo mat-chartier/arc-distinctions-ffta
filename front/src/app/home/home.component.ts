@@ -49,9 +49,4 @@ export class HomeComponent {
   etoiles(nom: string): string {
     return '★'.repeat(this.nbEtoiles(nom));
   }
-
-  /** Plage de score affichée : « min–max » ou « min et + ». */
-  plage(p: { min: number; max?: number }): string {
-    return p.max != null ? `${p.min}–${p.max}` : `${p.min} et +`;
-  }
 }

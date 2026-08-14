@@ -3,40 +3,11 @@
     margin-bottom: 0.25rem;
   }
 
-  .discipline-intro {
-    margin-top: 0.75rem;
-  }
-
   .section-titre {
     margin-top: 1rem;
     margin-bottom: 0.75rem;
     font-size: 1.15rem;
     color: #444;
-  }
-}
-
-// Lignes de paliers dans une carte
-.paliers {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.palier-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-
-  .palier-nom {
-    flex: 1 1 auto;
-    font-weight: 500;
-  }
-
-  .palier-plage {
-    flex: 0 0 auto;
-    font-variant-numeric: tabular-nums;
-    color: #555;
-    white-space: nowrap;
   }
 }
 
@@ -100,7 +71,12 @@
   }
 }
 
-// Tableau de barème multi-colonnes (Salle)
+// Défilement horizontal des tableaux larges (mobile)
+.table-scroll {
+  overflow-x: auto;
+}
+
+// Tableau de barème multi-colonnes (Salle, TAE, Campagne)
 .bareme-multi {
   width: 100%;
   border-collapse: collapse;

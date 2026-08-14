@@ -29,19 +29,19 @@ export interface BaremeMulti {
   paliers: PalierMulti[];
 }
 
-// Campagne : médaille sur fond → rendu deux tons.
-export interface PalierCampagne {
+// Campagne : médaille sur fond → rendu deux tons, tableau multi-colonnes.
+export interface PalierCampagneMulti {
   medaille: 'Or' | 'Argent' | 'Vert';
   fond: 'blanc' | 'vert' | 'noir' | 'bleu' | 'rouge';
-  min: number;
-  max?: number;
   image: string;
+  plages: string[]; // une plage de score par colonne
 }
 
-export interface BaremeCampagne {
+export interface BaremeCampagneMulti {
   titre: string;
-  conditions: string;
-  paliers: PalierCampagne[];
+  colonnes: string[];
+  note?: string;
+  paliers: PalierCampagneMulti[];
 }
 
 /** Plage de score formatée pour la borne i d'une liste de bornes inférieures. */
@@ -110,7 +110,7 @@ export const TAE_DN: BaremeMulti = {
 
 // ── CAMPAGNE ────────────────────────────────────────────────────────────────
 // Médaille / fond des paliers Écureuil (6) et Marcassin (4 premiers).
-const CAMP_DEF: { medaille: PalierCampagne['medaille']; fond: PalierCampagne['fond']; image: string }[] = [
+const CAMP_DEF: { medaille: PalierCampagneMulti['medaille']; fond: PalierCampagneMulti['fond']; image: string }[] = [
   { medaille: 'Vert', fond: 'blanc', image: 'vert-blanc' },
   { medaille: 'Argent', fond: 'vert', image: 'argent-vert' },
   { medaille: 'Or', fond: 'blanc', image: 'or-blanc' },
@@ -119,25 +119,31 @@ const CAMP_DEF: { medaille: PalierCampagne['medaille']; fond: PalierCampagne['fo
   { medaille: 'Or', fond: 'rouge', image: 'or-rouge' },
 ];
 
-function paliersCampagne(prefix: string, bornes: number[]): PalierCampagne[] {
-  return bornes.map((min, i) => ({
+/** Paliers d'un barème campagne fusionné : badge médaille/fond commun + N colonnes de score. */
+function paliersCampMulti(prefix: string, bornesParColonne: number[][]): PalierCampagneMulti[] {
+  const nbPaliers = bornesParColonne[0].length;
+  return Array.from({ length: nbPaliers }, (_, i) => ({
     medaille: CAMP_DEF[i].medaille,
     fond: CAMP_DEF[i].fond,
-    min,
-    max: i < bornes.length - 1 ? bornes[i + 1] - 1 : undefined,
     image: `${prefix}-${CAMP_DEF[i].image}`,
+    plages: bornesParColonne.map((bornes) => plageStr(bornes, i)),
   }));
 }
 
-export const CAMPAGNE_MARCASSIN: BaremeCampagne = {
-  titre: 'Marcassins',
-  conditions: 'Arc classique — U13 / U15 / U18',
-  paliers: paliersCampagne('campagne-marcassin', [160, 210, 270, 320]),
+export const CAMPAGNE_MARCASSIN: BaremeCampagneMulti = {
+  titre: 'Marcassins — Arc classique',
+  colonnes: ['Score'],
+  note: 'U13 / U15 : piquet blanc — U18 : piquet bleu',
+  paliers: paliersCampMulti('campagne-marcassin', [[160, 210, 270, 320]]),
 };
 
-export const CAMPAGNE_ECUREUIL: BaremeCampagne[] = [
-  { titre: 'Écureuils — Arc classique', conditions: 'U21 et +', paliers: paliersCampagne('campagne-ecureuil', [200, 240, 260, 300, 340, 380]) },
-  { titre: 'Écureuils — Arc à Poulies', conditions: 'U18 et +', paliers: paliersCampagne('campagne-ecureuil', [220, 260, 280, 320, 360, 400]) },
-  { titre: 'Écureuils — Arc nu', conditions: 'U18', paliers: paliersCampagne('campagne-ecureuil', [160, 200, 220, 260, 300, 340]) },
-  { titre: 'Écureuils — Arc nu', conditions: 'U21 et +', paliers: paliersCampagne('campagne-ecureuil', [180, 220, 240, 280, 320, 360]) },
-];
+export const CAMPAGNE_ECUREUIL: BaremeCampagneMulti = {
+  titre: 'Écureuils',
+  colonnes: ['Arc classique (U21+)', 'Arc à Poulies (U18+)', 'Arc nu — U18 (piquet blanc)', 'Arc nu — U21+ (piquet bleu)'],
+  paliers: paliersCampMulti('campagne-ecureuil', [
+    [200, 240, 260, 300, 340, 380],
+    [220, 260, 280, 320, 360, 400],
+    [160, 200, 220, 260, 300, 340],
+    [180, 220, 240, 280, 320, 360],
+  ]),
+};

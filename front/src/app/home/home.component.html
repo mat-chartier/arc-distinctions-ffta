@@ -40,11 +40,11 @@
 
       <!-- CAMPAGNE -->
       <p-tabpanel value="campagne">
-        <div class="row">
-          <ng-container [ngTemplateOutlet]="baremeCampCard" [ngTemplateOutletContext]="{ $implicit: campagneMarcassin }"></ng-container>
-          <ng-container *ngFor="let b of campagneEcureuil">
-            <ng-container [ngTemplateOutlet]="baremeCampCard" [ngTemplateOutletContext]="{ $implicit: b }"></ng-container>
-          </ng-container>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: campagneMarcassin }"></ng-container>
+        </div>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: campagneEcureuil }"></ng-container>
         </div>
       </p-tabpanel>
 
@@ -67,53 +67,68 @@
 <!-- Carte d'un barème multi-colonnes (Salle, TAE DI, TAE DN) -->
 <ng-template #baremeMultiCard let-bm>
   <p-card [header]="bm.titre">
-    <table class="bareme-multi">
-      <thead>
-        <tr>
-          <th>Distinction</th>
-          <th *ngFor="let c of bm.colonnes">{{ c }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let p of bm.paliers">
-          <td>
-            <div class="bm-distinction">
-              <ng-container *ngIf="p.image" [ngTemplateOutlet]="visuel" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
-              <span class="palier-nom">{{ p.nom }}</span>
-            </div>
-          </td>
-          <td *ngFor="let c of p.colonnes" class="bm-plage">
-            <div class="bm-cell">
-              <img
-                *ngIf="c.image && !imgFailed.has(c.image)"
-                class="palier-img palier-img--sm"
-                [src]="'images/distinctions/' + c.image + '.png'"
-                [alt]="p.nom"
-                (error)="imgFailed.add(c.image)"
-              />
-              <span>{{ c.plage }}</span>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="bareme-multi">
+        <thead>
+          <tr>
+            <th>Distinction</th>
+            <th *ngFor="let c of bm.colonnes">{{ c }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of bm.paliers">
+            <td>
+              <div class="bm-distinction">
+                <ng-container *ngIf="p.image" [ngTemplateOutlet]="visuel" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
+                <span class="palier-nom">{{ p.nom }}</span>
+              </div>
+            </td>
+            <td *ngFor="let c of p.colonnes" class="bm-plage">
+              <div class="bm-cell">
+                <img
+                  *ngIf="c.image && !imgFailed.has(c.image)"
+                  class="palier-img palier-img--sm"
+                  [src]="'images/distinctions/' + c.image + '.png'"
+                  [alt]="p.nom"
+                  (error)="imgFailed.add(c.image)"
+                />
+                <span>{{ c.plage }}</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div class="note" *ngIf="bm.note">{{ bm.note }}</div>
   </p-card>
 </ng-template>
 
-<!-- Carte d'un barème Campagne -->
-<ng-template #baremeCampCard let-b>
-  <div class="col-12 col-md-6 mb-3">
-    <p-card [header]="b.titre" [subheader]="b.conditions">
-      <div class="paliers">
-        <div class="palier-row" *ngFor="let p of b.paliers">
-          <ng-container [ngTemplateOutlet]="visuelCamp" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
-          <span class="palier-nom">{{ p.medaille }} sur fond {{ p.fond }}</span>
-          <span class="palier-plage">{{ plage(p) }}</span>
-        </div>
-      </div>
-    </p-card>
-  </div>
+<!-- Carte d'un barème Campagne fusionné (badge médaille/fond commun + colonnes de score) -->
+<ng-template #baremeCampMultiCard let-bm>
+  <p-card [header]="bm.titre">
+    <div class="table-scroll">
+      <table class="bareme-multi">
+        <thead>
+          <tr>
+            <th>Distinction</th>
+            <th *ngFor="let c of bm.colonnes">{{ c }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of bm.paliers">
+            <td>
+              <div class="bm-distinction">
+                <ng-container [ngTemplateOutlet]="visuelCamp" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
+                <span class="palier-nom">{{ p.medaille }} sur fond {{ p.fond }}</span>
+              </div>
+            </td>
+            <td *ngFor="let pl of p.plages" class="bm-plage">{{ pl }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note" *ngIf="bm.note">{{ bm.note }}</div>
+  </p-card>
 </ng-template>
 
 <!-- Visuel d'un palier Salle / TAE : image si présente, sinon pastille colorée -->
