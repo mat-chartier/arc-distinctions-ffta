@@ -2,12 +2,16 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { AppStore } from '../services/app.store';
+import { buildStockKey } from '../model/stock-key';
 
 interface DistinctionToOrder {
   key: string;
   value: {
     count: number;
     data: string[];
+    stockKey: string;
+    attribue: number;
+    aCommander: number;
   };
 }
 
@@ -35,32 +39,57 @@ export class DistinctionsToOrderComponent implements OnInit {
   loading = true;
   error: string = '';
 
+  // Stock physique par clé de type (#27) : quantité en base et quantité déjà
+  // réservée par des distinctions au statut « À donner » (méritées, non remises).
+  stockByKey = new Map<string, number>();
+  reservedByKey = new Map<string, number>();
+
   async ngOnInit() {
     try {
       this.loading = true;
       this.error = '';
 
-      // Récupérer les distinctions avec statut "À commander"
-      const distinctions = await this.firestoreService.getDistinctionsToOrder();
-      
+      // Récupérer toutes les distinctions (on dérive « À commander » et « À donner »)
+      const distinctions = await this.firestoreService.getDistinctions();
+
       // Récupérer tous les archers et résultats pour les jointures
       const archers = await this.firestoreService.getArchers();
       const resultats = await this.firestoreService.getResultats();
-      
+
+      // Récupérer les stocks et indexer par clé de type (#27)
+      const stocks = await this.firestoreService.getStocks();
+      this.stockByKey = new Map(stocks.map(s => [s.key, s.quantite]));
+
       // Créer des maps pour accès rapide
       const archersMap = new Map(archers.map(a => [a.id, a]));
       const resultatsMap = new Map(resultats.map(r => [r.id, r]));
-      
-      // Joindre les données
+
+      // Réserver le stock déjà promis aux distinctions « À donner » (#27)
+      this.reservedByKey = new Map<string, number>();
+      distinctions
+        .filter((d: any) => d.statut === 'A donner')
+        .forEach((d: any) => {
+          const resultat = resultatsMap.get(d.resultatId);
+          const key = buildStockKey({
+            discipline: d.discipline,
+            nom: d.nom,
+            arme: resultat?.arme,
+            distance: d.distance,
+          });
+          this.reservedByKey.set(key, (this.reservedByKey.get(key) ?? 0) + 1);
+        });
+
+      // Joindre les données (uniquement les distinctions « À commander »)
       const data = distinctions
+        .filter((d: any) => d.statut === 'A commander')
         .map((d: any) => {
           const archer = archersMap.get(d.archerId);
           const resultat = resultatsMap.get(d.resultatId);
-          
+
           if (!archer || !resultat) {
             return null;
           }
-          
+
           return {
             ...d,
             Archer: archer,
@@ -177,10 +206,28 @@ export class DistinctionsToOrderComponent implements OnInit {
         acc[nom].count++;
         acc[nom].data.push(data);
       } else {
-        acc[nom] = { count: 1, data: [data] };
+        // La clé de stock est constante au sein d'un groupe (discipline fixe,
+        // armeGroup fixe par tableau CLBB/CO, distance déjà incluse dans le nom pour TAEDI).
+        const stockKey = buildStockKey({
+          discipline: curr.discipline,
+          nom: curr.nom,
+          arme: curr.Resultat.arme,
+          distance: curr.distance,
+        });
+        acc[nom] = { count: 1, data: [data], stockKey, attribue: 0, aCommander: 0 };
       }
       return acc;
     }, {});
+
+    // Calculer l'attribution du stock et le reste à commander (#27)
+    Object.values(distinctionsToOrder).forEach((v: any) => {
+      const dispo = Math.max(
+        0,
+        (this.stockByKey.get(v.stockKey) ?? 0) - (this.reservedByKey.get(v.stockKey) ?? 0)
+      );
+      v.attribue = Math.min(v.count, dispo);
+      v.aCommander = Math.max(0, v.count - dispo);
+    });
 
     // Convertir l'objet en tableau de paires clé-valeur
     return Object.entries(distinctionsToOrder).map(
