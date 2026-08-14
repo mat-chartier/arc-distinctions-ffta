@@ -55,6 +55,9 @@ export class DistinctionsListComponent implements OnInit {
   // Stock virtuel décompté ligne à ligne (id de distinction → valeur virtuelle)
   virtualById = new Map<string, number>();
 
+  // Tri par défaut : nom de l'archer croissant (order 1 = ascendant)
+  defaultSort = [{ field: 'Archer.nom', order: 1 }];
+
   statuts = ['A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
   disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D', 'Nature'];
