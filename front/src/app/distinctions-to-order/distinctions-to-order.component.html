@@ -15,9 +15,10 @@
 
   <!-- Contenu -->
   <div *ngIf="!loading && !error">
-    <h3>Salle Classique</h3>
+    <h3 *ngIf="distinctionsCLBBToOrder.length">Salle Classique</h3>
     <p-table
       #distinctionsCLBBToOrderTable
+      *ngIf="distinctionsCLBBToOrder.length"
       [value]="distinctionsCLBBToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -45,9 +46,10 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">Salle Compound</h3>
+    <h3 *ngIf="distinctionsCOToOrder.length" class="mt-4">Salle Compound</h3>
     <p-table
       #distinctionsCOToOrderTable
+      *ngIf="distinctionsCOToOrder.length"
       [value]="distinctionsCOToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -75,9 +77,10 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">TAE DI Classique</h3>
+    <h3 *ngIf="distinctionsCLBBTAEDIToOrder.length" class="mt-4">TAE DI Classique</h3>
     <p-table
       #distinctionsCLBBTAEDIToOrderTable
+      *ngIf="distinctionsCLBBTAEDIToOrder.length"
       [value]="distinctionsCLBBTAEDIToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -105,9 +108,10 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">TAE DI Compound</h3>
+    <h3 *ngIf="distinctionsCOTAEDIToOrder.length" class="mt-4">TAE DI Compound</h3>
     <p-table
       #distinctionsCOTAEDIToOrderTable
+      *ngIf="distinctionsCOTAEDIToOrder.length"
       [value]="distinctionsCOTAEDIToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -135,9 +139,10 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">TAE DN Classique</h3>
+    <h3 *ngIf="distinctionsCLBBTAEDNToOrder.length" class="mt-4">TAE DN Classique</h3>
     <p-table
       #distinctionsCLBBTAEDNToOrderTable
+      *ngIf="distinctionsCLBBTAEDNToOrder.length"
       [value]="distinctionsCLBBTAEDNToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -165,9 +170,10 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">TAE DN Compound</h3>
+    <h3 *ngIf="distinctionsCOTAEDNToOrder.length" class="mt-4">TAE DN Compound</h3>
     <p-table
       #distinctionsCOTAEDNToOrderTable
+      *ngIf="distinctionsCOTAEDNToOrder.length"
       [value]="distinctionsCOTAEDNToOrder"
       [showGridlines]="true"
       [stripedRows]="true"
@@ -195,8 +201,8 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">Campagne — Marcassins (CL)</h3>
-    <p-table [value]="distinctionsCampagneMarcassinToOrder" [showGridlines]="true" [stripedRows]="true">
+    <h3 *ngIf="distinctionsCampagneMarcassinToOrder.length" class="mt-4">Campagne — Marcassins (CL)</h3>
+    <p-table *ngIf="distinctionsCampagneMarcassinToOrder.length" [value]="distinctionsCampagneMarcassinToOrder" [showGridlines]="true" [stripedRows]="true">
       <ng-template pTemplate="header">
         <tr>
           <th>Distinctions Campagne Marcassins</th>
@@ -220,8 +226,8 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">Campagne — Écureuils Classique</h3>
-    <p-table [value]="distinctionsCampagneEcureuilCLToOrder" [showGridlines]="true" [stripedRows]="true">
+    <h3 *ngIf="distinctionsCampagneEcureuilCLToOrder.length" class="mt-4">Campagne — Écureuils Classique</h3>
+    <p-table *ngIf="distinctionsCampagneEcureuilCLToOrder.length" [value]="distinctionsCampagneEcureuilCLToOrder" [showGridlines]="true" [stripedRows]="true">
       <ng-template pTemplate="header">
         <tr>
           <th>Distinctions Campagne Écureuils Arc Classique</th>
@@ -245,8 +251,8 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">Campagne — Écureuils Compound</h3>
-    <p-table [value]="distinctionsCampagneEcureuilCOToOrder" [showGridlines]="true" [stripedRows]="true">
+    <h3 *ngIf="distinctionsCampagneEcureuilCOToOrder.length" class="mt-4">Campagne — Écureuils Compound</h3>
+    <p-table *ngIf="distinctionsCampagneEcureuilCOToOrder.length" [value]="distinctionsCampagneEcureuilCOToOrder" [showGridlines]="true" [stripedRows]="true">
       <ng-template pTemplate="header">
         <tr>
           <th>Distinctions Campagne Écureuils Arc à Poulies</th>
@@ -270,8 +276,8 @@
       </ng-template>
     </p-table>
 
-    <h3 class="mt-4">Campagne — Écureuils Arc Nu (BB)</h3>
-    <p-table [value]="distinctionsCampagneEcureuilBBToOrder" [showGridlines]="true" [stripedRows]="true">
+    <h3 *ngIf="distinctionsCampagneEcureuilBBToOrder.length" class="mt-4">Campagne — Écureuils Arc Nu (BB)</h3>
+    <p-table *ngIf="distinctionsCampagneEcureuilBBToOrder.length" [value]="distinctionsCampagneEcureuilBBToOrder" [showGridlines]="true" [stripedRows]="true">
       <ng-template pTemplate="header">
         <tr>
           <th>Distinctions Campagne Écureuils Arc Nu</th>

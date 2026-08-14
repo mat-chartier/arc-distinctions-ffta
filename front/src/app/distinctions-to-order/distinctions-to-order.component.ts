@@ -39,10 +39,8 @@ export class DistinctionsToOrderComponent implements OnInit {
   loading = true;
   error: string = '';
 
-  // Stock physique par clé de type (#27) : quantité en base et quantité déjà
-  // réservée par des distinctions au statut « À donner » (méritées, non remises).
+  // Stock physique par clé de type (#27) : quantité en base.
   stockByKey = new Map<string, number>();
-  reservedByKey = new Map<string, number>();
 
   async ngOnInit() {
     try {
@@ -64,24 +62,10 @@ export class DistinctionsToOrderComponent implements OnInit {
       const archersMap = new Map(archers.map(a => [a.id, a]));
       const resultatsMap = new Map(resultats.map(r => [r.id, r]));
 
-      // Réserver le stock déjà promis aux distinctions « À donner » (#27)
-      this.reservedByKey = new Map<string, number>();
-      distinctions
-        .filter((d: any) => d.statut === 'A donner')
-        .forEach((d: any) => {
-          const resultat = resultatsMap.get(d.resultatId);
-          const key = buildStockKey({
-            discipline: d.discipline,
-            nom: d.nom,
-            arme: resultat?.arme,
-            distance: d.distance,
-          });
-          this.reservedByKey.set(key, (this.reservedByKey.get(key) ?? 0) + 1);
-        });
-
-      // Joindre les données (uniquement les distinctions « À commander »)
+      // Modèle unifié : toute distinction non encore remise (« À commander » ou
+      // « À donner ») pèse sur le stock ; le déficit vs stock = quantité à commander.
       const data = distinctions
-        .filter((d: any) => d.statut === 'A commander')
+        .filter((d: any) => d.statut === 'A commander' || d.statut === 'A donner')
         .map((d: any) => {
           const archer = archersMap.get(d.archerId);
           const resultat = resultatsMap.get(d.resultatId);
@@ -219,19 +203,18 @@ export class DistinctionsToOrderComponent implements OnInit {
       return acc;
     }, {});
 
-    // Calculer l'attribution du stock et le reste à commander (#27)
+    // Calculer l'attribution du stock et le reste à commander (#27).
+    // demande = A commander + A donner ; à commander = max(0, demande - stock).
     Object.values(distinctionsToOrder).forEach((v: any) => {
-      const dispo = Math.max(
-        0,
-        (this.stockByKey.get(v.stockKey) ?? 0) - (this.reservedByKey.get(v.stockKey) ?? 0)
-      );
-      v.attribue = Math.min(v.count, dispo);
-      v.aCommander = Math.max(0, v.count - dispo);
+      const stock = this.stockByKey.get(v.stockKey) ?? 0;
+      v.attribue = Math.min(v.count, stock);
+      v.aCommander = Math.max(0, v.count - stock);
     });
 
-    // Convertir l'objet en tableau de paires clé-valeur
-    return Object.entries(distinctionsToOrder).map(
-      ([key, value]) => ({ key, value } as DistinctionToOrder)
-    );
+    // Convertir en tableau et ne garder que les types ayant réellement quelque chose
+    // à commander (stock insuffisant) ; masquer ceux entièrement couverts par le stock.
+    return Object.entries(distinctionsToOrder)
+      .map(([key, value]) => ({ key, value } as DistinctionToOrder))
+      .filter(d => d.value.aCommander > 0);
   }
 }

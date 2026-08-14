@@ -49,6 +49,9 @@ export class DistinctionsListComponent implements OnInit {
   // Stock disponible par clé de type de distinction (#27)
   stockByKey = new Map<string, { id: string; quantite: number }>();
 
+  // Stock virtuel décompté ligne à ligne (id de distinction → valeur virtuelle)
+  virtualById = new Map<string, number>();
+
   statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
   disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D', 'Nature'];
@@ -112,9 +115,12 @@ export class DistinctionsListComponent implements OnInit {
       
       // Trier les saisons
       this.saisons.sort((a, b) => parseInt(b) - parseInt(a));
-      
+
       console.log('Distinctions chargées:', this.distinctionsWithArcher.length);
-      
+
+      // Calculer le stock virtuel une fois la table rendue / son état restauré
+      setTimeout(() => this.recomputeVirtualStock(), 0);
+
     } catch (error: any) {
       console.error('Erreur lors du chargement des distinctions:', error);
       this.error = 'Erreur lors du chargement des distinctions';
@@ -145,9 +151,12 @@ export class DistinctionsListComponent implements OnInit {
 
       // Rafraîchir le filtre du tableau
       distinctionsTable._filter();
-      
+
+      // Le changement de statut (et le décrément stock « Donnée ») modifie le décompte virtuel
+      this.recomputeVirtualStock();
+
       console.log('Statut mis à jour:', item.id, item.statut);
-      
+
     } catch (error) {
       console.error('Erreur lors de la mise à jour du statut:', error);
       // Recharger les données en cas d'erreur
@@ -185,6 +194,39 @@ export class DistinctionsListComponent implements OnInit {
 
   getStockCount(d: any): number {
     return this.stockByKey.get(this.getStockKey(d))?.quantite ?? 0;
+  }
+
+  /**
+   * Recalcule le stock virtuel ligne à ligne, dans l'ordre affiché (trié + filtré).
+   * Chaque distinction « A donner » / « A commander » consomme une unité virtuelle du
+   * stock réel de son type. Les « Donnée » (déjà déduites du stock réel), « N/A » et
+   * « NVP » ne consomment rien et n'ont pas de valeur virtuelle.
+   */
+  recomputeVirtualStock() {
+    const rows = this.distinctionsTable?.processedData ?? this.distinctionsWithArcher;
+    const running = new Map<string, number>();
+    const result = new Map<string, number>();
+
+    for (const d of rows as any[]) {
+      if (d.statut !== 'A donner' && d.statut !== 'A commander') continue;
+      const key = this.getStockKey(d);
+      if (!running.has(key)) running.set(key, this.getStockCount(d));
+      const v = running.get(key)! - 1;
+      running.set(key, v);
+      result.set(d.id, v);
+    }
+
+    this.virtualById = result;
+  }
+
+  /** Recalcul différé, après que la table a mis à jour tri/filtre/état restauré. */
+  scheduleRecomputeVirtualStock() {
+    setTimeout(() => this.recomputeVirtualStock(), 0);
+  }
+
+  /** Valeur du stock virtuel pour une ligne, ou null si non applicable. */
+  getVirtualStock(d: any): number | null {
+    return this.virtualById.has(d.id) ? this.virtualById.get(d.id)! : null;
   }
 
   getDisciplineDisplay(d: any): string {

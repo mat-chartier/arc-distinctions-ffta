@@ -45,6 +45,9 @@
       stateStorage="session"
       stateKey="distinctions-list-session"
       scrollable
+      (onSort)="scheduleRecomputeVirtualStock()"
+      (onFilter)="scheduleRecomputeVirtualStock()"
+      (onStateRestore)="scheduleRecomputeVirtualStock()"
     >
       <ng-template pTemplate="header">
         <tr>
@@ -133,7 +136,10 @@
             {{ getDisciplineDisplay(d) }} - {{ getNomDisplay(d) }}<ng-container *ngIf="d.distance > 0"> - {{d.distance}}m</ng-container> ({{ d.Resultat.arme }}) :
             {{ d.Resultat.score }} le {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" : "UTC" }}
           </td>
-          <td style="text-align: center;">{{ getStockCount(d) }}</td>
+          <td style="text-align: center;">
+            {{ getStockCount(d) }}<ng-container *ngIf="getVirtualStock(d) !== null">
+              (<span [class.text-danger]="getVirtualStock(d)! < 0">virt. {{ getVirtualStock(d) }}</span>)</ng-container>
+          </td>
           <td style="min-width: 200px;">
             <p-select
               [options]="statuts"
