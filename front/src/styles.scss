@@ -94,6 +94,21 @@ button.p-button {
 }
 .app-logout:hover { color: var(--pca-plum); }
 
+/* Lien de connexion (utilisateur déconnecté), aligné à droite */
+.app-login {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: var(--pca-magenta);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.app-login:hover { background: var(--pca-magenta-700); color: #fff; }
+
 /* app-root est inline par défaut : forcé en block pour que la topbar suive la
    largeur du viewport (et non celle du contenu qui peut déborder). */
 app-root { display: block; }
@@ -134,4 +149,60 @@ app-root { display: block; }
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }
+
+  /* Onglets accueil : contenus (scroll interne) au lieu de déborder la page */
+  .p-tablist { overflow-x: auto; max-width: 100%; }
+  .p-tab { padding: 0.5rem 0.7rem; font-size: 0.92rem; white-space: nowrap; }
+
+  /* Tables : cellules plus compactes sur mobile */
+  .p-datatable-tbody > tr > td,
+  .p-datatable-thead > tr > th { padding: 0.4rem 0.5rem; font-size: 0.9rem; }
+
+  /* ---- Liste des distinctions : cartes empilées (page de remise) ---- */
+  .distinctions-table .p-datatable-table { display: block; }
+  /* Ligne de libellés masquée ; ligne de filtres transformée en barre */
+  .distinctions-table .p-datatable-thead > tr:first-child { display: none; }
+  .distinctions-table .p-datatable-thead > tr:nth-child(2) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    border: none;
+  }
+  .distinctions-table .p-datatable-thead > tr:nth-child(2) > th {
+    display: block;
+    border: none !important;
+    padding: 0 0 0.5rem !important;
+    background: transparent !important;
+  }
+  .distinctions-table .p-datatable-thead > tr:nth-child(2) > th:empty { display: none; }
+
+  .distinctions-table .p-datatable-tbody { display: block; }
+  .distinctions-table .p-datatable-tbody > tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #e7e1e6;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(26, 20, 35, 0.05);
+  }
+  .distinctions-table .p-datatable-tbody > tr > td {
+    display: block;
+    border: none !important;
+    padding: 0.15rem 0 !important;
+    text-align: left !important;
+    white-space: normal;
+  }
+  .distinctions-table .col-archer { font-weight: 700; color: var(--pca-plum); font-size: 1rem; }
+  .distinctions-table .col-distinction { color: #5b5563; font-size: 0.9rem; }
+  /* Saison + En stock masqués dans la carte (restent dispo via les filtres) */
+  .distinctions-table .col-saison,
+  .distinctions-table .col-stock { display: none !important; }
+  .distinctions-table .col-statut { margin-top: 0.45rem; }
+  .distinctions-table .col-statut::before {
+    content: "État : ";
+    font-weight: 600;
+    color: var(--pca-muted);
+  }
+  .distinctions-table .col-statut .p-select { width: 100%; }
 }

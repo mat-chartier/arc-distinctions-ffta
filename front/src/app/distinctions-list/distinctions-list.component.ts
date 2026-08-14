@@ -40,6 +40,9 @@ interface DistinctionWithArcherAndResultat {
 export class DistinctionsListComponent implements OnInit {
   editMode = false;
   deleteMode = false;
+
+  // Vue « cartes empilées » sur mobile (désactive scroll/colonne figée du tableau)
+  isMobile = window.matchMedia('(max-width: 576px)').matches;
   distinctionsWithArcher: DistinctionWithArcherAndResultat[] = [];
   firestoreService = inject(AppStore);
   
@@ -59,6 +62,10 @@ export class DistinctionsListComponent implements OnInit {
   @ViewChild('distinctionsTable') distinctionsTable!: Table;
 
   async ngOnInit() {
+    // Suit le passage desktop <-> mobile pour basculer tableau / cartes
+    window
+      .matchMedia('(max-width: 576px)')
+      .addEventListener('change', (e) => (this.isMobile = e.matches));
     await this.fetchData();
   }
 

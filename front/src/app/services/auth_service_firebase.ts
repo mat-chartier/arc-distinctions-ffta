@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, NgZone, inject } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../model/user';
 import { Router } from '@angular/router';
@@ -30,6 +30,7 @@ import { environment } from '../../environments/environment';
 })
 export class AuthenticationService {
   private router = inject(Router);
+  private ngZone = inject(NgZone);
   private userSubject: BehaviorSubject<User | null>;
   public user: Observable<User | null>;
   
@@ -50,18 +51,22 @@ export class AuthenticationService {
     );
     this.user = this.userSubject.asObservable();
 
-    // Écouter les changements d'état d'authentification Firebase
-    onAuthStateChanged(this.auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const archerData = await this.loadArcherData(firebaseUser.uid);
-        if (archerData) {
-          localStorage.setItem('user', JSON.stringify(archerData));
-          this.userSubject.next(archerData);
+    // Écouter les changements d'état d'authentification Firebase.
+    // Le callback est exécuté hors de la zone Angular : on le ré-entre via
+    // NgZone.run() pour que la détection de changement se déclenche (menu, etc.).
+    onAuthStateChanged(this.auth, (firebaseUser) => {
+      this.ngZone.run(async () => {
+        if (firebaseUser) {
+          const archerData = await this.loadArcherData(firebaseUser.uid);
+          if (archerData) {
+            localStorage.setItem('user', JSON.stringify(archerData));
+            this.userSubject.next(archerData);
+          }
+        } else {
+          localStorage.removeItem('user');
+          this.userSubject.next(null);
         }
-      } else {
-        localStorage.removeItem('user');
-        this.userSubject.next(null);
-      }
+      });
     });
   }
 
@@ -171,7 +176,7 @@ export class AuthenticationService {
       await signOut(this.auth);
       localStorage.removeItem('user');
       this.userSubject.next(null);
-      this.router.navigate(['/login']);
+      this.router.navigate(['/']); // retour à l'accueil public
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
     }

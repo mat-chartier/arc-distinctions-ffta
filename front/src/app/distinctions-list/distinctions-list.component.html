@@ -44,14 +44,15 @@
       [globalFilterFields]="['statut']"
       stateStorage="session"
       stateKey="distinctions-list-session"
-      scrollable
+      [scrollable]="!isMobile"
+      styleClass="distinctions-table"
       (onSort)="scheduleRecomputeVirtualStock()"
       (onFilter)="scheduleRecomputeVirtualStock()"
       (onStateRestore)="scheduleRecomputeVirtualStock()"
     >
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="Archer.nom" pFrozenColumn>
+          <th pSortableColumn="Archer.nom" pFrozenColumn [frozen]="!isMobile">
             Archer <p-sortIcon field="Archer.nom" />
           </th>
           <th pSortableColumn="Resultat.saison">
@@ -64,7 +65,7 @@
           <th style="min-width: 200px;">Statut</th>
         </tr>
         <tr>
-          <th pFrozenColumn></th>
+          <th pFrozenColumn [frozen]="!isMobile"></th>
           <th style="z-index: 1000">
             <p-columnFilter field="Resultat.saison" matchMode="in" [showMenu]="false">
               <ng-template pTemplate="filter" let-value let-filter="filterCallback">
@@ -128,19 +129,19 @@
 
       <ng-template pTemplate="body" let-d>
         <tr>
-          <td pFrozenColumn>
+          <td pFrozenColumn [frozen]="!isMobile" class="col-archer">
             {{ d.Archer.nom }} {{ d.Archer.prenom }} ({{ d.Archer.noLicence }})
           </td>
-          <td>{{ d.Resultat.saison }}</td>
-          <td>
+          <td class="col-saison" [attr.data-label]="'Saison'">{{ d.Resultat.saison }}</td>
+          <td class="col-distinction">
             {{ getDisciplineDisplay(d) }} - {{ getNomDisplay(d) }}<ng-container *ngIf="d.distance > 0"> - {{d.distance}}m</ng-container> ({{ d.Resultat.arme }}) :
             {{ d.Resultat.score }} le {{ d.Resultat.dateDebutConcours | date : "dd/MM/yyyy" : "UTC" }}
           </td>
-          <td style="text-align: center;">
+          <td class="col-stock" style="text-align: center;" [attr.data-label]="'En stock'">
             {{ getStockCount(d) }}<ng-container *ngIf="getVirtualStock(d) !== null">
               (<span [class.text-danger]="getVirtualStock(d)! < 0">virt. {{ getVirtualStock(d) }}</span>)</ng-container>
           </td>
-          <td style="min-width: 200px;">
+          <td class="col-statut" style="min-width: 200px;">
             <p-select
               [options]="statuts"
               [(ngModel)]="d.statut"

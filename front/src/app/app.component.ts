@@ -3,7 +3,7 @@ import { Component, Injector, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { Menubar } from 'primeng/menubar';
-import { AuthenticationService } from './services/authentication.service';
+import { AuthenticationService } from './services/auth_service_firebase';
 import { AppStore } from './services/app.store';
 import { Archer } from './archer-details/archers-details';
 @Component({
@@ -23,7 +23,12 @@ export class AppComponent {
   private router = inject(Router);
 
   constructor(private authenticationService: AuthenticationService) {
-    this.authenticationService.user.subscribe((x) => (this.archer = x));
+    // Reconstruit le menu à chaque changement d'état d'authentification
+    // (connexion / déconnexion) pour qu'il apparaisse sans rechargement.
+    this.authenticationService.user.subscribe((x) => {
+      this.archer = x;
+      this.buildMenu();
+    });
   }
 
   logout() {
@@ -37,6 +42,10 @@ export class AppComponent {
     await this.router.navigate([currentUrl]);
   }
   ngOnInit() {
+    this.buildMenu();
+  }
+
+  private buildMenu() {
     this.items = [
       {
         label: 'Accueil',

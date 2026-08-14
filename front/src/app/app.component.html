@@ -16,6 +16,7 @@
     </ng-template>
   </p-menubar>
   <button class="app-logout" (click)="logout()" *ngIf="isAuthenticated()">Déconnexion</button>
+  <a class="app-login" routerLink="/login" *ngIf="!isAuthenticated()">Connexion</a>
 </header>
 
 <main class="app-main">

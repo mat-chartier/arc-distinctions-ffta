@@ -18,7 +18,7 @@ export const routes: Routes = [
     { path: 'distinctions-list', component: DistinctionsListComponent, canActivate: [AuthGuardService]},
     { path: 'distinctions-to-order', component: DistinctionsToOrderComponent, canActivate: [AuthGuardService]},
     { path: 'stocks', component: StocksComponent, canActivate: [AuthGuardService]},
-    { path: '', component: HomeComponent, canActivate: [AuthGuardService]},
+    { path: '', component: HomeComponent }, // accueil public (référentiel des distinctions)
     { path: 'login', component: LoginComponent },
     { path: 'unauthorized', component: UnauthorizedComponent },
     // otherwise redirect to home
