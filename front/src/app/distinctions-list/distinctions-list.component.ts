@@ -52,7 +52,7 @@ export class DistinctionsListComponent implements OnInit {
   // Stock virtuel décompté ligne à ligne (id de distinction → valeur virtuelle)
   virtualById = new Map<string, number>();
 
-  statuts = ['A commander', 'A donner', 'Donnée', 'N/A', 'NVP'];
+  statuts = ['A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
   disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D', 'Nature'];
 
@@ -198,9 +198,9 @@ export class DistinctionsListComponent implements OnInit {
 
   /**
    * Recalcule le stock virtuel ligne à ligne, dans l'ordre affiché (trié + filtré).
-   * Chaque distinction « A donner » / « A commander » consomme une unité virtuelle du
-   * stock réel de son type. Les « Donnée » (déjà déduites du stock réel), « N/A » et
-   * « NVP » ne consomment rien et n'ont pas de valeur virtuelle.
+   * Chaque distinction « A donner » consomme une unité virtuelle du stock réel de
+   * son type. Les « Donnée » (déjà déduites du stock réel), « N/A » et « NVP » ne
+   * consomment rien et n'ont pas de valeur virtuelle.
    */
   recomputeVirtualStock() {
     const rows = this.distinctionsTable?.processedData ?? this.distinctionsWithArcher;
@@ -208,7 +208,7 @@ export class DistinctionsListComponent implements OnInit {
     const result = new Map<string, number>();
 
     for (const d of rows as any[]) {
-      if (d.statut !== 'A donner' && d.statut !== 'A commander') continue;
+      if (d.statut !== 'A donner') continue;
       const key = this.getStockKey(d);
       if (!running.has(key)) running.set(key, this.getStockCount(d));
       const v = running.get(key)! - 1;

@@ -271,15 +271,4 @@ export class FirestoreService {
       distinctions
     };
   }
-
-  async getDistinctionsToOrder(): Promise<DistinctionDoc[]> {
-    // Récupérer les distinctions avec statut "A commander" (sans accent)
-    const distinctionsCol = collection(this.firestore, 'distinctions');
-    const q = query(distinctionsCol, where('statut', '==', 'A commander'));
-    const distinctionsSnapshot = await getDocs(q);
-    return distinctionsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as DistinctionDoc));
-  }
 }

@@ -397,10 +397,6 @@ export class AppStore {
     return all.find(d => d.id === id) ?? null;
   }
 
-  async getDistinctionsToOrder(): Promise<DistinctionDoc[]> {
-    return this.getDistinctions(undefined, 'A commander');
-  }
-
   async addDistinction(distinctionData: any) {
     const docRef = await this.firestoreService.addDistinction(distinctionData);
     const current = this.distinctionsCache();

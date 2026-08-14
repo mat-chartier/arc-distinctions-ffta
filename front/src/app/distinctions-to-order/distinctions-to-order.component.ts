@@ -47,7 +47,7 @@ export class DistinctionsToOrderComponent implements OnInit {
       this.loading = true;
       this.error = '';
 
-      // Récupérer toutes les distinctions (on dérive « À commander » et « À donner »)
+      // Récupérer toutes les distinctions (la demande = celles au statut « À donner »)
       const distinctions = await this.firestoreService.getDistinctions();
 
       // Récupérer tous les archers et résultats pour les jointures
@@ -62,10 +62,10 @@ export class DistinctionsToOrderComponent implements OnInit {
       const archersMap = new Map(archers.map(a => [a.id, a]));
       const resultatsMap = new Map(resultats.map(r => [r.id, r]));
 
-      // Modèle unifié : toute distinction non encore remise (« À commander » ou
-      // « À donner ») pèse sur le stock ; le déficit vs stock = quantité à commander.
+      // Toute distinction non encore remise (« À donner ») pèse sur le stock ;
+      // le déficit vs stock = quantité à commander.
       const data = distinctions
-        .filter((d: any) => d.statut === 'A commander' || d.statut === 'A donner')
+        .filter((d: any) => d.statut === 'A donner')
         .map((d: any) => {
           const archer = archersMap.get(d.archerId);
           const resultat = resultatsMap.get(d.resultatId);
@@ -204,7 +204,7 @@ export class DistinctionsToOrderComponent implements OnInit {
     }, {});
 
     // Calculer l'attribution du stock et le reste à commander (#27).
-    // demande = A commander + A donner ; à commander = max(0, demande - stock).
+    // demande = distinctions « À donner » ; à commander = max(0, demande - stock).
     Object.values(distinctionsToOrder).forEach((v: any) => {
       const stock = this.stockByKey.get(v.stockKey) ?? 0;
       v.attribue = Math.min(v.count, stock);
