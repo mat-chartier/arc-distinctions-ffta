@@ -1,2 +1,154 @@
-<img src="./images/distinctions.png" alt="Distinctions" />
+<div class="container mt-4 accueil">
+  <h2>Les distinctions et leurs paliers</h2>
+  <p class="text-muted">
+    Les distinctions se gagnent en <strong>compétition officielle</strong>, sur une épreuve tirée à la
+    <strong>distance de sa classe d'âge</strong> (ou en <strong>surclassement</strong>), selon le score
+    obtenu. Sélectionnez une discipline ; chaque palier indique la plage de score nécessaire pour l'obtenir.
+  </p>
 
+  <p-tabs value="salle">
+    <p-tablist>
+      <p-tab value="salle">Salle</p-tab>
+      <p-tab value="tae">TAE extérieur</p-tab>
+      <p-tab value="campagne">Campagne</p-tab>
+      <p-tab value="avenir">À venir</p-tab>
+    </p-tablist>
+
+    <p-tabpanels>
+      <!-- SALLE -->
+      <p-tabpanel value="salle">
+        <ng-container [ngTemplateOutlet]="baremeMultiCard" [ngTemplateOutletContext]="{ $implicit: salle }"></ng-container>
+      </p-tabpanel>
+
+      <!-- TAE EXTÉRIEUR -->
+      <p-tabpanel value="tae">
+        <div class="mb-3">
+          <p-card header="Deux distinctions distinctes">
+            <p class="mb-0">
+              <strong>TAE DI</strong> (Distances Internationales), badges de couleur Vert → 3 étoiles, et
+              <strong>TAE DN</strong> (Distances Nationales), écussons « Archers ».
+            </p>
+          </p-card>
+        </div>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeMultiCard" [ngTemplateOutletContext]="{ $implicit: taeDI }"></ng-container>
+        </div>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeMultiCard" [ngTemplateOutletContext]="{ $implicit: taeDN }"></ng-container>
+        </div>
+      </p-tabpanel>
+
+      <!-- CAMPAGNE -->
+      <p-tabpanel value="campagne">
+        <div class="row">
+          <ng-container [ngTemplateOutlet]="baremeCampCard" [ngTemplateOutletContext]="{ $implicit: campagneMarcassin }"></ng-container>
+          <ng-container *ngFor="let b of campagneEcureuil">
+            <ng-container [ngTemplateOutlet]="baremeCampCard" [ngTemplateOutletContext]="{ $implicit: b }"></ng-container>
+          </ng-container>
+        </div>
+      </p-tabpanel>
+
+      <!-- À VENIR -->
+      <p-tabpanel value="avenir">
+        <div class="a-venir">
+          <i class="pi pi-clock"></i>
+          <div>
+            <strong>3D / Nature — à venir</strong>
+            <p class="mb-0 text-muted">Ces disciplines seront ajoutées ultérieurement.</p>
+          </div>
+        </div>
+      </p-tabpanel>
+    </p-tabpanels>
+  </p-tabs>
+</div>
+
+<!-- ── Templates réutilisables ────────────────────────────────────────────── -->
+
+<!-- Carte d'un barème multi-colonnes (Salle, TAE DI, TAE DN) -->
+<ng-template #baremeMultiCard let-bm>
+  <p-card [header]="bm.titre">
+    <table class="bareme-multi">
+      <thead>
+        <tr>
+          <th>Distinction</th>
+          <th *ngFor="let c of bm.colonnes">{{ c }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of bm.paliers">
+          <td>
+            <div class="bm-distinction">
+              <ng-container *ngIf="p.image" [ngTemplateOutlet]="visuel" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
+              <span class="palier-nom">{{ p.nom }}</span>
+            </div>
+          </td>
+          <td *ngFor="let c of p.colonnes" class="bm-plage">
+            <div class="bm-cell">
+              <img
+                *ngIf="c.image && !imgFailed.has(c.image)"
+                class="palier-img palier-img--sm"
+                [src]="'images/distinctions/' + c.image + '.png'"
+                [alt]="p.nom"
+                (error)="imgFailed.add(c.image)"
+              />
+              <span>{{ c.plage }}</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note" *ngIf="bm.note">{{ bm.note }}</div>
+  </p-card>
+</ng-template>
+
+<!-- Carte d'un barème Campagne -->
+<ng-template #baremeCampCard let-b>
+  <div class="col-12 col-md-6 mb-3">
+    <p-card [header]="b.titre" [subheader]="b.conditions">
+      <div class="paliers">
+        <div class="palier-row" *ngFor="let p of b.paliers">
+          <ng-container [ngTemplateOutlet]="visuelCamp" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
+          <span class="palier-nom">{{ p.medaille }} sur fond {{ p.fond }}</span>
+          <span class="palier-plage">{{ plage(p) }}</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</ng-template>
+
+<!-- Visuel d'un palier Salle / TAE : image si présente, sinon pastille colorée -->
+<ng-template #visuel let-p>
+  <img
+    *ngIf="!imgFailed.has(p.image); else pastille"
+    class="palier-img"
+    [src]="'images/distinctions/' + p.image + '.png'"
+    [alt]="p.nom"
+    (error)="imgFailed.add(p.image)"
+  />
+  <ng-template #pastille>
+    <span class="palier" [ngClass]="classePalier(p.nom)">{{ etoiles(p.nom) }}</span>
+  </ng-template>
+</ng-template>
+
+<!-- Visuel d'un palier Campagne : image si présente, sinon pastille médaille/fond -->
+<ng-template #visuelCamp let-p>
+  <img
+    *ngIf="!imgFailed.has(p.image); else pastilleCamp"
+    class="palier-img"
+    [src]="'images/distinctions/' + p.image + '.png'"
+    [alt]="p.medaille + ' sur fond ' + p.fond"
+    (error)="imgFailed.add(p.image)"
+  />
+  <ng-template #pastilleCamp>
+    <span class="camp" [ngClass]="'camp--fond-' + p.fond">
+      <span
+        class="camp-med"
+        [ngClass]="{
+          'camp-med--or': p.medaille === 'Or',
+          'camp-med--argent': p.medaille === 'Argent',
+          'camp-med--vert': p.medaille === 'Vert'
+        }"
+      ></span>
+    </span>
+  </ng-template>
+</ng-template>

@@ -1,0 +1,170 @@
+.accueil {
+  h2 {
+    margin-bottom: 0.25rem;
+  }
+
+  .discipline-intro {
+    margin-top: 0.75rem;
+  }
+
+  .section-titre {
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.15rem;
+    color: #444;
+  }
+}
+
+// Lignes de paliers dans une carte
+.paliers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.palier-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  .palier-nom {
+    flex: 1 1 auto;
+    font-weight: 500;
+  }
+
+  .palier-plage {
+    flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
+    color: #555;
+    white-space: nowrap;
+  }
+}
+
+// Image réelle d'une distinction (repli sur pastille si absente)
+.palier-img {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+// Pastille colorée (couleur de cible) — repli
+.palier {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+
+  &--vert   { background: #2e7d32; }
+  &--blanc  { background: #fff; color: #222; border: 1px solid #bbb; }
+  &--noir   { background: #111; }
+  &--bleu   { background: #1565c0; }
+  &--rouge  { background: #c62828; }
+  &--jaune  { background: #f6c700; color: #222; }
+  &--etoile { background: #d4af37; color: #4a3b00; }
+  &--defaut { background: #999; }
+}
+
+// Pastille campagne : médaille sur fond coloré
+.camp {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+
+  &--fond-blanc { background: #fff; border: 1px solid #bbb; }
+  &--fond-vert  { background: #2e7d32; }
+  &--fond-noir  { background: #111; }
+  &--fond-bleu  { background: #1565c0; }
+  &--fond-rouge { background: #c62828; }
+
+  .camp-med {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+
+    &--or     { background: #d4af37; }
+    &--argent { background: #c0c0c0; }
+    &--vert   { background: #43a047; }
+  }
+}
+
+// Tableau de barème multi-colonnes (Salle)
+.bareme-multi {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+  }
+
+  thead th {
+    background: #f5f5f5;
+    white-space: nowrap;
+  }
+
+  .bm-distinction {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    .palier-nom {
+      font-weight: 500;
+    }
+  }
+
+  .bm-plage {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: #555;
+
+    .bm-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .palier-img--sm {
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
+.note {
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #777;
+}
+
+// Onglet « À venir »
+.a-venir {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  color: #888;
+  background: #fafafa;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+
+  i {
+    font-size: 1.5rem;
+  }
+}
