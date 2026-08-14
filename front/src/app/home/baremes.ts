@@ -31,8 +31,8 @@ export interface BaremeMulti {
 
 // Campagne : médaille sur fond → rendu deux tons, tableau multi-colonnes.
 export interface PalierCampagneMulti {
-  medaille: 'Or' | 'Argent' | 'Vert';
-  fond: 'blanc' | 'vert' | 'noir' | 'bleu' | 'rouge';
+  medaille: 'Or' | 'Argent' | 'Vert' | 'Noir';
+  fond: 'blanc' | 'vert' | 'noir' | 'bleu' | 'rouge' | 'orange';
   image: string;
   plages: string[]; // une plage de score par colonne
 }
@@ -146,4 +146,42 @@ export const CAMPAGNE_ECUREUIL: BaremeCampagneMulti = {
     [160, 200, 220, 260, 300, 340],
     [180, 220, 240, 280, 320, 360],
   ]),
+};
+
+// ── TIR 3D ──────────────────────────────────────────────────────────────────
+// Parcours 1×24 cibles. Brocard (adultes) : mêmes médailles/fonds que l'Écureuil
+// campagne (6 paliers), 5 colonnes d'arc. Lynx (jeunes) : 3 paliers sur fond orange.
+// En 3D, classiques (CL) et poulies (CO) sont classés « Arc Libre ».
+export const BROCARD_3D: BaremeCampagneMulti = {
+  titre: 'Tir 3D — Brocard (adultes)',
+  colonnes: ['Arc Droit', 'Arc Chasse', 'Arc Nu', 'Arc à Poulies Nu', 'Arc Libre'],
+  note: 'Arc Droit / Chasse / Nu / Poulies Nu : U21+ — Arc Libre : U18+ (classique + poulies)',
+  paliers: paliersCampMulti('3d-brocard', [
+    [70, 125, 185, 235, 270, 335],
+    [85, 140, 195, 260, 300, 360],
+    [110, 160, 220, 270, 315, 375],
+    [140, 210, 280, 330, 385, 435],
+    [185, 260, 330, 380, 435, 460],
+  ]),
+};
+
+// Paliers Lynx : médaille/fond spécifiques (fond orange), non couverts par CAMP_DEF.
+const LYNX_DEF: { medaille: PalierCampagneMulti['medaille']; fond: PalierCampagneMulti['fond']; image: string }[] = [
+  { medaille: 'Noir', fond: 'orange', image: 'noir-orange' },
+  { medaille: 'Argent', fond: 'orange', image: 'argent-orange' },
+  { medaille: 'Or', fond: 'orange', image: 'or-orange' },
+];
+
+const LYNX_BORNES = [150, 175, 210];
+
+export const LYNX_3D: BaremeCampagneMulti = {
+  titre: 'Tir 3D — Lynx (U13 / U15 / U18)',
+  colonnes: ['Arc Nu'],
+  note: 'Arc Nu uniquement',
+  paliers: LYNX_DEF.map((def, i) => ({
+    medaille: def.medaille,
+    fond: def.fond,
+    image: `3d-lynx-${def.image}`,
+    plages: [plageStr(LYNX_BORNES, i)],
+  })),
 };

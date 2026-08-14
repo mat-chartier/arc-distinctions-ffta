@@ -8,6 +8,8 @@ import {
   TAE_DN,
   CAMPAGNE_MARCASSIN,
   CAMPAGNE_ECUREUIL,
+  BROCARD_3D,
+  LYNX_3D,
 } from './baremes';
 
 @Component({
@@ -23,6 +25,8 @@ export class HomeComponent {
   taeDN = TAE_DN;
   campagneMarcassin = CAMPAGNE_MARCASSIN;
   campagneEcureuil = CAMPAGNE_ECUREUIL;
+  brocard3D = BROCARD_3D;
+  lynx3D = LYNX_3D;
 
   // Slugs d'images introuvables → repli sur la pastille colorée.
   imgFailed = new Set<string>();

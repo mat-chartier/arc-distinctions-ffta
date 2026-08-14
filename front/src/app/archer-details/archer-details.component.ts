@@ -69,12 +69,17 @@ export class ArcherDetailsComponent implements OnInit {
     if (d.discipline === 'CAMPAGNE_MARCASSIN' || d.discipline === 'CAMPAGNE_ECUREUIL') {
       return `Campagne - Piquet ${d.piquet}`;
     }
+    if (d.discipline === '3D_BROCARD' || d.discipline === '3D_LYNX') {
+      return 'Tir 3D';
+    }
     return d.discipline;
   }
 
   getNomDisplay(d: DistinctionWithResultat): string {
     if (d.discipline === 'CAMPAGNE_MARCASSIN') return `Marcassin - ${d.nom}`;
     if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
+    if (d.discipline === '3D_BROCARD') return `Brocard - ${d.nom}`;
+    if (d.discipline === '3D_LYNX') return `Lynx - ${d.nom}`;
     return d.nom;
   }
 

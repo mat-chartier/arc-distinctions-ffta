@@ -14,6 +14,7 @@
       <p-tab value="salle">Salle</p-tab>
       <p-tab value="tae">TAE extérieur</p-tab>
       <p-tab value="campagne">Campagne</p-tab>
+      <p-tab value="3d">3D</p-tab>
       <p-tab value="avenir">À venir</p-tab>
     </p-tablist>
 
@@ -51,13 +52,23 @@
         </div>
       </p-tabpanel>
 
+      <!-- 3D -->
+      <p-tabpanel value="3d">
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: brocard3D }"></ng-container>
+        </div>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: lynx3D }"></ng-container>
+        </div>
+      </p-tabpanel>
+
       <!-- À VENIR -->
       <p-tabpanel value="avenir">
         <div class="a-venir">
           <i class="pi pi-clock"></i>
           <div>
-            <strong>3D / Nature — à venir</strong>
-            <p class="mb-0 text-muted">Ces disciplines seront ajoutées ultérieurement.</p>
+            <strong>Nature — à venir</strong>
+            <p class="mb-0 text-muted">Cette discipline sera ajoutée ultérieurement.</p>
           </div>
         </div>
       </p-tabpanel>
@@ -172,7 +183,8 @@
         [ngClass]="{
           'camp-med--or': p.medaille === 'Or',
           'camp-med--argent': p.medaille === 'Argent',
-          'camp-med--vert': p.medaille === 'Vert'
+          'camp-med--vert': p.medaille === 'Vert',
+          'camp-med--noir': p.medaille === 'Noir'
         }"
       ></span>
     </span>

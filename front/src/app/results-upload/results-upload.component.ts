@@ -242,6 +242,14 @@ export class ResultsUploadComponent {
           { score: resultRaw.score, piquet }
         );
       }
+    } else if (resultRaw.discipline === '3') {
+      // Tir 3D : parcours simple (1×24 cibles), pas de piquet ni de split.
+      // Le champ DISTANCE de l'export vaut 1/2 (non-mètres) → forcé à 0 pour ne pas
+      // polluer la clé d'unicité des distinctions.
+      this.processResultForBestDistinction(
+        resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+        { distance: 0, score: resultRaw.score }
+      );
     }
   }
 
@@ -254,7 +262,8 @@ export class ResultsUploadComponent {
   ) {
     const result = {
       archerId: archer.id,
-      distance: overrides.distance || resultRaw.distance,
+      // ?? et non || : le 3D force distance à 0 (valeur falsy à préserver).
+      distance: overrides.distance ?? resultRaw.distance,
       dateDebutConcours: this.parseDate(resultRaw.dateDebutConcours),
       arme: resultRaw.arme,
       blason: overrides.blason || resultRaw.blason,
@@ -598,6 +607,9 @@ export class ResultsUploadComponent {
     if (d.discipline === 'C') {
       return `Campagne - Piquet ${d.piquet ?? d.distance}`;
     }
+    if (d.discipline === '3') {
+      return 'Tir 3D';
+    }
     return `${d.discipline} - ${d.distance}m`;
   }
 
@@ -605,6 +617,9 @@ export class ResultsUploadComponent {
     const d = item.data;
     if (d.discipline === 'CAMPAGNE_MARCASSIN' || d.discipline === 'CAMPAGNE_ECUREUIL') {
       return `Campagne - Piquet ${d.piquet}`;
+    }
+    if (d.discipline === '3D_BROCARD' || d.discipline === '3D_LYNX') {
+      return 'Tir 3D';
     }
     if (d.distance > 0) return `${d.discipline} - ${d.distance}m`;
     return d.discipline;
@@ -614,6 +629,8 @@ export class ResultsUploadComponent {
     const d = item.data;
     if (d.discipline === 'CAMPAGNE_MARCASSIN') return `Marcassin - ${d.nom}`;
     if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
+    if (d.discipline === '3D_BROCARD') return `Brocard - ${d.nom}`;
+    if (d.discipline === '3D_LYNX') return `Lynx - ${d.nom}`;
     return d.nom;
   }
 }

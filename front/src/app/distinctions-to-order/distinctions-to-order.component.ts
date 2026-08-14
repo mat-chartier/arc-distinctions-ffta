@@ -35,6 +35,9 @@ export class DistinctionsToOrderComponent implements OnInit {
   distinctionsCampagneEcureuilCLToOrder: DistinctionToOrder[] = [];
   distinctionsCampagneEcureuilCOToOrder: DistinctionToOrder[] = [];
   distinctionsCampagneEcureuilBBToOrder: DistinctionToOrder[] = [];
+  // Tir 3D : badge par niveau (indépendant de l'arme) → une table par groupe.
+  distinctions3DBrocardToOrder: DistinctionToOrder[] = [];
+  distinctions3DLynxToOrder: DistinctionToOrder[] = [];
   
   loading = true;
   error: string = '';
@@ -93,6 +96,8 @@ export class DistinctionsToOrderComponent implements OnInit {
       let dataFilteredCampagneEcureuilCL: any[] = [];
       let dataFilteredCampagneEcureuilCO: any[] = [];
       let dataFilteredCampagneEcureuilBB: any[] = [];
+      let dataFiltered3DBrocard: any[] = [];
+      let dataFiltered3DLynx: any[] = [];
 
       data.forEach((resultat: any) => {
         if (resultat.discipline === 'Salle') {
@@ -123,6 +128,10 @@ export class DistinctionsToOrderComponent implements OnInit {
           } else if (resultat.Resultat.arme === 'BB') {
             dataFilteredCampagneEcureuilBB.push(resultat);
           }
+        } else if (resultat.discipline === '3D_BROCARD') {
+          dataFiltered3DBrocard.push(resultat);
+        } else if (resultat.discipline === '3D_LYNX') {
+          dataFiltered3DLynx.push(resultat);
         }
       });
 
@@ -136,6 +145,8 @@ export class DistinctionsToOrderComponent implements OnInit {
       this.distinctionsCampagneEcureuilCLToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilCL);
       this.distinctionsCampagneEcureuilCOToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilCO);
       this.distinctionsCampagneEcureuilBBToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilBB);
+      this.distinctions3DBrocardToOrder = this.getDistinctionsToOrder(dataFiltered3DBrocard);
+      this.distinctions3DLynxToOrder = this.getDistinctionsToOrder(dataFiltered3DLynx);
 
       console.log('Distinctions à commander chargées');
 

@@ -55,6 +55,21 @@ class DistinctionRules {
     "Or sur fond bleu",
     "Or sur fond rouge",
   ];
+  // Tir 3D — Brocard (adultes) : 6 niveaux, mêmes libellés que l'Écureuil campagne.
+  DISTINCTIONS_3D_BROCARD = [
+    "Vert sur fond blanc",
+    "Argent sur fond vert",
+    "Or sur fond blanc",
+    "Or sur fond noir",
+    "Or sur fond bleu",
+    "Or sur fond rouge",
+  ];
+  // Tir 3D — Lynx (U13/U15/U18, Arc Nu) : 3 niveaux sur fond orange.
+  DISTINCTIONS_3D_LYNX = [
+    "Noir sur fond orange",
+    "Argent sur fond orange",
+    "Or sur fond orange",
+  ];
 
   getSameOrBetter(
     nom: string,
@@ -86,6 +101,14 @@ class DistinctionRules {
       return this.DISTINCTIONS_CAMPAGNE_ECUREUIL.slice(
         this.DISTINCTIONS_CAMPAGNE_ECUREUIL.findIndex((d) => d === nom)
       );
+    } else if (discipline === "3D_BROCARD") {
+      return this.DISTINCTIONS_3D_BROCARD.slice(
+        this.DISTINCTIONS_3D_BROCARD.findIndex((d) => d === nom)
+      );
+    } else if (discipline === "3D_LYNX") {
+      return this.DISTINCTIONS_3D_LYNX.slice(
+        this.DISTINCTIONS_3D_LYNX.findIndex((d) => d === nom)
+      );
     }
     return null;
   }
@@ -109,8 +132,43 @@ class DistinctionRules {
   getNatureDistinction(resultat: Resultat): Distinction {
     throw new Error("Method not implemented.");
   }
-  get3DDistinction(resultat: Resultat): Distinction {
-    throw new Error("Method not implemented.");
+  // Tir 3D : parcours de 1×24 cibles, seuils de score par catégorie/arme.
+  // Aiguillage validé (docs/reglement-3d-extrait.md) :
+  //  - Arc Nu (CL/BB) + jeunes {U13,U15,U18} → LYNX
+  //  - sinon → BROCARD, colonne selon l'arme.
+  // Mapping code export → colonne : AD=Droit, AC=Chasse, CL/BB=Arc Nu,
+  // CO=Arc à Poulies Nu, TL=Arc Libre. (En 3D, le code CL de l'export = arc nu.)
+  BROCARD_SEUILS: Record<string, number[]> = {
+    AD: [70, 125, 185, 235, 270, 335], // Arc Droit
+    AC: [85, 140, 195, 260, 300, 360], // Arc Chasse
+    CL: [110, 160, 220, 270, 315, 375], // Arc Nu (classique en 3D)
+    BB: [110, 160, 220, 270, 315, 375], // Arc Nu (bare bow)
+    CO: [140, 210, 280, 330, 385, 435], // Arc à Poulies Nu
+    TL: [185, 260, 330, 380, 435, 460], // Arc Libre (tir libre)
+  };
+
+  get3DDistinction(resultat: Resultat): Distinction | null {
+    const { arme, categorie, score } = resultat;
+    const dist = { discipline: "3D", distance: 0 };
+    const JEUNE_CAT = ["U13", "U15", "U18"];
+
+    // Lynx : Arc Nu (CL/BB), jeunes uniquement
+    if ((arme === "CL" || arme === "BB") && JEUNE_CAT.includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(
+        score, this.DISTINCTIONS_3D_LYNX, [150, 175, 210],
+        { ...dist, discipline: "3D_LYNX" }
+      );
+    }
+
+    // Brocard : colonne selon l'arme
+    const seuils = this.BROCARD_SEUILS[arme];
+    if (seuils) {
+      return this.getCampagneDistinctionByThresholds(
+        score, this.DISTINCTIONS_3D_BROCARD, seuils,
+        { ...dist, discipline: "3D_BROCARD" }
+      );
+    }
+    return null;
   }
   getCampagneDistinction(resultat: Resultat): Distinction | null {
     const { arme, categorie, score } = resultat;

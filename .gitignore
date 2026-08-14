@@ -10,3 +10,7 @@ front/.firebase/
 link_admin_user.js
 migration_script.js
 test-connection.js
+
+# Exports FFTA réels (données personnelles adhérents : noms + licences).
+# On garde volontairement docs/sample-ffta-export.csv (échantillon anonymisé).
+docs/ResultatsIndividuels_*.csv
