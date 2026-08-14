@@ -11,8 +11,28 @@ import {
   withInterceptorsFromDi,
 } from '@angular/common/http';
 import Aura from '@primeng/themes/aura';
+import { definePreset } from '@primeng/themes';
 import { providePrimeNG } from 'primeng/config';
 import { AuthInterceptor } from './services/auth-interceptor';
+
+// Primaire magenta (charte PCA Grenoble) appliquée au preset Aura.
+const FftaPreset = definePreset(Aura, {
+  semantic: {
+    primary: {
+      50: '#fdf2f9',
+      100: '#fce7f3',
+      200: '#f9cfe6',
+      300: '#f39ad1',
+      400: '#ec5cb0',
+      500: '#e5289d',
+      600: '#c32285',
+      700: '#901160',
+      800: '#7e0f54',
+      900: '#6a0d47',
+      950: '#45082e',
+    },
+  },
+});
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,7 +43,11 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: FftaPreset,
+        options: {
+          // Clair uniquement : sélecteur de mode sombre jamais appliqué.
+          darkModeSelector: '.app-dark-never',
+        },
       },
     }),
   ],

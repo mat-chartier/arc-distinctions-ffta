@@ -1,25 +1,137 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================================
+   Thème global — charte inspirée de la Première Compagnie d'Arc
+   de Grenoble (magenta / prune, clair uniquement).
+   ============================================================ */
+
+:root {
+  --pca-magenta: #e5289d;
+  --pca-magenta-600: #c32285;
+  --pca-magenta-700: #901160;
+  --pca-plum: #1a1423;
+  --pca-teal: #017e84;
+  --pca-cream: #f5f4f0;
+  --pca-ink: #241d2b;
+  --pca-muted: #6b6470;
+}
+
 body.arc-distinctions-app {
-    margin: 1rem;
+  margin: 0;
+  background: var(--pca-cream);
+  color: var(--pca-ink);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 button.p-button {
-    margin: 0.5rem;
+  margin: 0.5rem;
 }
 
-/* Tables: scroll horizontalement sur petits écrans */
+/* ---- Shell : topbar + navigation --------------------------------- */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.55rem 1.4rem;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #ffffff;
+  border-bottom: 3px solid var(--pca-magenta);
+  box-shadow: 0 2px 10px rgba(26, 20, 35, 0.06);
+}
+.brand {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+}
+.brand-logo {
+  height: 42px;
+  width: auto;
+  display: block;
+}
+.brand-name {
+  font-family: 'Darker Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 1.7rem;
+  line-height: 1;
+  letter-spacing: 0.3px;
+  color: var(--pca-plum);
+  white-space: nowrap;
+}
+.brand-name b { color: var(--pca-magenta); font-weight: 800; }
+
+/* Menubar intégrée à la topbar (styles globaux : le DOM interne de
+   p-menubar échappe à l'encapsulation du composant). */
+.app-topbar .p-menubar {
+  background: transparent;
+  border: none;
+  padding: 0;
+  flex: 1 1 auto;
+}
+.app-topbar .p-menubar > .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link,
+.app-topbar .p-menubar > .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content .p-menubar-item-link .p-menubar-item-icon {
+  color: var(--pca-plum);
+}
+.app-topbar .p-menubar > .p-menubar-root-list > .p-menubar-item > .p-menubar-item-content:hover {
+  background: #f3eef1;
+  border-radius: 8px;
+}
+.app-topbar .p-menubar-button { color: var(--pca-plum); }
+
+/* Action déconnexion : enfant direct de la topbar, poussée à droite */
+.app-logout {
+  flex: 0 0 auto;
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  color: var(--pca-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+.app-logout:hover { color: var(--pca-plum); }
+
+/* app-root est inline par défaut : forcé en block pour que la topbar suive la
+   largeur du viewport (et non celle du contenu qui peut déborder). */
+app-root { display: block; }
+.app-main { display: block; }
+.accueil { max-width: 1120px; }
+
+/* ---- Cartes / onglets / tables (polish global) ------------------- */
+.p-card {
+  border: 1px solid #e7e1e6;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(26, 20, 35, 0.04);
+}
+.p-card .p-card-title {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--pca-plum);
+}
+.bareme-multi thead th {
+  background: #f4f1f3 !important;
+  color: var(--pca-plum);
+}
+
+/* Tables : scroll horizontal sur petits écrans */
 .p-datatable-wrapper {
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
-/* Mobile */
+/* ---- Mobile ------------------------------------------------------ */
 @media (max-width: 576px) {
-    body.arc-distinctions-app {
-        margin: 0.25rem;
-    }
-
-    .container {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
+  .app-topbar { padding: 0.5rem 0.6rem; gap: 0.5rem; }
+  .brand-logo { height: 34px; }
+  .brand-name { font-size: 1.05rem; }
+  /* La nav mobile (burger) ne s'étire pas sur toute la largeur : la
+     déconnexion reste collée à droite. */
+  .app-topbar .p-menubar { flex: 0 0 auto; width: auto !important; }
+  .app-logout { padding: 0.25rem 0.35rem; }
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }

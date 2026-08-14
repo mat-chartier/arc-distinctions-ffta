@@ -3,6 +3,36 @@
     margin-bottom: 0.25rem;
   }
 
+  // Bandeau héro (sobre) : surtitre discret + titre display prune
+  .home-hero {
+    padding: 1.75rem 0 1.25rem;
+
+    &__eyebrow {
+      margin: 0 0 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #8a8391;
+    }
+
+    h2 {
+      margin: 0;
+      font-family: 'Darker Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 2.2rem;
+      line-height: 1;
+      color: var(--pca-plum);
+    }
+
+    &__intro {
+      margin: 0.8rem 0 0;
+      max-width: 62ch;
+      color: #5b5563;
+      line-height: 1.5;
+    }
+  }
+
   .section-titre {
     margin-top: 1rem;
     margin-bottom: 0.75rem;
