@@ -3,6 +3,19 @@
 Déposez ici les images des distinctions au format `<slug>.png`. Tant qu'un fichier est
 absent, l'accueil affiche automatiquement une **pastille colorée** de repli à la place.
 
+## Source et licence des visuels fournis
+
+Les PNG Salle, TAE DI, Marcassins et Écureuils présents ici ont été **découpés par palier**
+depuis les planches de badges de **Nhhi** sur
+[Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Archery_in_France),
+sous licence **CC BY-SA 4.0**. Planches d'origine :
+`Badges_Salle_FFTA.png`, `Badges_extérieur_FFTA.png`, `Badges_marcassin.png`, `Badges_ecureuil.png`.
+L'attribution figure en pied de l'écran d'accueil (`home.component.html`).
+
+> **TAE DN** : les badges « Archers » (bordure or / argent par arme) ne sont pas disponibles
+> sur cette page Wikipédia. Les 10 slugs `taedn-*` restent donc absents et s'affichent en
+> pastille de couleur de repli.
+
 Convention : le `slug` de chaque palier est défini dans
 `front/src/app/home/baremes.ts`. Liste complète des fichiers attendus :
 
