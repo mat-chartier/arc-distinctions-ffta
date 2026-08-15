@@ -18,6 +18,10 @@ interface DistinctionWithArcherAndResultat {
   statut: string;
   distance: number;
   discipline: string;
+  // Regroupement pour le filtre « Distinctions » : les sous-disciplines
+  // (Campagne Marcassin/Écureuil, 3D Brocard/Lynx, Nature Sanglier/Marcassin)
+  // sont réunies sous une entrée unique.
+  disciplineGroupe: string;
   Archer: ArcherDoc;
   Resultat: ResultatDoc & { dateDebutConcours: Date };
 }
@@ -60,7 +64,8 @@ export class DistinctionsListComponent implements OnInit {
 
   statuts = ['A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
-  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D_BROCARD', '3D_LYNX', 'NATURE_SANGLIER', 'NATURE_MARCASSIN'];
+  // Options du filtre « Distinctions » : sous-disciplines regroupées (voir disciplineGroupe()).
+  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'Campagne', '3D', 'Nature'];
 
   @ViewChild('distinctionsTable') distinctionsTable!: Table;
 
@@ -114,6 +119,7 @@ export class DistinctionsListComponent implements OnInit {
           
           return {
             ...d,
+            disciplineGroupe: this.disciplineGroupe(d.discipline),
             Archer: archer,
             Resultat: {
               ...resultat,
@@ -237,6 +243,14 @@ export class DistinctionsListComponent implements OnInit {
   /** Valeur du stock virtuel pour une ligne, ou null si non applicable. */
   getVirtualStock(d: any): number | null {
     return this.virtualById.has(d.id) ? this.virtualById.get(d.id)! : null;
+  }
+
+  /** Regroupe une sous-discipline sous une entrée unique pour le filtre. */
+  disciplineGroupe(discipline: string): string {
+    if (discipline === 'CAMPAGNE_MARCASSIN' || discipline === 'CAMPAGNE_ECUREUIL') return 'Campagne';
+    if (discipline === '3D_BROCARD' || discipline === '3D_LYNX') return '3D';
+    if (discipline === 'NATURE_SANGLIER' || discipline === 'NATURE_MARCASSIN') return 'Nature';
+    return discipline; // Salle, TAEDI, TAEDN
   }
 
   getDisciplineDisplay(d: any): string {
