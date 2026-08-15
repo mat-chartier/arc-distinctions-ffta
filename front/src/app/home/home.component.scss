@@ -140,6 +140,19 @@
     .palier-nom {
       font-weight: 500;
     }
+
+    // TAE DN : deux variantes (or / argent) côte à côte dans la colonne Distinction.
+    .dn-badges {
+      display: inline-flex;
+      gap: 0.3rem;
+
+      .dn-badge {
+        flex: 0 0 auto;
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+      }
+    }
   }
 
   .bm-plage {

@@ -87,11 +87,11 @@
   </p-tabs>
 
   <p class="credits">
-    Visuels des distinctions : badges brodés par
+    Visuels des distinctions (Salle, TAE DI, Campagne, 3D, Nature) : badges brodés par
     <a href="https://commons.wikimedia.org/wiki/User:Nhhi" target="_blank" rel="noopener">Nhhi</a>
     via <a href="https://commons.wikimedia.org/wiki/Category:Archery_in_France" target="_blank" rel="noopener">Wikimedia Commons</a>,
     sous licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 4.0</a>
-    (planches découpées par palier). Les visuels TAE DN sont affichés en pastille de couleur en attendant leurs badges.
+    (planches découpées par palier). Les écussons TAE DN proviennent du règlement FFTA.
   </p>
 </div>
 
@@ -113,6 +113,16 @@
             <td>
               <div class="bm-distinction">
                 <ng-container *ngIf="p.image" [ngTemplateOutlet]="visuel" [ngTemplateOutletContext]="{ $implicit: p }"></ng-container>
+                <span class="dn-badges" *ngIf="p.images?.length">
+                  <img
+                    *ngFor="let img of p.images"
+                    class="dn-badge"
+                    [hidden]="imgFailed.has(img)"
+                    [src]="'images/distinctions/' + img + '.png'"
+                    [alt]="p.nom"
+                    (error)="imgFailed.add(img)"
+                  />
+                </span>
                 <span class="palier-nom">{{ p.nom }}</span>
               </div>
             </td>

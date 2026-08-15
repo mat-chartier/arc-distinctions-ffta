@@ -19,6 +19,7 @@ export interface ColonneScore {
 export interface PalierMulti {
   nom: string;
   image?: string; // badge commun à toutes les colonnes (Salle, TAE DI)
+  images?: string[]; // plusieurs badges dans la colonne Distinction (TAE DN : or + argent)
   colonnes: ColonneScore[];
 }
 
@@ -100,10 +101,13 @@ export const TAE_DN: BaremeMulti = {
   colonnes: ['Arc classique (bordure or)', 'Arc à Poulies (bordure argent)'],
   paliers: NOMS_DN.map((nom, i) => ({
     nom,
-    // Pas de badge commun : le visuel diffère par arme (bordure or vs argent).
+    // Le visuel diffère par arme (bordure or vs argent) : les deux variantes sont
+    // affichées ensemble dans la colonne Distinction ; les colonnes d'arme ne
+    // portent que le score.
+    images: [`taedn-classique-${CLES_DN[i]}`, `taedn-poulies-${CLES_DN[i]}`],
     colonnes: [
-      { plage: plageStr(DN_CL, i), image: `taedn-classique-${CLES_DN[i]}` },
-      { plage: plageStr(DN_CO, i), image: `taedn-poulies-${CLES_DN[i]}` },
+      { plage: plageStr(DN_CL, i) },
+      { plage: plageStr(DN_CO, i) },
     ],
   })),
 };
