@@ -220,3 +220,18 @@ export const MARCASSIN_NATURE: BaremeCampagneMulti = {
     plages: [plageStr(MARCASSIN_BORNES, i)],
   })),
 };
+
+// ── BEURSAULT ─────────────────────────────────────────────────────────────────
+// Badges Marmots 1→4, attribués sur le seul nombre d'honneurs (ni arme, ni
+// catégorie d'âge, ni sexe).
+export const BEURSAULT: BaremeMulti = {
+  titre: 'Beursault — Marmots',
+  colonnes: ['Honneurs'],
+  note: 'Toutes armes et catégories — seul le nombre d’honneurs compte',
+  paliers: [
+    { nom: '1 marmot', image: 'beursault-1-marmot', colonnes: [{ plage: '32–34' }] },
+    { nom: '2 marmots', image: 'beursault-2-marmots', colonnes: [{ plage: '35–37' }] },
+    { nom: '3 marmots', image: 'beursault-3-marmots', colonnes: [{ plage: '38–39' }] },
+    { nom: '4 marmots', image: 'beursault-4-marmots', colonnes: [{ plage: '40' }] },
+  ],
+};

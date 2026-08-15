@@ -257,6 +257,14 @@ export class ResultsUploadComponent {
         resultRaw, archer, existingResults, bestDistinctionsFromUpload,
         { distance: 0, score: resultRaw.score }
       );
+    } else if (resultRaw.discipline === 'B') {
+      // Beursault : le badge Marmot dépend du nombre d'honneurs, encodé dans
+      // SCORE_DIST1 de l'export (SCORE = SCORE_DIST1 × 1000 + points). On passe
+      // les honneurs dans le champ score ; distance forcée à 0.
+      this.processResultForBestDistinction(
+        resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+        { distance: 0, score: resultRaw.scoreDist1 }
+      );
     }
   }
 
@@ -620,6 +628,9 @@ export class ResultsUploadComponent {
     if (d.discipline === 'N') {
       return 'Tir Nature';
     }
+    if (d.discipline === 'B') {
+      return 'Beursault';
+    }
     return `${d.discipline} - ${d.distance}m`;
   }
 
@@ -633,6 +644,9 @@ export class ResultsUploadComponent {
     }
     if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
       return 'Tir Nature';
+    }
+    if (d.discipline === 'BEURSAULT') {
+      return 'Beursault';
     }
     if (d.distance > 0) return `${d.discipline} - ${d.distance}m`;
     return d.discipline;

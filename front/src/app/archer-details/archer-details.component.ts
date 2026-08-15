@@ -75,6 +75,9 @@ export class ArcherDetailsComponent implements OnInit {
     if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
       return 'Tir Nature';
     }
+    if (d.discipline === 'BEURSAULT') {
+      return 'Beursault';
+    }
     return d.discipline;
   }
 
@@ -95,6 +98,7 @@ export class ArcherDetailsComponent implements OnInit {
       case 'C': return 'Campagne';
       case '3': return '3D';
       case 'N': return 'Nature';
+      case 'B': return 'Beursault';
       default: return r.discipline;
     }
   }

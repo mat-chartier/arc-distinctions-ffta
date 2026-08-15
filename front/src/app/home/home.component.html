@@ -16,7 +16,7 @@
       <p-tab value="campagne">Campagne</p-tab>
       <p-tab value="3d">3D</p-tab>
       <p-tab value="nature">Nature</p-tab>
-      <p-tab value="avenir">À venir</p-tab>
+      <p-tab value="beursault">Beursault</p-tab>
     </p-tablist>
 
     <p-tabpanels>
@@ -73,15 +73,9 @@
         </div>
       </p-tabpanel>
 
-      <!-- À VENIR -->
-      <p-tabpanel value="avenir">
-        <div class="a-venir">
-          <i class="pi pi-clock"></i>
-          <div>
-            <strong>Beursault — à venir</strong>
-            <p class="mb-0 text-muted">Cette discipline sera ajoutée ultérieurement.</p>
-          </div>
-        </div>
+      <!-- BEURSAULT -->
+      <p-tabpanel value="beursault">
+        <ng-container [ngTemplateOutlet]="baremeMultiCard" [ngTemplateOutletContext]="{ $implicit: beursault }"></ng-container>
       </p-tabpanel>
     </p-tabpanels>
   </p-tabs>
@@ -91,7 +85,7 @@
     <a href="https://commons.wikimedia.org/wiki/User:Nhhi" target="_blank" rel="noopener">Nhhi</a>
     via <a href="https://commons.wikimedia.org/wiki/Category:Archery_in_France" target="_blank" rel="noopener">Wikimedia Commons</a>,
     sous licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr" target="_blank" rel="noopener">CC BY-SA 4.0</a>
-    (planches découpées par palier). Les écussons TAE DN proviennent du règlement FFTA.
+    (planches découpées par palier). Les écussons TAE DN et Beursault proviennent du règlement FFTA.
   </p>
 </div>
 

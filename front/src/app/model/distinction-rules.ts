@@ -85,6 +85,14 @@ class DistinctionRules {
     "Argent sur fond orange",
     "Or sur fond orange",
   ];
+  // Beursault — Marmots : 4 niveaux, attribués sur le nombre d'honneurs
+  // (indépendant de l'arme, de la catégorie d'âge et du sexe).
+  DISTINCTIONS_BEURSAULT = [
+    "1 marmot",
+    "2 marmots",
+    "3 marmots",
+    "4 marmots",
+  ];
 
   getSameOrBetter(
     nom: string,
@@ -132,6 +140,10 @@ class DistinctionRules {
       return this.DISTINCTIONS_NATURE_MARCASSIN.slice(
         this.DISTINCTIONS_NATURE_MARCASSIN.findIndex((d) => d === nom)
       );
+    } else if (discipline === "BEURSAULT") {
+      return this.DISTINCTIONS_BEURSAULT.slice(
+        this.DISTINCTIONS_BEURSAULT.findIndex((d) => d === nom)
+      );
     }
     return null;
   }
@@ -148,6 +160,8 @@ class DistinctionRules {
         return this.get3DDistinction(resultat);
       case "N":
         return this.getNatureDistinction(resultat);
+      case "B":
+        return this.getBeursaultDistinction(resultat);
       default:
         return null;
     }
@@ -189,6 +203,16 @@ class DistinctionRules {
       );
     }
     return null;
+  }
+
+  // Beursault : le badge Marmot dépend UNIQUEMENT du nombre d'honneurs
+  // (ni arme, ni catégorie d'âge, ni sexe). À l'import, les honneurs (SCORE_DIST1
+  // de l'export) sont passés dans le champ `score`. Seuils : 32/35/38/40.
+  getBeursaultDistinction(resultat: Resultat): Distinction | null {
+    return this.getCampagneDistinctionByThresholds(
+      resultat.score, this.DISTINCTIONS_BEURSAULT, [32, 35, 38, 40],
+      { discipline: "BEURSAULT", distance: 0 }
+    );
   }
   // Tir 3D : parcours de 1×24 cibles, seuils de score par catégorie/arme.
   // Aiguillage validé (docs/reglement-3d-extrait.md) :

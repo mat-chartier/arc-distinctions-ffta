@@ -47,3 +47,29 @@ describe('distinctionRules — Tir Nature (getNatureDistinction via getDistincti
       .toEqual(['Argent sur fond orange', 'Or sur fond orange']);
   });
 });
+
+describe('distinctionRules — Beursault (getBeursaultDistinction via getDistinction "B")', () => {
+  // Pour Beursault, le champ `score` porte le nombre d'honneurs (SCORE_DIST1).
+  function bres(honneurs: number, arme = 'CL'): any {
+    return { discipline: 'B', score: honneurs, distance: 0, blason: '', arme, categorie: 'S1' };
+  }
+
+  it('attribue les marmots selon les honneurs (32/35/38/40), sans logique d\'arme', () => {
+    expect(distinctionRules.getDistinction(bres(31))).toBeNull();
+    expect(distinctionRules.getDistinction(bres(32))!.nom).toBe('1 marmot');
+    expect(distinctionRules.getDistinction(bres(34))!.nom).toBe('1 marmot');
+    expect(distinctionRules.getDistinction(bres(35))!.nom).toBe('2 marmots');
+    expect(distinctionRules.getDistinction(bres(39))!.nom).toBe('3 marmots');
+    expect(distinctionRules.getDistinction(bres(40))!.nom).toBe('4 marmots');
+    expect(distinctionRules.getDistinction(bres(45))!.nom).toBe('4 marmots');
+    // Même résultat quelle que soit l'arme (poulies).
+    const d = distinctionRules.getDistinction(bres(36, 'CO'))!;
+    expect(d.nom).toBe('2 marmots');
+    expect(d.discipline).toBe('BEURSAULT');
+  });
+
+  it('getSameOrBetter couvre les marmots', () => {
+    expect(distinctionRules.getSameOrBetter('2 marmots', 'BEURSAULT', 'CL'))
+      .toEqual(['2 marmots', '3 marmots', '4 marmots']);
+  });
+});

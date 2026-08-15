@@ -41,6 +41,8 @@ export class DistinctionsToOrderComponent implements OnInit {
   // Tir Nature : badge par niveau (indépendant de l'arme) → une table par groupe.
   distinctionsNatureSanglierToOrder: DistinctionToOrder[] = [];
   distinctionsNatureMarcassinToOrder: DistinctionToOrder[] = [];
+  // Beursault : badge Marmot fonction des honneurs seuls (ni arme, ni catégorie).
+  distinctionsBeursaultToOrder: DistinctionToOrder[] = [];
   
   loading = true;
   error: string = '';
@@ -103,6 +105,7 @@ export class DistinctionsToOrderComponent implements OnInit {
       let dataFiltered3DLynx: any[] = [];
       let dataFilteredNatureSanglier: any[] = [];
       let dataFilteredNatureMarcassin: any[] = [];
+      let dataFilteredBeursault: any[] = [];
 
       data.forEach((resultat: any) => {
         if (resultat.discipline === 'Salle') {
@@ -141,6 +144,8 @@ export class DistinctionsToOrderComponent implements OnInit {
           dataFilteredNatureSanglier.push(resultat);
         } else if (resultat.discipline === 'NATURE_MARCASSIN') {
           dataFilteredNatureMarcassin.push(resultat);
+        } else if (resultat.discipline === 'BEURSAULT') {
+          dataFilteredBeursault.push(resultat);
         }
       });
 
@@ -158,6 +163,7 @@ export class DistinctionsToOrderComponent implements OnInit {
       this.distinctions3DLynxToOrder = this.getDistinctionsToOrder(dataFiltered3DLynx);
       this.distinctionsNatureSanglierToOrder = this.getDistinctionsToOrder(dataFilteredNatureSanglier);
       this.distinctionsNatureMarcassinToOrder = this.getDistinctionsToOrder(dataFilteredNatureMarcassin);
+      this.distinctionsBeursaultToOrder = this.getDistinctionsToOrder(dataFilteredBeursault);
 
       console.log('Distinctions à commander chargées');
 

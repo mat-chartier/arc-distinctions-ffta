@@ -65,7 +65,7 @@ export class DistinctionsListComponent implements OnInit {
   statuts = ['A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
   // Options du filtre « Distinctions » : sous-disciplines regroupées (voir disciplineGroupe()).
-  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'Campagne', '3D', 'Nature'];
+  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'Campagne', '3D', 'Nature', 'Beursault'];
 
   @ViewChild('distinctionsTable') distinctionsTable!: Table;
 
@@ -250,6 +250,7 @@ export class DistinctionsListComponent implements OnInit {
     if (discipline === 'CAMPAGNE_MARCASSIN' || discipline === 'CAMPAGNE_ECUREUIL') return 'Campagne';
     if (discipline === '3D_BROCARD' || discipline === '3D_LYNX') return '3D';
     if (discipline === 'NATURE_SANGLIER' || discipline === 'NATURE_MARCASSIN') return 'Nature';
+    if (discipline === 'BEURSAULT') return 'Beursault';
     return discipline; // Salle, TAEDI, TAEDN
   }
 
@@ -262,6 +263,9 @@ export class DistinctionsListComponent implements OnInit {
     }
     if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
       return 'Tir Nature';
+    }
+    if (d.discipline === 'BEURSAULT') {
+      return 'Beursault';
     }
     return d.discipline;
   }

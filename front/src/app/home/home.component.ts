@@ -12,6 +12,7 @@ import {
   LYNX_3D,
   SANGLIER_NATURE,
   MARCASSIN_NATURE,
+  BEURSAULT,
 } from './baremes';
 
 @Component({
@@ -31,6 +32,7 @@ export class HomeComponent {
   lynx3D = LYNX_3D;
   sanglierNature = SANGLIER_NATURE;
   marcassinNature = MARCASSIN_NATURE;
+  beursault = BEURSAULT;
 
   // Slugs d'images introuvables → repli sur la pastille colorée.
   imgFailed = new Set<string>();
