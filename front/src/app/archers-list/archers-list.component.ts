@@ -2,12 +2,13 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Archer } from '../archer-details/archers-details';
 import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
 import { ApisService } from '../services/apis-service';
 import { AppStore } from '../services/app.store';
 
 @Component({
   selector: 'app-archers-list',
-  imports: [RouterLink, RouterLinkActive, TableModule],
+  imports: [RouterLink, RouterLinkActive, TableModule, InputTextModule],
   templateUrl: './archers-list.component.html',
   styleUrl: './archers-list.component.scss',
 })

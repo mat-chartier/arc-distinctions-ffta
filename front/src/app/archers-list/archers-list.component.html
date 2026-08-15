@@ -2,16 +2,27 @@
   <h2>Liste des archers</h2>
 
   <p-table
+  #dt
   [value]="archers"
   [paginator]="true"
   [rows]="50"
   [rowsPerPageOptions]="[50, 100, 200]"
+  [globalFilterFields]="['nom', 'prenom', 'noLicence']"
   sortMode="multiple"
   showGridlines
   stripedRows
   stateStorage="session"
   stateKey="archers-list-session"
 >
+  <ng-template #caption>
+    <input
+      pInputText
+      type="text"
+      class="archers-search"
+      (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+      placeholder="Rechercher un archer (nom, prénom ou n° de licence)"
+    />
+  </ng-template>
   <ng-template #header>
     <tr>
       <th pSortableColumn="nom">Nom <p-sortIcon field="nom" /></th>
