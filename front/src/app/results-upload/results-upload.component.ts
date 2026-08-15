@@ -250,6 +250,13 @@ export class ResultsUploadComponent {
         resultRaw, archer, existingResults, bestDistinctionsFromUpload,
         { distance: 0, score: resultRaw.score }
       );
+    } else if (resultRaw.discipline === 'N') {
+      // Tir Nature : parcours simple (21 cibles), pas de piquet ni de split.
+      // Le champ DISTANCE n'entre pas dans le barème → forcé à 0 (comme 3D).
+      this.processResultForBestDistinction(
+        resultRaw, archer, existingResults, bestDistinctionsFromUpload,
+        { distance: 0, score: resultRaw.score }
+      );
     }
   }
 
@@ -610,6 +617,9 @@ export class ResultsUploadComponent {
     if (d.discipline === '3') {
       return 'Tir 3D';
     }
+    if (d.discipline === 'N') {
+      return 'Tir Nature';
+    }
     return `${d.discipline} - ${d.distance}m`;
   }
 
@@ -621,6 +631,9 @@ export class ResultsUploadComponent {
     if (d.discipline === '3D_BROCARD' || d.discipline === '3D_LYNX') {
       return 'Tir 3D';
     }
+    if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
+      return 'Tir Nature';
+    }
     if (d.distance > 0) return `${d.discipline} - ${d.distance}m`;
     return d.discipline;
   }
@@ -631,6 +644,8 @@ export class ResultsUploadComponent {
     if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
     if (d.discipline === '3D_BROCARD') return `Brocard - ${d.nom}`;
     if (d.discipline === '3D_LYNX') return `Lynx - ${d.nom}`;
+    if (d.discipline === 'NATURE_SANGLIER') return `Sanglier - ${d.nom}`;
+    if (d.discipline === 'NATURE_MARCASSIN') return `Marcassin - ${d.nom}`;
     return d.nom;
   }
 }

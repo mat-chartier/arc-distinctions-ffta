@@ -50,6 +50,8 @@ export function stockTypeLabel(t: {
   if (t.discipline === 'CAMPAGNE_ECUREUIL') return `Campagne Écureuil - ${nom}`;
   if (t.discipline === '3D_BROCARD') return `3D Brocard - ${nom}`;
   if (t.discipline === '3D_LYNX') return `3D Lynx - ${nom}`;
+  if (t.discipline === 'NATURE_SANGLIER') return `Nature Sanglier - ${nom}`;
+  if (t.discipline === 'NATURE_MARCASSIN') return `Nature Marcassin - ${nom}`;
 
   let label = `${t.discipline} - ${nom}`;
   if (t.discipline === 'TAEDI' && t.distance && t.distance > 0) label += ` - ${t.distance}m`;

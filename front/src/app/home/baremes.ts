@@ -185,3 +185,34 @@ export const LYNX_3D: BaremeCampagneMulti = {
     plages: [plageStr(LYNX_BORNES, i)],
   })),
 };
+
+// ── TIR NATURE ────────────────────────────────────────────────────────────────
+// Parcours de 21 cibles tirées 1 fois. Sanglier (adultes) : mêmes médailles/fonds
+// que l'Écureuil campagne (6 paliers), 5 colonnes d'arc. Marcassin (jeunes) :
+// 3 paliers sur fond orange (mêmes visuels que le Lynx 3D).
+export const SANGLIER_NATURE: BaremeCampagneMulti = {
+  titre: 'Tir Nature — Sanglier (adultes)',
+  colonnes: ['Arc Droit', 'Arc Chasse', 'Arc Nu', 'Arc à Poulies Nu', 'Arc Libre'],
+  note: 'Arc Droit / Chasse / Nu / Poulies Nu : U21+ — Arc Libre : U18+',
+  paliers: paliersCampMulti('nature-sanglier', [
+    [125, 240, 350, 425, 500, 540],
+    [175, 290, 400, 475, 550, 590],
+    [200, 315, 425, 500, 575, 615],
+    [250, 340, 450, 525, 600, 640],
+    [300, 415, 525, 600, 675, 715],
+  ]),
+};
+
+const MARCASSIN_BORNES = [165, 275, 390];
+
+export const MARCASSIN_NATURE: BaremeCampagneMulti = {
+  titre: 'Tir Nature — Marcassin (U13 / U15 / U18)',
+  colonnes: ['Arc Nu'],
+  note: 'Arc Nu uniquement',
+  paliers: LYNX_DEF.map((def, i) => ({
+    medaille: def.medaille,
+    fond: def.fond,
+    image: `nature-marcassin-${def.image}`,
+    plages: [plageStr(MARCASSIN_BORNES, i)],
+  })),
+};

@@ -10,6 +10,8 @@ import {
   CAMPAGNE_ECUREUIL,
   BROCARD_3D,
   LYNX_3D,
+  SANGLIER_NATURE,
+  MARCASSIN_NATURE,
 } from './baremes';
 
 @Component({
@@ -27,6 +29,8 @@ export class HomeComponent {
   campagneEcureuil = CAMPAGNE_ECUREUIL;
   brocard3D = BROCARD_3D;
   lynx3D = LYNX_3D;
+  sanglierNature = SANGLIER_NATURE;
+  marcassinNature = MARCASSIN_NATURE;
 
   // Slugs d'images introuvables → repli sur la pastille colorée.
   imgFailed = new Set<string>();

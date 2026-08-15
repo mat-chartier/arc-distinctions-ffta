@@ -60,7 +60,7 @@ export class DistinctionsListComponent implements OnInit {
 
   statuts = ['A donner', 'Donnée', 'N/A', 'NVP'];
   saisons: string[] = [];
-  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D_BROCARD', '3D_LYNX', 'Nature'];
+  disciplines: string[] = ['Salle', 'TAEDI', 'TAEDN', 'CAMPAGNE_MARCASSIN', 'CAMPAGNE_ECUREUIL', '3D_BROCARD', '3D_LYNX', 'NATURE_SANGLIER', 'NATURE_MARCASSIN'];
 
   @ViewChild('distinctionsTable') distinctionsTable!: Table;
 
@@ -246,6 +246,9 @@ export class DistinctionsListComponent implements OnInit {
     if (d.discipline === '3D_BROCARD' || d.discipline === '3D_LYNX') {
       return 'Tir 3D';
     }
+    if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
+      return 'Tir Nature';
+    }
     return d.discipline;
   }
 
@@ -254,6 +257,8 @@ export class DistinctionsListComponent implements OnInit {
     if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
     if (d.discipline === '3D_BROCARD') return `Brocard - ${d.nom}`;
     if (d.discipline === '3D_LYNX') return `Lynx - ${d.nom}`;
+    if (d.discipline === 'NATURE_SANGLIER') return `Sanglier - ${d.nom}`;
+    if (d.discipline === 'NATURE_MARCASSIN') return `Marcassin - ${d.nom}`;
     return d.nom;
   }
 

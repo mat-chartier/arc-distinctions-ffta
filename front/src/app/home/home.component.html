@@ -15,6 +15,7 @@
       <p-tab value="tae">TAE extérieur</p-tab>
       <p-tab value="campagne">Campagne</p-tab>
       <p-tab value="3d">3D</p-tab>
+      <p-tab value="nature">Nature</p-tab>
       <p-tab value="avenir">À venir</p-tab>
     </p-tablist>
 
@@ -62,12 +63,22 @@
         </div>
       </p-tabpanel>
 
+      <!-- NATURE -->
+      <p-tabpanel value="nature">
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: sanglierNature }"></ng-container>
+        </div>
+        <div class="mb-3">
+          <ng-container [ngTemplateOutlet]="baremeCampMultiCard" [ngTemplateOutletContext]="{ $implicit: marcassinNature }"></ng-container>
+        </div>
+      </p-tabpanel>
+
       <!-- À VENIR -->
       <p-tabpanel value="avenir">
         <div class="a-venir">
           <i class="pi pi-clock"></i>
           <div>
-            <strong>Nature — à venir</strong>
+            <strong>Beursault — à venir</strong>
             <p class="mb-0 text-muted">Cette discipline sera ajoutée ultérieurement.</p>
           </div>
         </div>

@@ -70,6 +70,21 @@ class DistinctionRules {
     "Argent sur fond orange",
     "Or sur fond orange",
   ];
+  // Tir Nature — Sanglier (adultes) : 6 niveaux, mêmes libellés que l'Écureuil campagne.
+  DISTINCTIONS_NATURE_SANGLIER = [
+    "Vert sur fond blanc",
+    "Argent sur fond vert",
+    "Or sur fond blanc",
+    "Or sur fond noir",
+    "Or sur fond bleu",
+    "Or sur fond rouge",
+  ];
+  // Tir Nature — Marcassin (U13/U15/U18, Arc Nu) : 3 niveaux sur fond orange.
+  DISTINCTIONS_NATURE_MARCASSIN = [
+    "Noir sur fond orange",
+    "Argent sur fond orange",
+    "Or sur fond orange",
+  ];
 
   getSameOrBetter(
     nom: string,
@@ -109,6 +124,14 @@ class DistinctionRules {
       return this.DISTINCTIONS_3D_LYNX.slice(
         this.DISTINCTIONS_3D_LYNX.findIndex((d) => d === nom)
       );
+    } else if (discipline === "NATURE_SANGLIER") {
+      return this.DISTINCTIONS_NATURE_SANGLIER.slice(
+        this.DISTINCTIONS_NATURE_SANGLIER.findIndex((d) => d === nom)
+      );
+    } else if (discipline === "NATURE_MARCASSIN") {
+      return this.DISTINCTIONS_NATURE_MARCASSIN.slice(
+        this.DISTINCTIONS_NATURE_MARCASSIN.findIndex((d) => d === nom)
+      );
     }
     return null;
   }
@@ -129,8 +152,43 @@ class DistinctionRules {
         return null;
     }
   }
-  getNatureDistinction(resultat: Resultat): Distinction {
-    throw new Error("Method not implemented.");
+  // Tir Nature : parcours de 21 cibles tirées 1 fois, seuils de score par
+  // catégorie/arme. Aiguillage validé (docs/reglement-nature-extrait.md) :
+  //  - Arc Nu (CL/BB) + jeunes {U13,U15,U18} → MARCASSIN
+  //  - sinon → SANGLIER, colonne selon l'arme.
+  // Mapping code export → colonne : AD=Droit, AC=Chasse, CL/BB=Arc Nu,
+  // CO=Arc à Poulies Nu, TL=Arc Libre. (En Nature, le code CL de l'export = arc nu.)
+  SANGLIER_SEUILS: Record<string, number[]> = {
+    AD: [125, 240, 350, 425, 500, 540], // Arc Droit
+    AC: [175, 290, 400, 475, 550, 590], // Arc Chasse
+    CL: [200, 315, 425, 500, 575, 615], // Arc Nu (classique en Nature)
+    BB: [200, 315, 425, 500, 575, 615], // Arc Nu (bare bow)
+    CO: [250, 340, 450, 525, 600, 640], // Arc à Poulies Nu
+    TL: [300, 415, 525, 600, 675, 715], // Arc Libre (tir libre)
+  };
+
+  getNatureDistinction(resultat: Resultat): Distinction | null {
+    const { arme, categorie, score } = resultat;
+    const dist = { discipline: "NATURE", distance: 0 };
+    const JEUNE_CAT = ["U13", "U15", "U18"];
+
+    // Marcassin : Arc Nu (CL/BB), jeunes uniquement
+    if ((arme === "CL" || arme === "BB") && JEUNE_CAT.includes(categorie)) {
+      return this.getCampagneDistinctionByThresholds(
+        score, this.DISTINCTIONS_NATURE_MARCASSIN, [165, 275, 390],
+        { ...dist, discipline: "NATURE_MARCASSIN" }
+      );
+    }
+
+    // Sanglier : colonne selon l'arme
+    const seuils = this.SANGLIER_SEUILS[arme];
+    if (seuils) {
+      return this.getCampagneDistinctionByThresholds(
+        score, this.DISTINCTIONS_NATURE_SANGLIER, seuils,
+        { ...dist, discipline: "NATURE_SANGLIER" }
+      );
+    }
+    return null;
   }
   // Tir 3D : parcours de 1×24 cibles, seuils de score par catégorie/arme.
   // Aiguillage validé (docs/reglement-3d-extrait.md) :

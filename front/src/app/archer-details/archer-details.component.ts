@@ -72,6 +72,9 @@ export class ArcherDetailsComponent implements OnInit {
     if (d.discipline === '3D_BROCARD' || d.discipline === '3D_LYNX') {
       return 'Tir 3D';
     }
+    if (d.discipline === 'NATURE_SANGLIER' || d.discipline === 'NATURE_MARCASSIN') {
+      return 'Tir Nature';
+    }
     return d.discipline;
   }
 
@@ -80,6 +83,8 @@ export class ArcherDetailsComponent implements OnInit {
     if (d.discipline === 'CAMPAGNE_ECUREUIL') return `Écureuil - ${d.nom}`;
     if (d.discipline === '3D_BROCARD') return `Brocard - ${d.nom}`;
     if (d.discipline === '3D_LYNX') return `Lynx - ${d.nom}`;
+    if (d.discipline === 'NATURE_SANGLIER') return `Sanglier - ${d.nom}`;
+    if (d.discipline === 'NATURE_MARCASSIN') return `Marcassin - ${d.nom}`;
     return d.nom;
   }
 

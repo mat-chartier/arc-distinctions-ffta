@@ -38,6 +38,9 @@ export class DistinctionsToOrderComponent implements OnInit {
   // Tir 3D : badge par niveau (indépendant de l'arme) → une table par groupe.
   distinctions3DBrocardToOrder: DistinctionToOrder[] = [];
   distinctions3DLynxToOrder: DistinctionToOrder[] = [];
+  // Tir Nature : badge par niveau (indépendant de l'arme) → une table par groupe.
+  distinctionsNatureSanglierToOrder: DistinctionToOrder[] = [];
+  distinctionsNatureMarcassinToOrder: DistinctionToOrder[] = [];
   
   loading = true;
   error: string = '';
@@ -98,6 +101,8 @@ export class DistinctionsToOrderComponent implements OnInit {
       let dataFilteredCampagneEcureuilBB: any[] = [];
       let dataFiltered3DBrocard: any[] = [];
       let dataFiltered3DLynx: any[] = [];
+      let dataFilteredNatureSanglier: any[] = [];
+      let dataFilteredNatureMarcassin: any[] = [];
 
       data.forEach((resultat: any) => {
         if (resultat.discipline === 'Salle') {
@@ -132,6 +137,10 @@ export class DistinctionsToOrderComponent implements OnInit {
           dataFiltered3DBrocard.push(resultat);
         } else if (resultat.discipline === '3D_LYNX') {
           dataFiltered3DLynx.push(resultat);
+        } else if (resultat.discipline === 'NATURE_SANGLIER') {
+          dataFilteredNatureSanglier.push(resultat);
+        } else if (resultat.discipline === 'NATURE_MARCASSIN') {
+          dataFilteredNatureMarcassin.push(resultat);
         }
       });
 
@@ -147,6 +156,8 @@ export class DistinctionsToOrderComponent implements OnInit {
       this.distinctionsCampagneEcureuilBBToOrder = this.getDistinctionsToOrder(dataFilteredCampagneEcureuilBB);
       this.distinctions3DBrocardToOrder = this.getDistinctionsToOrder(dataFiltered3DBrocard);
       this.distinctions3DLynxToOrder = this.getDistinctionsToOrder(dataFiltered3DLynx);
+      this.distinctionsNatureSanglierToOrder = this.getDistinctionsToOrder(dataFilteredNatureSanglier);
+      this.distinctionsNatureMarcassinToOrder = this.getDistinctionsToOrder(dataFilteredNatureMarcassin);
 
       console.log('Distinctions à commander chargées');
 
