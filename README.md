@@ -18,6 +18,7 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
 - **Gestion du stock** : inventaire des écussons par type (clé de stock), décompté par les distinctions à remettre
 - **Liste des archers** : recherche par nom, prénom ou numéro de licence
 - **Fiche archer** : historique des résultats et distinctions par archer
+- **Gestion des comptes** (admin) : création d'un accès pour un archer importé (invitation par email), attribution du rôle et renvoi d'invitation
 
 ## Architecture technique
 
@@ -42,11 +43,14 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
                           │  ├── resultats          │
                           │  ├── distinctions       │
                           │  ├── stocks             │
+                          │  ├── users (comptes)    │
                           │  └── meta/cacheVersion   │
                           └─────────────────────────┘
 ```
 
-- **Authentification** : l'accueil (référentiel des barèmes) est **public** ; toutes les pages de gestion (import, listes, stock, fiche archer) sont protégées par `AuthGuardService`.
+- **Authentification & rôles** : l'accueil (référentiel des barèmes) est **public**. Les pages de consultation (listes, fiche archer) sont protégées par `AuthGuardService` (tout utilisateur connecté). Les pages d'écriture (import de résultats, stock, `admin/users`) et les bascules d'édition des distinctions sont réservées aux **administrateurs** via `AdminGuardService` (rôle `admin`).
+- **Comptes** : un document `users/{uid}` (clé = uid Firebase Auth) porte le rôle et pointe vers l'archer via `archerId`, ce qui garde l'identifiant de l'archer stable. La création d'un accès et l'invitation par email se font depuis l'écran de gestion des comptes (`AdminService`, sans backend). Un seed unique (`seed_admin_user.js`) provisionne le premier admin.
+- **Règles Firestore** : versionnées dans `front/firestore.rules` (source de vérité = console Firebase ; le déploiement `--only hosting` ne les touche pas — publier les règles reste une action délibérée).
 - **Cache** : cache en mémoire (Angular Signals) avec persistance `localStorage`, invalidé en temps réel via un listener Firestore sur un document de version partagé (`meta/cacheVersion`) — conçu pour rester sobre en lectures (plan Firebase gratuit).
 
 ## Développement
