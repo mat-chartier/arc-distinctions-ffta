@@ -141,29 +141,52 @@ export class AuthenticationService {
   }
 
   /**
-   * Charge les données complètes de l'archer depuis Firestore
+   * Charge les données complètes de l'utilisateur connecté.
+   *
+   * Modèle courant : un document `users/{uid}` porte le rôle et pointe vers
+   * l'archer via `archerId` (l'ID de l'archer reste stable, cf. issue #32).
+   * Fallback legacy : si aucun `users/{uid}` n'existe encore (ex. compte admin
+   * pas encore seedé), on retombe sur l'ancien schéma `archers/{uid}`.
    */
   private async loadArcherData(uid: string): Promise<User | null> {
     try {
-      const archerRef = doc(this.firestore, 'archers', uid);
-      const archerSnap = await getDoc(archerRef);
-      
+      // Schéma courant : users/{uid} → archerId + role
+      const userSnap = await getDoc(doc(this.firestore, 'users', uid));
+      if (userSnap.exists()) {
+        const account = userSnap.data();
+        const archerId = account['archerId'];
+        const archerSnap = await getDoc(doc(this.firestore, 'archers', archerId));
+        if (!archerSnap.exists()) {
+          console.error('Compte lié à un archer introuvable:', archerId);
+          return null;
+        }
+        const archer = archerSnap.data();
+        return {
+          id: archerId,
+          noLicence: archer['noLicence'],
+          nom: archer['nom'],
+          prenom: archer['prenom'],
+          role: account['role'] || 'archer',
+          email: account['email'] || archer['email'],
+        } as User;
+      }
+
+      // Fallback legacy : archers/{uid} (docID == uid)
+      const archerSnap = await getDoc(doc(this.firestore, 'archers', uid));
       if (!archerSnap.exists()) {
         return null;
       }
-
       const data = archerSnap.data();
-      
       return {
         id: uid,
         noLicence: data['noLicence'],
         nom: data['nom'],
         prenom: data['prenom'],
         role: data['role'] || 'archer',
-        email: data['email']
+        email: data['email'],
       } as User;
     } catch (error) {
-      console.error('Erreur lors du chargement des données archer:', error);
+      console.error('Erreur lors du chargement des données utilisateur:', error);
       return null;
     }
   }

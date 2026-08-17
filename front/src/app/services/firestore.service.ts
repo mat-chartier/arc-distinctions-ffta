@@ -18,7 +18,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { getApp } from 'firebase/app';
-import { ArcherDoc, ResultatDoc, DistinctionDoc, ArcherWithResultsData } from '../model/firestore-types';
+import { ArcherDoc, ResultatDoc, DistinctionDoc, ArcherWithResultsData, UserAccountDoc } from '../model/firestore-types';
 import { StockDoc } from '../model/stock-key';
 
 @Injectable({
@@ -252,6 +252,42 @@ export class FirestoreService {
     const result = await deleteDoc(stockRef);
     this.updateCacheVersion('stocks').catch(console.error);
     return result;
+  }
+
+  // ============ USERS (comptes de connexion) ============
+
+  /** Comptes de connexion (collection `users`, docID = uid Firebase Auth). */
+  async getUsers(): Promise<UserAccountDoc[]> {
+    console.log('[Firestore] GET users');
+    const usersCol = collection(this.firestore, 'users');
+    const usersSnapshot = await getDocs(usersCol);
+    return usersSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as UserAccountDoc));
+  }
+
+  async getUser(uid: string): Promise<UserAccountDoc | null> {
+    console.log('[Firestore] GET user', uid);
+    const userRef = doc(this.firestore, 'users', uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      return { id: userSnap.id, ...userSnap.data() } as UserAccountDoc;
+    }
+    return null;
+  }
+
+  /** Crée (ou remplace) le compte users/{uid} liant un archer à un login. */
+  async createUserAccount(uid: string, data: { archerId: string; role: string; email?: string }) {
+    console.log('[Firestore] SET user', uid);
+    const userRef = doc(this.firestore, 'users', uid);
+    return setDoc(userRef, this.stripUndefined({ ...data, linkedAt: Timestamp.now() }));
+  }
+
+  async updateUserRole(uid: string, role: string) {
+    console.log('[Firestore] UPDATE user role', uid, role);
+    const userRef = doc(this.firestore, 'users', uid);
+    return updateDoc(userRef, { role });
   }
 
   // ============ QUERIES COMPLEXES ============

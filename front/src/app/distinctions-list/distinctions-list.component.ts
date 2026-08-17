@@ -7,6 +7,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ButtonModule } from 'primeng/button';
 import { AppStore, parseFirestoreDate } from '../services/app.store';
+import { AuthenticationService } from '../services/auth_service_firebase';
 import { ArcherDoc, ResultatDoc } from '../model/firestore-types';
 import { buildStockKey } from '../model/stock-key';
 
@@ -49,7 +50,13 @@ export class DistinctionsListComponent implements OnInit {
   isMobile = window.matchMedia('(max-width: 576px)').matches;
   distinctionsWithArcher: DistinctionWithArcherAndResultat[] = [];
   firestoreService = inject(AppStore);
-  
+  private authService = inject(AuthenticationService);
+
+  /** Réserve les bascules d'édition/suppression aux administrateurs. */
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
   loading = true;
   error: string = '';
 

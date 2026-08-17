@@ -1,0 +1,165 @@
+<div class="container mt-4">
+  <h2>Gestion des comptes</h2>
+  <p class="text-muted">
+    Création et administration des accès de connexion. Un compte est lié à un
+    archer importé ; l'archer reçoit un email pour définir son mot de passe.
+    <strong>Un changement de rôle n'est effectif qu'à la prochaine connexion</strong>
+    de l'utilisateur concerné.
+  </p>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+  <div *ngIf="info" class="alert alert-success">{{ info }}</div>
+
+  <div *ngIf="!loading">
+    <div class="mb-4">
+      <p-button
+        icon="pi pi-user-plus"
+        label="Créer un accès"
+        (onClick)="openCreateDialog()"
+        [disabled]="unlinkedArchers.length === 0"
+      />
+      <span *ngIf="unlinkedArchers.length === 0" class="text-muted ms-2">
+        Tous les archers ont déjà un compte.
+      </span>
+    </div>
+
+    <!-- Table des comptes existants -->
+    <p-table
+      [value]="accounts"
+      [paginator]="accounts.length > 50"
+      [rows]="50"
+      sortMode="multiple"
+      [showGridlines]="true"
+      [stripedRows]="true"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="nom">Nom <p-sortIcon field="nom" /></th>
+          <th pSortableColumn="prenom">Prénom <p-sortIcon field="prenom" /></th>
+          <th>N° licence</th>
+          <th>Email</th>
+          <th pSortableColumn="role" style="width: 10rem;">Rôle <p-sortIcon field="role" /></th>
+          <th style="width: 20rem;">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr>
+          <td>{{ row.nom }}</td>
+          <td>{{ row.prenom }}</td>
+          <td>{{ row.noLicence }}</td>
+          <td>{{ row.email }}</td>
+          <td>{{ roleLabel(row.role) }}</td>
+          <td>
+            <div class="d-inline-flex gap-2">
+              <p-button
+                size="small"
+                severity="secondary"
+                [icon]="row.role === 'admin' ? 'pi pi-user' : 'pi pi-shield'"
+                [label]="row.role === 'admin' ? 'Passer archer' : 'Passer admin'"
+                (onClick)="toggleRole(row)"
+              />
+              <p-button
+                size="small"
+                severity="secondary"
+                icon="pi pi-envelope"
+                label="Renvoyer l'invitation"
+                [disabled]="!row.email"
+                (onClick)="resend(row)"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center">Aucun compte pour le moment</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Dialog : créer un accès -->
+  <p-dialog
+    header="Créer un accès"
+    [(visible)]="showCreateDialog"
+    [modal]="true"
+    [style]="{ width: '32rem' }"
+    [draggable]="false"
+  >
+    <div class="d-flex flex-column gap-3">
+      <div>
+        <label class="form-label">Archer</label>
+        <p-select
+          [options]="unlinkedArchers"
+          [(ngModel)]="selectedArcher"
+          (onChange)="onArcherSelected()"
+          optionLabel="nom"
+          placeholder="Choisir un archer sans compte…"
+          [filter]="true"
+          filterBy="nom,prenom,noLicence"
+          appendTo="body"
+          [style]="{ width: '100%' }"
+        >
+          <ng-template let-a pTemplate="selectedItem">
+            <span *ngIf="a">{{ archerLabel(a) }}</span>
+          </ng-template>
+          <ng-template let-a pTemplate="item">
+            <span>{{ archerLabel(a) }}</span>
+          </ng-template>
+        </p-select>
+      </div>
+
+      <div>
+        <label class="form-label">Email</label>
+        <input
+          pInputText
+          type="email"
+          class="w-100"
+          [(ngModel)]="newEmail"
+          placeholder="email@exemple.fr"
+        />
+      </div>
+
+      <div>
+        <label class="form-label">Rôle</label>
+        <p-select
+          [options]="roleOptions"
+          [(ngModel)]="newRole"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [style]="{ width: '100%' }"
+        />
+      </div>
+
+      <div *ngIf="dialogError" class="alert alert-danger mb-0">{{ dialogError }}</div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Annuler"
+        severity="secondary"
+        [text]="true"
+        (onClick)="showCreateDialog = false"
+        [disabled]="saving"
+      />
+      <p-button
+        label="Créer l'accès"
+        icon="pi pi-check"
+        (onClick)="submitCreate()"
+        [loading]="saving"
+        [disabled]="!selectedArcher || !newEmail.trim() || saving"
+      />
+    </ng-template>
+  </p-dialog>
+</div>

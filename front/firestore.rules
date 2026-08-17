@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    // Admin reconnu via users/{uid} (modèle courant, issue #32) OU archers/{uid}
+    // (legacy : compte lié par la convention docID == uid, avant seed du users doc).
+    function isAdmin() {
+      return request.auth != null && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid))
+          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+        ||
+        (exists(/databases/$(database)/documents/archers/$(request.auth.uid))
+          && get(/databases/$(database)/documents/archers/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Archers collection
+    match /archers/{archerId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Resultats collection
+    match /resultats/{resultatId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Distinctions collection
+    match /distinctions/{distinctionId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Version info
+    match /meta/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    // Stock collection
+    match /stocks/{stockId} {
+      allow read:  if isAuthenticated();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Users collection (comptes de connexion, issue #32)
+    match /users/{uid} {
+      // login : chacun lit son propre compte ; l'admin liste toute la collection
+      allow read:  if isAuthenticated() && (request.auth.uid == uid || isAdmin());
+      allow write: if isAdmin();
+    }
+  }
+}

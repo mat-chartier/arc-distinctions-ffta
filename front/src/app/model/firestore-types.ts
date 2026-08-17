@@ -39,6 +39,16 @@ export interface DistinctionDoc {
   createdAt?: any;
 }
 
+// Compte de connexion lié à un archer.
+// docID = uid Firebase Auth ; archerId pointe vers archers/{archerId}.
+export interface UserAccountDoc {
+  id: string;        // uid Firebase Auth
+  archerId: string;  // référence vers archers/{archerId}
+  role: string;      // 'admin' | 'archer'
+  email?: string;
+  linkedAt?: any;
+}
+
 export interface ArcherWithResultsData {
   archer: ArcherDoc;
   resultats: ResultatDoc[];

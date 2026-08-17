@@ -98,6 +98,17 @@ export class AppComponent {
     ];
     if (this.isAdmin()) {
       this.items.push({
+        label: 'Admin',
+        icon: 'pi pi-cog',
+        items: [
+          {
+            label: 'Gestion des comptes',
+            icon: 'pi pi-users',
+            routerLink: '/admin/users',
+          },
+        ],
+      });
+      this.items.push({
         label: 'Refresh Cache',
         icon: 'pi pi-refresh',
         command: () => confirm("Voulez-vous vraiment rafraîchir le cache de données Firestore ?") && this.refreshCache()

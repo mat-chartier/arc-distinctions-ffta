@@ -23,13 +23,13 @@
       />
     </div>
 
-    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+    <div *ngIf="isAdmin" style="display: flex; align-items: center; margin-bottom: 1rem;">
       <div style="margin-bottom: 6px; margin-right: 0.5rem;">Edition </div>
       <p-toggleswitch [(ngModel)]="editMode" />
       <div *ngIf="editMode" style="margin-bottom: 6px; margin-left: 1rem; margin-right: 0.5rem;">
-        Suppression 
+        Suppression
       </div>
-      <p-toggleswitch [(ngModel)]="deleteMode" *ngIf="editMode"/> 
+      <p-toggleswitch [(ngModel)]="deleteMode" *ngIf="editMode"/>
     </div>
 
     <p-table
