@@ -46,6 +46,26 @@ export class AppComponent {
   }
 
   private buildMenu() {
+    // Archer (non-admin) : menu réduit à l'accueil et à sa propre fiche.
+    if (!this.isAdmin()) {
+      this.items = [
+        {
+          label: 'Accueil',
+          icon: 'pi pi-home',
+          routerLink: '/',
+        },
+      ];
+      if (this.archer?.id) {
+        this.items.push({
+          label: 'Mon profil',
+          icon: 'pi pi-user',
+          routerLink: ['/archer', this.archer.id],
+        });
+      }
+      return;
+    }
+
+    // Admin : menu complet.
     this.items = [
       {
         label: 'Accueil',
@@ -94,10 +114,8 @@ export class AppComponent {
             routerLink: '/results-upload',
           },
         ],
-      }
-    ];
-    if (this.isAdmin()) {
-      this.items.push({
+      },
+      {
         label: 'Admin',
         icon: 'pi pi-cog',
         items: [
@@ -107,14 +125,13 @@ export class AppComponent {
             routerLink: '/admin/users',
           },
         ],
-      });
-      this.items.push({
+      },
+      {
         label: 'Refresh Cache',
         icon: 'pi pi-refresh',
         command: () => confirm("Voulez-vous vraiment rafraîchir le cache de données Firestore ?") && this.refreshCache()
-      });
-    }
-
+      },
+    ];
   }
 
   isAdmin() {
