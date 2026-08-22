@@ -12,6 +12,7 @@ import { NgModule } from '@angular/core';
 import { HomeComponent } from './home/home.component';
 import { UnauthorizedComponent } from './unauthorized/unauthorized.component';
 import { AdminUsersComponent } from './admin-users/admin-users.component';
+import { AuthActionComponent } from './auth-action/auth-action.component';
 
 export const routes: Routes = [
     { path: 'archer/:id', component: ArcherDetailsComponent, canActivate: [SelfOrAdminGuardService]},
@@ -23,6 +24,7 @@ export const routes: Routes = [
     { path: 'admin/users', component: AdminUsersComponent, canActivate: [AdminGuardService]},
     { path: '', component: HomeComponent }, // accueil public (référentiel des distinctions)
     { path: 'login', component: LoginComponent },
+    { path: 'auth/action', component: AuthActionComponent }, // page d'action Firebase custom (reset mdp)
     { path: 'unauthorized', component: UnauthorizedComponent },
     // otherwise redirect to home
     { path: '**', redirectTo: '' }

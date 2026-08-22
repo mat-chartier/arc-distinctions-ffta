@@ -5,13 +5,15 @@ import { Router } from '@angular/router';
 
 // Import Firebase directement (sans @angular/fire)
 import { initializeApp, FirebaseApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithEmailAndPassword, 
-  signOut, 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
+  verifyPasswordResetCode,
+  confirmPasswordReset,
   Auth,
-  User as FirebaseUser 
+  User as FirebaseUser
 } from 'firebase/auth';
 import { 
   getFirestore, 
@@ -222,5 +224,21 @@ export class AuthenticationService {
    */
   isAdmin(): boolean {
     return this.userValue?.role === 'admin';
+  }
+
+  /**
+   * Valide un code d'action de réinitialisation de mot de passe (oobCode) et
+   * renvoie l'email associé. Lève une erreur si le code est invalide/expiré.
+   * Utilisé par la page d'action personnalisée (invitation + mot de passe oublié).
+   */
+  async verifyResetCode(oobCode: string): Promise<string> {
+    return verifyPasswordResetCode(this.auth, oobCode);
+  }
+
+  /**
+   * Applique un nouveau mot de passe pour un code d'action valide.
+   */
+  async confirmReset(oobCode: string, newPassword: string): Promise<void> {
+    await confirmPasswordReset(this.auth, oobCode, newPassword);
   }
 }
