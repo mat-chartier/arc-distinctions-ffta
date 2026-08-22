@@ -57,10 +57,22 @@ export class AuthenticationService {
     onAuthStateChanged(this.auth, (firebaseUser) => {
       this.ngZone.run(async () => {
         if (firebaseUser) {
-          const archerData = await this.loadArcherData(firebaseUser.uid);
-          if (archerData) {
-            localStorage.setItem('user', JSON.stringify(archerData));
-            this.userSubject.next(archerData);
+          try {
+            const archerData = await this.loadArcherData(firebaseUser.uid);
+            if (archerData) {
+              localStorage.setItem('user', JSON.stringify(archerData));
+              this.userSubject.next(archerData);
+            } else {
+              // Compte de connexion supprimé (users/{uid} confirmé absent, pas
+              // une erreur réseau) : révoquer la session. Le signOut relance ce
+              // callback avec firebaseUser=null → nettoyage du cache ci-dessous.
+              console.warn('[Auth] Compte introuvable pour', firebaseUser.uid, '— déconnexion.');
+              await signOut(this.auth);
+            }
+          } catch (error) {
+            // Erreur réseau/Firestore : ne PAS déconnecter, conserver l'état
+            // courant (évite de vider les sessions à la moindre coupure).
+            console.error('[Auth] Chargement du compte échoué (session conservée):', error);
           }
         } else {
           localStorage.removeItem('user');
@@ -147,48 +159,48 @@ export class AuthenticationService {
    * l'archer via `archerId` (l'ID de l'archer reste stable, cf. issue #32).
    * Fallback legacy : si aucun `users/{uid}` n'existe encore (ex. compte admin
    * pas encore seedé), on retombe sur l'ancien schéma `archers/{uid}`.
+   *
+   * Retourne `null` uniquement quand le compte est **réellement absent**
+   * (aucun `users/{uid}` ni `archers/{uid}`) : l'appelant peut alors révoquer la
+   * session. Les erreurs réseau/Firestore sont **propagées** (et non converties
+   * en `null`) pour ne pas confondre « compte supprimé » et « lecture échouée ».
    */
   private async loadArcherData(uid: string): Promise<User | null> {
-    try {
-      // Schéma courant : users/{uid} → archerId + role
-      const userSnap = await getDoc(doc(this.firestore, 'users', uid));
-      if (userSnap.exists()) {
-        const account = userSnap.data();
-        const archerId = account['archerId'];
-        const archerSnap = await getDoc(doc(this.firestore, 'archers', archerId));
-        if (!archerSnap.exists()) {
-          console.error('Compte lié à un archer introuvable:', archerId);
-          return null;
-        }
-        const archer = archerSnap.data();
-        return {
-          id: archerId,
-          noLicence: archer['noLicence'],
-          nom: archer['nom'],
-          prenom: archer['prenom'],
-          role: account['role'] || 'archer',
-          email: account['email'] || archer['email'],
-        } as User;
-      }
-
-      // Fallback legacy : archers/{uid} (docID == uid)
-      const archerSnap = await getDoc(doc(this.firestore, 'archers', uid));
+    // Schéma courant : users/{uid} → archerId + role
+    const userSnap = await getDoc(doc(this.firestore, 'users', uid));
+    if (userSnap.exists()) {
+      const account = userSnap.data();
+      const archerId = account['archerId'];
+      const archerSnap = await getDoc(doc(this.firestore, 'archers', archerId));
       if (!archerSnap.exists()) {
+        console.error('Compte lié à un archer introuvable:', archerId);
         return null;
       }
-      const data = archerSnap.data();
+      const archer = archerSnap.data();
       return {
-        id: uid,
-        noLicence: data['noLicence'],
-        nom: data['nom'],
-        prenom: data['prenom'],
-        role: data['role'] || 'archer',
-        email: data['email'],
+        id: archerId,
+        noLicence: archer['noLicence'],
+        nom: archer['nom'],
+        prenom: archer['prenom'],
+        role: account['role'] || 'archer',
+        email: account['email'] || archer['email'],
       } as User;
-    } catch (error) {
-      console.error('Erreur lors du chargement des données utilisateur:', error);
+    }
+
+    // Fallback legacy : archers/{uid} (docID == uid)
+    const archerSnap = await getDoc(doc(this.firestore, 'archers', uid));
+    if (!archerSnap.exists()) {
       return null;
     }
+    const data = archerSnap.data();
+    return {
+      id: uid,
+      noLicence: data['noLicence'],
+      nom: data['nom'],
+      prenom: data['prenom'],
+      role: data['role'] || 'archer',
+      email: data['email'],
+    } as User;
   }
 
   /**

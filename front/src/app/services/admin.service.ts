@@ -67,6 +67,16 @@ export class AdminService {
     await this.firestore.updateUserRole(uid, role);
   }
 
+  /**
+   * Retire l'accès applicatif d'un archer : supprime le document `users/{uid}`.
+   * Le compte Firebase Auth n'est PAS supprimé (impossible côté front pour un
+   * autre utilisateur, il faudrait l'Admin SDK) — à retirer à la main dans la
+   * console Authentication pour une révocation totale.
+   */
+  async removeAccess(uid: string): Promise<void> {
+    await this.firestore.deleteUserAccount(uid);
+  }
+
   /** Mot de passe aléatoire jetable — jamais affiché, seul le mail de reset fait foi. */
   private randomPassword(): string {
     const bytes = new Uint8Array(24);

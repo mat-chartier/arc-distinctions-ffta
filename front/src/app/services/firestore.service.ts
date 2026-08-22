@@ -290,6 +290,13 @@ export class FirestoreService {
     return updateDoc(userRef, { role });
   }
 
+  /** Supprime le compte users/{uid} (retire l'accès applicatif de l'archer). */
+  async deleteUserAccount(uid: string) {
+    console.log('[Firestore] DELETE user', uid);
+    const userRef = doc(this.firestore, 'users', uid);
+    return deleteDoc(userRef);
+  }
+
   // ============ QUERIES COMPLEXES ============
 
   async getArcherWithResults(archerId: string): Promise<ArcherWithResultsData> {

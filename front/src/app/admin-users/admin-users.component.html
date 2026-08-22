@@ -75,6 +75,13 @@
                 [disabled]="!row.email"
                 (onClick)="resend(row)"
               />
+              <p-button
+                size="small"
+                severity="danger"
+                icon="pi pi-user-minus"
+                label="Retirer l'accès"
+                (onClick)="openRemoveDialog(row)"
+              />
             </div>
           </td>
         </tr>
@@ -159,6 +166,48 @@
         (onClick)="submitCreate()"
         [loading]="saving"
         [disabled]="!selectedArcher || !newEmail.trim() || saving"
+      />
+    </ng-template>
+  </p-dialog>
+
+  <!-- Dialog : retirer l'accès -->
+  <p-dialog
+    header="Retirer l'accès"
+    [(visible)]="showRemoveDialog"
+    [modal]="true"
+    [style]="{ width: '32rem' }"
+    [draggable]="false"
+  >
+    <div *ngIf="removeTarget" class="d-flex flex-column gap-3">
+      <p class="mb-0">
+        Retirer l'accès de
+        <strong>{{ removeTarget.nom }} {{ removeTarget.prenom }}</strong> ?
+        L'archer perdra ses droits de connexion. Son profil d'archer et ses
+        résultats / distinctions ne sont pas affectés.
+      </p>
+      <div class="alert alert-warning mb-0">
+        Le compte Firebase Auth<span *ngIf="removeTarget.email"> (<strong>{{ removeTarget.email }}</strong>)</span>
+        n'est pas supprimé. Pour révoquer totalement l'accès, supprime-le aussi
+        dans Firebase Console → Authentication → Users.
+      </div>
+      <div *ngIf="dialogError" class="alert alert-danger mb-0">{{ dialogError }}</div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Annuler"
+        severity="secondary"
+        [text]="true"
+        (onClick)="showRemoveDialog = false"
+        [disabled]="removing"
+      />
+      <p-button
+        label="Retirer l'accès"
+        icon="pi pi-user-minus"
+        severity="danger"
+        (onClick)="confirmRemove()"
+        [loading]="removing"
+        [disabled]="removing"
       />
     </ng-template>
   </p-dialog>

@@ -66,6 +66,11 @@ export class AdminUsersComponent implements OnInit {
   newEmail = '';
   newRole: 'admin' | 'archer' = 'archer';
 
+  // Dialog « retirer l'accès »
+  showRemoveDialog = false;
+  removing = false;
+  removeTarget: AccountRow | null = null;
+
   async ngOnInit() {
     await this.fetchData();
   }
@@ -167,6 +172,31 @@ export class AdminUsersComponent implements OnInit {
     } catch (e: any) {
       console.error('Erreur lors du changement de rôle:', e);
       this.error = 'Erreur lors du changement de rôle';
+    }
+  }
+
+  openRemoveDialog(row: AccountRow) {
+    this.removeTarget = row;
+    this.dialogError = '';
+    this.showRemoveDialog = true;
+  }
+
+  async confirmRemove() {
+    if (!this.removeTarget) return;
+    const target = this.removeTarget;
+    this.removing = true;
+    this.dialogError = '';
+    this.info = '';
+    try {
+      await this.admin.removeAccess(target.uid);
+      this.info = `Accès retiré pour ${target.nom} ${target.prenom}. Le compte Firebase Auth${target.email ? ` (${target.email})` : ''} n'a pas été supprimé — pense à le retirer dans Authentication > Users pour révoquer totalement l'accès.`;
+      this.showRemoveDialog = false;
+      await this.fetchData();
+    } catch (e: any) {
+      console.error('Erreur lors du retrait de l\'accès:', e);
+      this.dialogError = 'Erreur lors du retrait de l\'accès : ' + (e?.message ?? e);
+    } finally {
+      this.removing = false;
     }
   }
 
