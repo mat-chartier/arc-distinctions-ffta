@@ -124,6 +124,13 @@ describe('distinctionRules — TAE (T) : aiguillage DI/DN + barèmes', () => {
   it('TAE DN poulies « argent »', () => {
     expect(distinctionRules.getDistinction(r({ discipline: 'T', arme: 'CO', distance: 50, blason: '122', score: 690 }))!.nom).toBe("Archer d'or (argent)");
   });
+
+  it('TAE à 20m : aucune distinction (ni DI, ni DN)', () => {
+    // Un score très élevé à 20m ne doit produire aucune distinction, quel que soit le profil.
+    expect(distinctionRules.getDistinction(r({ discipline: 'T', arme: 'CL', distance: 20, score: 700 }))).toBeNull();
+    expect(distinctionRules.getDistinction(r({ discipline: 'T', arme: 'CO', distance: 20, blason: '122', score: 700 }))).toBeNull();
+    expect(distinctionRules.getDistinction(r({ discipline: 'T', arme: 'CL', distance: 20, categorie: 'U11', score: 700 }))).toBeNull();
+  });
 });
 
 describe('distinctionRules — Campagne (C)', () => {

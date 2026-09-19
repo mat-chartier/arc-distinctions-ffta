@@ -423,10 +423,8 @@ class DistinctionRules {
     };
     switch (distinction.distance) {
       case 20:
-        if (resultat.categorie === "U11") {
-          return { ...distinction, discipline: "TAEDI" } as Distinction;
-        }
-        return { ...distinction, discipline: "TAEDN" } as Distinction;
+        // Le TAE tiré à 20m ne donne droit à aucune distinction (ni DI, ni DN).
+        return null;
       case 30:
         if (
           resultat.blason === "80" &&
