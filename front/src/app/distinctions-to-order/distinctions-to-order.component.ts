@@ -208,16 +208,16 @@ export class DistinctionsToOrderComponent implements OnInit {
   }
 
   getDistinctionsToOrder(distinctions: any[]): DistinctionToOrder[] {
-    let distinctionsToOrder = distinctions.reduce((acc: any, curr: any) => {
+    // Regrouper par type de distinction (nom ; + distance pour TAEDI, qui distingue
+    // physiquement par distance). Un archer ne compte qu'UNE fois par type : s'il a
+    // plusieurs résultats « À donner » du même niveau, on retient le plus ancien
+    // (saison la plus petite), cohérent avec la chronologie d'obtention (#46).
+    const groups = distinctions.reduce((acc: any, curr: any) => {
       let nom = curr.nom;
       if (curr.discipline === 'TAEDI') {
         nom = `${nom} - ${curr.distance}`;
       }
-      const data = ` ${curr.Archer.prenom} ${curr.Archer.nom} : ${curr.Resultat.score} (${curr.Resultat.saison})`;
-      if (acc[nom]) {
-        acc[nom].count++;
-        acc[nom].data.push(data);
-      } else {
+      if (!acc[nom]) {
         // La clé de stock est constante au sein d'un groupe (discipline fixe,
         // armeGroup fixe par tableau CLBB/CO, distance déjà incluse dans le nom pour TAEDI).
         const stockKey = buildStockKey({
@@ -226,17 +226,35 @@ export class DistinctionsToOrderComponent implements OnInit {
           arme: curr.Resultat.arme,
           distance: curr.distance,
         });
-        acc[nom] = { count: 1, data: [data], stockKey, attribue: 0, aCommander: 0 };
+        acc[nom] = { stockKey, byArcher: new Map<string, any>() };
+      }
+      const prev = acc[nom].byArcher.get(curr.archerId);
+      if (!prev || curr.Resultat.saison < prev.Resultat.saison) {
+        acc[nom].byArcher.set(curr.archerId, curr);
       }
       return acc;
     }, {});
 
-    // Calculer l'attribution du stock et le reste à commander (#27).
-    // demande = distinctions « À donner » ; à commander = max(0, demande - stock).
-    Object.values(distinctionsToOrder).forEach((v: any) => {
-      const stock = this.stockByKey.get(v.stockKey) ?? 0;
-      v.attribue = Math.min(v.count, stock);
-      v.aCommander = Math.max(0, v.count - stock);
+    // Construire le décompte à partir des entrées dédoublonnées par archer, puis
+    // calculer l'attribution du stock et le reste à commander (#27).
+    // demande = archers distincts « À donner » ; à commander = max(0, demande - stock).
+    const distinctionsToOrder: any = {};
+    Object.entries(groups).forEach(([nom, group]: [string, any]) => {
+      const retenus = [...group.byArcher.values()].sort(
+        (a, b) => a.Resultat.saison - b.Resultat.saison
+      );
+      const data = retenus.map(
+        (c: any) => ` ${c.Archer.prenom} ${c.Archer.nom} : ${c.Resultat.score} (${c.Resultat.saison})`
+      );
+      const count = retenus.length;
+      const stock = this.stockByKey.get(group.stockKey) ?? 0;
+      distinctionsToOrder[nom] = {
+        count,
+        data,
+        stockKey: group.stockKey,
+        attribue: Math.min(count, stock),
+        aCommander: Math.max(0, count - stock),
+      };
     });
 
     // Convertir en tableau et ne garder que les types ayant réellement quelque chose
