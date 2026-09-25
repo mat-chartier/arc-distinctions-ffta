@@ -159,11 +159,9 @@ export class AuthenticationService {
    *
    * Modèle courant : un document `users/{uid}` porte le rôle et pointe vers
    * l'archer via `archerId` (l'ID de l'archer reste stable, cf. issue #32).
-   * Fallback legacy : si aucun `users/{uid}` n'existe encore (ex. compte admin
-   * pas encore seedé), on retombe sur l'ancien schéma `archers/{uid}`.
    *
    * Retourne `null` uniquement quand le compte est **réellement absent**
-   * (aucun `users/{uid}` ni `archers/{uid}`) : l'appelant peut alors révoquer la
+   * (aucun `users/{uid}`, ou archer lié introuvable) : l'appelant peut alors révoquer la
    * session. Les erreurs réseau/Firestore sont **propagées** (et non converties
    * en `null`) pour ne pas confondre « compte supprimé » et « lecture échouée ».
    */
@@ -189,20 +187,7 @@ export class AuthenticationService {
       } as User;
     }
 
-    // Fallback legacy : archers/{uid} (docID == uid)
-    const archerSnap = await getDoc(doc(this.firestore, 'archers', uid));
-    if (!archerSnap.exists()) {
-      return null;
-    }
-    const data = archerSnap.data();
-    return {
-      id: uid,
-      noLicence: data['noLicence'],
-      nom: data['nom'],
-      prenom: data['prenom'],
-      role: data['role'] || 'archer',
-      email: data['email'],
-    } as User;
+    return null;
   }
 
   /**
