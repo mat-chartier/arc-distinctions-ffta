@@ -22,12 +22,12 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
 
 ## Architecture technique
 
-**SPA Angular 19** hébergée sur **Firebase Hosting**, avec **Cloud Firestore** comme base de données et **Firebase Authentication** pour l'accès.
+**SPA Angular 19** hébergée sur **Firebase Hosting** (site `arc-distinctions`, servi sur `https://1cie-grenoble.distinctarc.fr`), avec **Cloud Firestore** comme base de données et **Firebase Authentication** pour l'accès.
 
 ```
 ┌─────────────────────────────────────────────────┐
 │                Firebase Hosting                 │
-│            (arc-distinctions.web.app)           │
+│         (1cie-grenoble.distinctarc.fr)          │
 │                                                 │
 │  Angular 19 SPA                                 │
 │  ├── PrimeNG 19 (composants UI)                 │
@@ -50,7 +50,7 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
 
 - **Authentification & rôles** : l'accueil (référentiel des barèmes) est **public**. Les pages de consultation (listes, fiche archer) sont protégées par `AuthGuardService` (tout utilisateur connecté). Les pages d'écriture (import de résultats, stock, `admin/users`) et les bascules d'édition des distinctions sont réservées aux **administrateurs** via `AdminGuardService` (rôle `admin`).
 - **Comptes** : un document `users/{uid}` (clé = uid Firebase Auth) porte le rôle et pointe vers l'archer via `archerId`, ce qui garde l'identifiant de l'archer stable. La création d'un accès et l'invitation par email se font depuis l'écran de gestion des comptes (`AdminService`, sans backend). Un seed unique (`seed_admin_user.js`) provisionne le premier admin.
-- **Règles Firestore** : versionnées dans `front/firestore.rules` (source de vérité = console Firebase ; le déploiement `--only hosting` ne les touche pas — publier les règles reste une action délibérée).
+- **Règles Firestore** : versionnées dans `front/firestore.rules` (source de vérité = console Firebase ; le déploiement Hosting ne les touche pas — publier les règles reste une action délibérée).
 - **Cache** : cache en mémoire (Angular Signals) avec persistance `localStorage`, invalidé en temps réel via un listener Firestore sur un document de version partagé (`meta/cacheVersion`) — conçu pour rester sobre en lectures (plan Firebase gratuit).
 
 ## Développement
@@ -75,7 +75,24 @@ npm test           # ng test (Karma + Jasmine)
 
 ## Déploiement
 
+Le projet Firebase porte **deux sites Hosting** (déclarés dans `front/firebase.json`) :
+
+| Site | Contenu | Domaines |
+|---|---|---|
+| `arc-distinctions` | l'application Angular | `1cie-grenoble.distinctarc.fr` (+ `arc-distinctions.web.app`) |
+| `distinctarc` | page de présentation statique (`front/landing/`) | `distinctarc.fr`, `www.distinctarc.fr` → redirigé vers la racine |
+
 ```bash
 cd front
-npm run deploy     # build + firebase deploy --only hosting
+npm run deploy           # app : build + firebase deploy --only hosting:arc-distinctions
+npm run deploy:landing   # page de présentation : firebase deploy --only hosting:distinctarc
 ```
+
+Chaque script ne déploie **que son site** : déployer l'app ne touche pas la page de présentation, et inversement.
+
+### Domaine `distinctarc.fr`
+
+- Acheté chez **OVH** ; zone DNS gérée chez OVH (`dns111` / `ns111.ovh.net`).
+- Racine : `A 199.36.158.100` + `TXT hosting-site=distinctarc` (Firebase) ; `www` : `CNAME distinctarc.web.app.` ; `1cie-grenoble` : `CNAME arc-distinctions.web.app.`
+- Messagerie : boîte OVH `contact@distinctarc.fr` (MX OVH, SPF, DKIM `ovhmo-selector-1/2`, DMARC `p=none`).
+- Un nouveau sous-domaine d'app doit aussi être ajouté dans **Authentication → Settings → Domaines autorisés**, sinon la connexion échoue.
