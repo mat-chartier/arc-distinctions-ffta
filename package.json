@@ -1,7 +1,8 @@
 {
     "scripts": {
         "frontend:start": "cd front && npm start",
-        "frontend:deploy": "npm run --prefix front deploy"
+        "frontend:deploy": "npm run --prefix front deploy",
+        "landing:deploy": "npm run --prefix front deploy:landing"
     },
     "devDependencies": {
         "firebase-admin": "^13.6.1",

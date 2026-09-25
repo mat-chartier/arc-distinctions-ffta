@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>distinctarc — les distinctions de vos archers, sans tableur</title>
+  <meta name="description" content="distinctarc calcule automatiquement les distinctions obtenues par les archers de votre club à partir des résultats FFTA, et suit leur commande et leur remise.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23fff' stroke='%231c2433' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%231c2433'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23e0a526'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1c2433;
+      --ink-soft: #4a5263;
+      --gold: #e0a526;
+      --gold-deep: #9a6b00;
+      --paper: #f7f5f0;
+      --card: #ffffff;
+      --line: #e3dfd6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 400 1.05rem/1.6 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .wrap { max-width: 60rem; margin: 0 auto; padding-inline: 1.25rem; }
+    h1, h2, .brand {
+      font-family: 'Darker Grotesque', 'Inter', sans-serif;
+      line-height: 1.05;
+      margin: 0;
+    }
+
+    header { padding-block: 1.5rem; }
+    .brand { font-weight: 800; font-size: 1.9rem; letter-spacing: 0.3px; }
+    .brand b { color: var(--gold-deep); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 2.5rem;
+      align-items: center;
+      padding-block: 3rem 4rem;
+    }
+    .hero h1 { font-weight: 800; font-size: clamp(2.6rem, 6vw, 4rem); }
+    .hero h1 em { font-style: normal; color: var(--gold-deep); }
+    .hero p { color: var(--ink-soft); font-size: 1.15rem; max-width: 34rem; margin: 1.25rem 0 2rem; }
+    .target { width: 100%; max-width: 18rem; justify-self: center; }
+
+    .cta {
+      display: inline-block;
+      background: var(--ink);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.85rem 1.4rem;
+      border-radius: 0.5rem;
+    }
+    .cta:hover { background: #2c3850; }
+
+    section { padding-block: 3rem; border-top: 1px solid var(--line); }
+    section h2 { font-weight: 800; font-size: 2.2rem; margin-bottom: 1.5rem; }
+
+    .problem p { max-width: 42rem; color: var(--ink-soft); margin: 0; }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 1rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .features li {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--gold);
+      border-radius: 0.5rem;
+      padding: 1.25rem;
+    }
+    .features strong { display: block; margin-bottom: 0.35rem; }
+    .features span { color: var(--ink-soft); font-size: 0.97rem; }
+
+    .disciplines { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; padding: 0; list-style: none; }
+    .disciplines li {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.92rem;
+    }
+
+    .proof p { margin: 0; max-width: 42rem; }
+
+    .contact { text-align: center; }
+    .contact p { color: var(--ink-soft); margin: 0 0 1.5rem; }
+    .contact .mail { font-weight: 600; color: var(--ink); }
+
+    footer {
+      padding-block: 2rem 3rem;
+      border-top: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 44rem) {
+      .hero { grid-template-columns: 1fr; padding-block: 1.5rem 3rem; }
+      .target { max-width: 11rem; grid-row: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="brand">distinct<b>arc</b></div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Les distinctions de vos archers, <em>sans tableur.</em></h1>
+        <p>distinctarc repère automatiquement les distinctions obtenues par les archers de votre club à partir de leurs résultats, et vous aide à les commander puis à les remettre.</p>
+        <a class="cta" href="#contact">Présenter distinctarc à mon club</a>
+      </div>
+      <svg class="target" viewBox="0 0 200 200" role="img" aria-label="Blason de tir à l'arc">
+        <circle cx="100" cy="100" r="96" fill="#fff" stroke="#1c2433" stroke-width="2"/>
+        <circle cx="100" cy="100" r="77" fill="#1c2433"/>
+        <circle cx="100" cy="100" r="58" fill="#4a5263"/>
+        <circle cx="100" cy="100" r="39" fill="#e3dfd6"/>
+        <circle cx="100" cy="100" r="20" fill="#e0a526"/>
+        <circle cx="100" cy="100" r="6" fill="#9a6b00"/>
+      </svg>
+    </div>
+
+    <section class="problem">
+      <h2>Le casse-tête des écussons</h2>
+      <p>Après chaque concours, il faut retrouver quels archers ont franchi un palier, dans quelle discipline, avec quel arc et dans quelle catégorie. Puis vérifier le stock, commander ce qui manque, et ne pas oublier de le remettre. Dans un tableur, c'est long et on en rate forcément.</p>
+    </section>
+
+    <section>
+      <h2>Ce que fait distinctarc</h2>
+      <ul class="features">
+        <li><strong>Import des résultats</strong><span>Vous importez l'export CSV des résultats FFTA, avec un aperçu avant de valider.</span></li>
+        <li><strong>Calcul automatique</strong><span>Les distinctions obtenues sont détectées selon le barème fédéral de chaque discipline.</span></li>
+        <li><strong>Suivi jusqu'à la remise</strong><span>Chaque distinction passe de «&nbsp;à commander&nbsp;» à «&nbsp;à remettre&nbsp;» puis «&nbsp;remise&nbsp;».</span></li>
+        <li><strong>Stock d'écussons</strong><span>La liste de commande tient compte des écussons déjà en stock au club.</span></li>
+        <li><strong>Un espace par archer</strong><span>Chaque archer consulte ses résultats et ses distinctions.</span></li>
+      </ul>
+      <ul class="disciplines" aria-label="Disciplines prises en charge">
+        <li>Salle</li>
+        <li>TAE Distances Internationales</li>
+        <li>TAE Distances Nationales</li>
+        <li>Campagne</li>
+        <li>3D</li>
+        <li>Nature</li>
+        <li>Beursault</li>
+      </ul>
+    </section>
+
+    <section class="proof">
+      <h2>Déjà en service</h2>
+      <p>distinctarc est né au sein de la 1<sup>re</sup> Compagnie d'Arc de Grenoble, qui l'utilise pour suivre les distinctions de ses archers.</p>
+    </section>
+
+    <section class="contact" id="contact">
+      <h2>Votre club est intéressé&nbsp;?</h2>
+      <p>Écrivez-nous, on vous présente l'outil.</p>
+      <a class="cta" href="mailto:contact@distinctarc.fr">contact@distinctarc.fr</a>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    distinctarc est un service indépendant, non affilié à la Fédération Française de Tir à l'Arc. Les distinctions sont calculées selon le règlement fédéral en vigueur.
+  </footer>
+</body>
+</html>
