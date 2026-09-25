@@ -12,6 +12,7 @@ import {
   onAuthStateChanged,
   verifyPasswordResetCode,
   confirmPasswordReset,
+  sendPasswordResetEmail,
   Auth,
   User as FirebaseUser
 } from 'firebase/auth';
@@ -225,5 +226,28 @@ export class AuthenticationService {
    */
   async confirmReset(oobCode: string, newPassword: string): Promise<void> {
     await confirmPasswordReset(this.auth, oobCode, newPassword);
+  }
+
+  /**
+   * Envoie l'email de réinitialisation (« mot de passe oublié », issue #40).
+   * Ne révèle pas si un compte existe : un email inconnu ne lève pas d'erreur
+   * (protection contre l'énumération d'adresses) — l'appelant affiche donc un
+   * message neutre. Les erreurs de format / quota / réseau sont traduites.
+   */
+  async sendPasswordReset(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email);
+    } catch (error: any) {
+      if (error.code === 'auth/user-not-found') {
+        return; // même comportement qu'un compte existant (message neutre)
+      } else if (error.code === 'auth/invalid-email') {
+        throw new Error('Adresse email invalide');
+      } else if (error.code === 'auth/too-many-requests') {
+        throw new Error('Trop de tentatives. Réessayez plus tard.');
+      } else if (error.code === 'auth/network-request-failed') {
+        throw new Error('Erreur réseau. Vérifiez votre connexion.');
+      }
+      throw new Error("Impossible d'envoyer l'email de réinitialisation");
+    }
   }
 }

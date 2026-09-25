@@ -19,6 +19,8 @@ export class LoginComponent implements OnInit {
   loading = false;
   submitted = false;
   error = '';
+  resetMessage = '';
+  resetLoading = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -67,5 +69,25 @@ export class LoginComponent implements OnInit {
         this.error = error.message;
         this.loading = false;
       });
+  }
+
+  /** « Mot de passe oublié ? » : envoie le lien à l'email saisi (issue #40). */
+  forgotPassword() {
+    this.error = '';
+    this.resetMessage = '';
+    const email = (this.f['licence'].value || '').trim();
+    if (!email) {
+      this.error = 'Saisissez votre email ci-dessus, puis cliquez sur « Mot de passe oublié ? ».';
+      return;
+    }
+    this.resetLoading = true;
+    this.authenticationService
+      .sendPasswordReset(email)
+      .then(() => {
+        this.resetMessage =
+          'Si un compte existe pour cette adresse, un email de réinitialisation vient d\'être envoyé.';
+      })
+      .catch((error) => (this.error = error.message))
+      .finally(() => (this.resetLoading = false));
   }
 }
