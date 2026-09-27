@@ -12,10 +12,10 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
   - Tir 3D (Brocard / Lynx)
   - Tir Nature (Sanglier / Marcassin)
   - Beursault (Marmots 1 à 4, sur le nombre d'« honneurs »)
-- **Accueil public** : référentiel des distinctions et de leurs barèmes/paliers par discipline, avec les visuels des écussons
+- **Accueil public** : référentiel des distinctions et de leurs barèmes/paliers par discipline, avec les visuels des distinctions
 - **Liste des distinctions** : suivi du statut de chaque distinction (à commander, à remettre, donnée…), avec filtre par discipline et recherche
 - **Distinctions à commander** : vue regroupée par type, tenant compte du **stock physique** disponible
-- **Gestion du stock** : inventaire des écussons par type (clé de stock), décompté par les distinctions à remettre
+- **Gestion du stock** : inventaire des distinctions par type (clé de stock), décompté par celles à remettre
 - **Liste des archers** : recherche par nom, prénom ou numéro de licence
 - **Fiche archer** : historique des résultats et distinctions par archer
 - **Gestion des comptes** (admin) : création d'un accès pour un archer importé (invitation par email), attribution du rôle et renvoi d'invitation

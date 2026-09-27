@@ -3,7 +3,7 @@
  * qu'UN exemplaire par type physique de distinction.
  *
  * Contexte : un même archer peut avoir plusieurs résultats ouvrant droit au même
- * niveau de distinction (même écusson physique). L'écran « à commander » a été
+ * niveau de distinction (même distinction physique). L'écran « à commander » a été
  * corrigé pour n'en compter qu'un ; mais les enregistrements en double persistent
  * en base (ils pèsent sur la fiche archer et le décompte de stock). On ne conserve
  * que l'exemplaire de la saison la plus ANCIENNE (chronologie d'obtention).

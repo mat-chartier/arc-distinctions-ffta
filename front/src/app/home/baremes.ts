@@ -90,7 +90,7 @@ export const TAE_DI: BaremeMulti = {
   ),
 };
 
-// ── TAE DN (Distances Nationales) : écussons « Archers », bordure or / argent ─
+// ── TAE DN (Distances Nationales) : distinctions « Archers », bordure or / argent ─
 const NOMS_DN = ['1 Archer', '2 Archers', '3 Archers', '4 Archers', "Archer d'Or"];
 const CLES_DN = ['1-archer', '2-archers', '3-archers', '4-archers', 'archer-or'];
 const DN_CL = [500, 550, 600, 640, 670];
