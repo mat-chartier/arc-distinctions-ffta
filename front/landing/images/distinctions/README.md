@@ -1,7 +1,7 @@
-# Visuels des distinctions (écran d'accueil)
+# Visuels des distinctions (référentiel public distinctarc.fr/distinctions)
 
 Déposez ici les images des distinctions au format `<slug>.png`. Tant qu'un fichier est
-absent, l'accueil affiche automatiquement une **pastille colorée** de repli à la place.
+absent, la page générée affiche une **pastille colorée** de repli à la place (relancer `npm run build:landing`).
 
 ## Source et licence des visuels fournis
 
@@ -10,14 +10,14 @@ depuis les planches de badges de **Nhhi** sur
 [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:Archery_in_France),
 sous licence **CC BY-SA 4.0**. Planches d'origine :
 `Badges_Salle_FFTA.png`, `Badges_extérieur_FFTA.png`, `Badges_marcassin.png`, `Badges_ecureuil.png`.
-L'attribution figure en pied de l'écran d'accueil (`home.component.html`).
+L'attribution figure en pied de page de la landing et de `distinctions.html`.
 
 > **TAE DN** : les badges « Archers » (bordure or / argent par arme) ne sont pas disponibles
 > sur cette page Wikipédia. Les 10 slugs `taedn-*` restent donc absents et s'affichent en
 > pastille de couleur de repli.
 
 Convention : le `slug` de chaque palier est défini dans
-`front/src/app/home/baremes.ts`. Liste complète des fichiers attendus :
+`front/landing/src/baremes.ts`. Liste complète des fichiers attendus :
 
 ## Salle (visuel commun classique / arc nu / arc à poulies)
 - salle-vert.png

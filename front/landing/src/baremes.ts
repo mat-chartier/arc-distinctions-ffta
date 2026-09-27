@@ -1,4 +1,5 @@
-// Données de présentation des distinctions et de leurs paliers (écran d'accueil).
+// Données de présentation des distinctions et de leurs paliers (page distinctarc.fr/distinctions,
+// générée par landing/build.mjs).
 //
 // SOURCE DE VÉRITÉ : front/src/app/model/distinction-rules.ts (barèmes codés en dur)
 // + règlement FFTA (docs/distinctions_0.pdf). Ce fichier en est une transcription pour
@@ -6,7 +7,7 @@
 // seuils dans distinction-rules.ts, penser à répercuter ici.
 //
 // Chaque badge porte un `image` = slug de fichier attendu dans
-// public/images/distinctions/<slug>.png. Si le fichier est absent, l'accueil retombe sur
+// landing/images/distinctions/<slug>.png. Si le fichier est absent, la page retombe sur
 // une pastille colorée (couleur de cible) — sauf badges de colonne (DN) qui n'affichent
 // alors que le score.
 

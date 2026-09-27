@@ -12,7 +12,7 @@ Application de gestion des distinctions de tir à l'arc pour un club affilié à
   - Tir 3D (Brocard / Lynx)
   - Tir Nature (Sanglier / Marcassin)
   - Beursault (Marmots 1 à 4, sur le nombre d'« honneurs »)
-- **Accueil public** : référentiel des distinctions et de leurs barèmes/paliers par discipline, avec les visuels des distinctions
+- **Référentiel public** ([distinctarc.fr/distinctions](https://distinctarc.fr/distinctions)) : barèmes et paliers de chaque discipline, avec les visuels des distinctions. La racine de l'app n'a plus de page propre : elle renvoie vers la connexion, la fiche de l'archer ou la liste des distinctions (admin)
 - **Liste des distinctions** : suivi du statut de chaque distinction (à commander, à remettre, donnée…), avec filtre par discipline et recherche
 - **Distinctions à commander** : vue regroupée par type, tenant compte du **stock physique** disponible
 - **Gestion du stock** : inventaire des distinctions par type (clé de stock), décompté par celles à remettre
@@ -80,13 +80,15 @@ Le projet Firebase porte **deux sites Hosting** (déclarés dans `front/firebase
 | Site | Contenu | Domaines |
 |---|---|---|
 | `arc-distinctions` | l'application Angular | `1cie-grenoble.distinctarc.fr` (+ `arc-distinctions.web.app`) |
-| `distinctarc` | page de présentation statique (`front/landing/`) | `distinctarc.fr`, `www.distinctarc.fr` → redirigé vers la racine |
+| `distinctarc` | site statique (`front/landing/`) : présentation + référentiel `/distinctions` | `distinctarc.fr`, `www.distinctarc.fr` → redirigé vers la racine |
 
 ```bash
 cd front
 npm run deploy           # app : build + firebase deploy --only hosting:arc-distinctions
-npm run deploy:landing   # page de présentation : firebase deploy --only hosting:distinctarc
+npm run deploy:landing   # site statique : génère /distinctions puis firebase deploy --only hosting:distinctarc
 ```
+
+La page `landing/distinctions.html` est **générée** (et commitée) par `npm run build:landing` à partir de `landing/src/baremes.ts` et `landing/src/distinctions.template.html` ; ne pas la modifier à la main. `node landing/build.mjs --check` échoue si elle n'est pas à jour. `baremes.ts` est une transcription d'affichage de `front/src/app/model/distinction-rules.ts` : tout changement de seuil doit être répercuté dans les deux.
 
 Chaque script ne déploie **que son site** : déployer l'app ne touche pas la page de présentation, et inversement.
 

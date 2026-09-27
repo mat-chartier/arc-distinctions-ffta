@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "deploy": "ng build && ../node_modules/.bin/firebase deploy --only hosting:arc-distinctions",
-    "deploy:landing": "../node_modules/.bin/firebase deploy --only hosting:distinctarc",
+    "build:landing": "node landing/build.mjs",
+    "deploy:landing": "node landing/build.mjs && ../node_modules/.bin/firebase deploy --only hosting:distinctarc",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

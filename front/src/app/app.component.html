@@ -7,12 +7,16 @@
   </a>
   <p-menubar [model]="items" styleClass="app-nav" *ngIf="isAuthenticated()">
     <ng-template #item let-item>
-      <ng-container>
+      <a *ngIf="item.url; else interne" [href]="item.url" [target]="item.target" rel="noopener" class="p-menubar-item-link">
+        <span [class]="item.icon"></span>
+        <span class="ml-2">{{ item.label }}</span>
+      </a>
+      <ng-template #interne>
         <a [routerLink]="item.routerLink" class="p-menubar-item-link">
           <span [class]="item.icon"></span>
           <span class="ml-2">{{ item.label }}</span>
         </a>
-      </ng-container>
+      </ng-template>
     </ng-template>
   </p-menubar>
   <button class="app-logout" (click)="logout()" *ngIf="isAuthenticated()">Déconnexion</button>
@@ -22,3 +26,8 @@
 <main class="app-main">
   <router-outlet />
 </main>
+
+<footer class="app-footer">
+  <a href="https://distinctarc.fr/distinctions" target="_blank" rel="noopener">Barèmes des distinctions</a>
+  · Propulsé par <a href="https://distinctarc.fr" target="_blank" rel="noopener">distinctarc.fr</a>
+</footer>

@@ -113,6 +113,16 @@ button.p-button {
    largeur du viewport (et non celle du contenu qui peut déborder). */
 app-root { display: block; }
 .app-main { display: block; }
+
+/* Pied de page discret : lien vers le référentiel public distinctarc.fr */
+.app-footer {
+  margin-top: 3rem;
+  padding: 1.25rem 1.4rem 1.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--pca-muted);
+}
+.app-footer a { color: var(--pca-plum); }
 .accueil { max-width: 1120px; }
 
 /* ---- Cartes / onglets / tables (polish global) ------------------- */

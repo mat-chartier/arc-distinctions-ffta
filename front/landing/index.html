@@ -5,173 +5,351 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>distinctarc — les distinctions de vos archers, sans tableur</title>
   <meta name="description" content="distinctarc calcule automatiquement les distinctions obtenues par les archers de votre club à partir des résultats FFTA, et suit leur commande et leur remise.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23fff' stroke='%231c2433' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='10' fill='%231c2433'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23e0a526'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15.5' fill='%23fff' stroke='%23111' stroke-width='.6'/%3E%3Ccircle cx='16' cy='16' r='12.4' fill='%23111'/%3E%3Ccircle cx='16' cy='16' r='9.3' fill='%2300a6d6'/%3E%3Ccircle cx='16' cy='16' r='6.2' fill='%23ea3344'/%3E%3Ccircle cx='16' cy='16' r='3.1' fill='%23ffd83d'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@600;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --ink: #1c2433;
-      --ink-soft: #4a5263;
-      --gold: #e0a526;
-      --gold-deep: #9a6b00;
-      --paper: #f7f5f0;
-      --card: #ffffff;
-      --line: #e3dfd6;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 400 1.05rem/1.6 'Inter', system-ui, -apple-system, sans-serif;
-    }
-    .wrap { max-width: 60rem; margin: 0 auto; padding-inline: 1.25rem; }
-    h1, h2, .brand {
-      font-family: 'Darker Grotesque', 'Inter', sans-serif;
-      line-height: 1.05;
-      margin: 0;
-    }
-
-    header { padding-block: 1.5rem; }
-    .brand { font-weight: 800; font-size: 1.9rem; letter-spacing: 0.3px; }
-    .brand b { color: var(--gold-deep); }
-
+    /* ── Hero ─────────────────────────────────────────────────────────── */
     .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(60rem 30rem at 85% 30%, rgba(255, 216, 61, 0.28), transparent 60%),
+        radial-gradient(40rem 26rem at 5% 100%, rgba(0, 166, 214, 0.12), transparent 60%);
+    }
+    .hero .wrap {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 2.5rem;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 2rem;
       align-items: center;
-      padding-block: 3rem 4rem;
+      padding-block: 3.5rem 4.5rem;
     }
-    .hero h1 { font-weight: 800; font-size: clamp(2.6rem, 6vw, 4rem); }
-    .hero h1 em { font-style: normal; color: var(--gold-deep); }
-    .hero p { color: var(--ink-soft); font-size: 1.15rem; max-width: 34rem; margin: 1.25rem 0 2rem; }
-    .target { width: 100%; max-width: 18rem; justify-self: center; }
-
-    .cta {
+    .eyebrow {
       display: inline-block;
-      background: var(--ink);
-      color: #fff;
-      text-decoration: none;
-      font-weight: 600;
-      padding: 0.85rem 1.4rem;
-      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-deep);
+      background: rgba(0, 166, 214, 0.1);
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 1.25rem;
     }
-    .cta:hover { background: #2c3850; }
+    .hero h1 { font-weight: 900; font-size: clamp(2.8rem, 7vw, 4.8rem); letter-spacing: -0.5px; }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(transparent 62%, var(--gold) 62% 92%, transparent 92%);
+      padding-inline: 0.1em;
+    }
+    .hero p.lead { color: var(--ink-soft); font-size: 1.18rem; max-width: 34rem; margin: 1.4rem 0 2rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+    .target {
+      width: 100%;
+      max-width: 26rem;
+      justify-self: center;
+      filter: drop-shadow(0 18px 28px rgba(20, 26, 36, 0.22));
+      animation: settle 0.9s cubic-bezier(.2, .9, .3, 1.2) both;
+    }
+    @keyframes settle { from { transform: translateY(18px) rotate(-6deg); opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) { .target { animation: none; } }
 
-    section { padding-block: 3rem; border-top: 1px solid var(--line); }
-    section h2 { font-weight: 800; font-size: 2.2rem; margin-bottom: 1.5rem; }
+    /* ── Mur de distinctions ─────────────────────────────────────────── */
+    .wall { background: var(--card); border-bottom: 1px solid var(--line); padding-block: 2.5rem; }
+    .wall p {
+      text-align: center;
+      margin: 0 0 1.5rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 1.1rem 1.6rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .badges img {
+      display: block;
+      height: 64px;
+      width: auto;
+      filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.18));
+      transition: transform 0.2s ease;
+    }
+    .badges li:nth-child(odd) img { transform: rotate(-4deg); }
+    .badges li:nth-child(even) img { transform: rotate(3deg); }
+    .badges img:hover { transform: scale(1.18) rotate(0deg); }
+    .wall .more { text-align: center; margin: 1.75rem 0 0; }
+    .wall .more a { font-weight: 600; }
+    @media (max-width: 40rem) { .badges img { height: 48px; } .badges { gap: 0.8rem 1rem; } }
 
-    .problem p { max-width: 42rem; color: var(--ink-soft); margin: 0; }
+    /* ── Sections ─────────────────────────────────────────────────────── */
+    section.block { padding-block: 4.5rem; }
+    section.block h2 { font-weight: 900; font-size: clamp(2.1rem, 5vw, 2.9rem); margin-bottom: 1.5rem; }
+
+    .problem {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.75rem;
+      align-items: start;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      border-left: 8px solid var(--red);
+    }
+    .problem .num {
+      font-family: 'Darker Grotesque', sans-serif;
+      font-weight: 900;
+      font-size: 4rem;
+      line-height: 0.8;
+      color: var(--red);
+    }
+    .problem h2 { margin-bottom: 0.75rem !important; }
+    .problem p { margin: 0; color: var(--ink-soft); max-width: 44rem; }
+    @media (max-width: 40rem) { .problem { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem; } }
 
     .features {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+      gap: 1.1rem;
       list-style: none;
       padding: 0;
       margin: 0;
     }
     .features li {
       background: var(--card);
-      border: 1px solid var(--line);
-      border-top: 3px solid var(--gold);
-      border-radius: 0.5rem;
-      padding: 1.25rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      transition: transform 0.2s ease;
     }
-    .features strong { display: block; margin-bottom: 0.35rem; }
-    .features span { color: var(--ink-soft); font-size: 0.97rem; }
+    .features li:hover { transform: translateY(-3px); }
+    .features .ico {
+      display: grid;
+      place-items: center;
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+    .features .ico svg { width: 1.35rem; height: 1.35rem; }
+    .ico.gold { background: var(--gold); color: var(--black); }
+    .ico.red { background: var(--red); color: #fff; }
+    .ico.blue { background: var(--blue); color: #fff; }
+    .ico.black { background: var(--black); color: #fff; }
+    .ico.white { background: #fff; color: var(--black); box-shadow: inset 0 0 0 2px var(--black); }
+    .feature-link { background: var(--black) !important; }
+    .feature-link a { display: block; color: #fff; text-decoration: none; }
+    .feature-link span { color: #c9ced8 !important; }
+    .features strong { display: block; font-size: 1.08rem; margin-bottom: 0.35rem; }
+    .features span { color: var(--ink-soft); font-size: 0.98rem; }
 
-    .disciplines { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; padding: 0; list-style: none; }
-    .disciplines li {
+    .disciplines { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 2rem 0 0; padding: 0; list-style: none; }
+    .disciplines a {
+      display: inline-block;
       background: var(--card);
-      border: 1px solid var(--line);
+      border: 2px solid var(--ink);
+      color: var(--ink);
+      text-decoration: none;
       border-radius: 999px;
-      padding: 0.3rem 0.9rem;
-      font-size: 0.92rem;
+      padding: 0.35rem 1rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.15s ease;
     }
+    .disciplines a:hover { background: var(--gold); }
 
-    .proof p { margin: 0; max-width: 42rem; }
-
-    .contact { text-align: center; }
-    .contact p { color: var(--ink-soft); margin: 0 0 1.5rem; }
-    .contact .mail { font-weight: 600; color: var(--ink); }
-
-    footer {
-      padding-block: 2rem 3rem;
-      border-top: 1px solid var(--line);
-      color: var(--ink-soft);
-      font-size: 0.88rem;
+    .proof {
+      background: var(--black);
+      color: #fff;
+      padding-block: 4rem;
     }
+    .proof .wrap { display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; }
+    .proof h2 { font-weight: 900; font-size: clamp(2rem, 5vw, 2.6rem); margin-bottom: 0.75rem; }
+    .proof p { margin: 0; color: #c9ced8; max-width: 40rem; }
+    .proof .mini { width: 7rem; height: 7rem; }
+    @media (max-width: 40rem) { .proof .wrap { grid-template-columns: 1fr; } .proof .mini { display: none; } }
 
-    @media (max-width: 44rem) {
-      .hero { grid-template-columns: 1fr; padding-block: 1.5rem 3rem; }
-      .target { max-width: 11rem; grid-row: 1; }
+    .contact { background: var(--gold); text-align: center; padding-block: 4.5rem; }
+    .contact h2 { font-weight: 900; font-size: clamp(2.2rem, 6vw, 3.2rem); margin-bottom: 0.75rem; }
+    .contact p { margin: 0 0 1.75rem; font-size: 1.1rem; }
+
+    @media (max-width: 48rem) {
+      .hero .wrap { grid-template-columns: 1fr; padding-block: 2rem 3rem; }
+      .target { max-width: 15rem; grid-row: 1; }
     }
   </style>
 </head>
 <body>
-  <header class="wrap">
-    <div class="brand">distinct<b>arc</b></div>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="distinctarc, accueil">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15.5" fill="#fff" stroke="#111" stroke-width=".6"/><circle cx="16" cy="16" r="12.4" fill="#111"/><circle cx="16" cy="16" r="9.3" fill="#00a6d6"/><circle cx="16" cy="16" r="6.2" fill="#ea3344"/><circle cx="16" cy="16" r="3.1" fill="#ffd83d"/></svg>
+        <span>distinct<b>arc</b></span>
+      </a>
+      <nav class="site-nav" aria-label="Navigation principale">
+        <a href="/distinctions">Les distinctions</a>
+        <a class="nav-optional" href="#contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="wrap">
+  <main>
     <div class="hero">
-      <div>
-        <h1>Les distinctions de vos archers, <em>sans tableur.</em></h1>
-        <p>distinctarc repère automatiquement les distinctions obtenues par les archers de votre club à partir de leurs résultats, et vous aide à les commander puis à les remettre.</p>
-        <a class="cta" href="#contact">Présenter distinctarc à mon club</a>
+      <div class="wrap">
+        <div>
+          <span class="eyebrow">Pour les clubs de tir à l'arc</span>
+          <h1>Les distinctions de vos archers, <em>sans tableur.</em></h1>
+          <p class="lead">distinctarc repère automatiquement les distinctions obtenues par les archers de votre club à partir de leurs résultats, et vous aide à les commander puis à les remettre.</p>
+          <div class="actions">
+            <a class="btn btn-gold" href="#contact">Présenter distinctarc à mon club</a>
+            <a class="btn btn-ghost" href="/distinctions">Voir les barèmes →</a>
+          </div>
+        </div>
+
+        <!-- Blason World Archery : 10 zones de même largeur, 2 flèches plantées -->
+        <svg class="target" viewBox="0 0 250 240" role="img" aria-label="Blason de tir à l'arc avec deux flèches plantées au centre">
+          <g stroke-width=".7">
+            <circle cx="120" cy="125" r="100" fill="#fff" stroke="#111"/>
+            <circle cx="120" cy="125" r="90" fill="#fff" stroke="#111"/>
+            <circle cx="120" cy="125" r="80" fill="#111" stroke="#111"/>
+            <circle cx="120" cy="125" r="70" fill="#111" stroke="#fff"/>
+            <circle cx="120" cy="125" r="60" fill="#00a6d6" stroke="#111"/>
+            <circle cx="120" cy="125" r="50" fill="#00a6d6" stroke="#111"/>
+            <circle cx="120" cy="125" r="40" fill="#ea3344" stroke="#111"/>
+            <circle cx="120" cy="125" r="30" fill="#ea3344" stroke="#111"/>
+            <circle cx="120" cy="125" r="20" fill="#ffd83d" stroke="#111"/>
+            <circle cx="120" cy="125" r="10" fill="#ffd83d" stroke="#111"/>
+            <circle cx="120" cy="125" r="5" fill="none" stroke="#111" stroke-width=".5"/>
+          </g>
+          <path d="M118 125h4M120 123v4" stroke="#111" stroke-width=".5"/>
+          <!-- Flèche 1 (dans le X) -->
+          <line x1="117" y1="121" x2="139" y2="131" stroke="#000" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="117" cy="121" rx="2.6" ry="2.2" fill="#000" fill-opacity=".55"/>
+          <line x1="117" y1="121" x2="205" y2="38" stroke="#23262b" stroke-width="3.2" stroke-linecap="round"/>
+          <polygon points="182.1,59.6 192.2,59.7 205.4,47.2 200.6,42.2" fill="#ea3344"/>
+          <polygon points="182.1,59.6 182.6,49.5 195.8,37.1 200.6,42.2" fill="#b8222f"/>
+          <circle cx="205" cy="38" r="2.4" fill="#23262b"/>
+          <!-- Flèche 2 (dans le 9) -->
+          <line x1="131" y1="137" x2="153" y2="147" stroke="#000" stroke-opacity=".18" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="131" cy="137" rx="2.6" ry="2.2" fill="#000" fill-opacity=".55"/>
+          <line x1="131" y1="137" x2="232" y2="76" stroke="#23262b" stroke-width="3.2" stroke-linecap="round"/>
+          <polygon points="205.7,91.9 215.4,94.2 230.6,85.0 226.9,79.1" fill="#00a6d6"/>
+          <polygon points="205.7,91.9 208.2,82.2 223.3,73.1 226.9,79.1" fill="#00739a"/>
+          <circle cx="232" cy="76" r="2.4" fill="#23262b"/>
+        </svg>
       </div>
-      <svg class="target" viewBox="0 0 200 200" role="img" aria-label="Blason de tir à l'arc">
-        <circle cx="100" cy="100" r="96" fill="#fff" stroke="#1c2433" stroke-width="2"/>
-        <circle cx="100" cy="100" r="77" fill="#1c2433"/>
-        <circle cx="100" cy="100" r="58" fill="#4a5263"/>
-        <circle cx="100" cy="100" r="39" fill="#e3dfd6"/>
-        <circle cx="100" cy="100" r="20" fill="#e0a526"/>
-        <circle cx="100" cy="100" r="6" fill="#9a6b00"/>
-      </svg>
     </div>
 
-    <section class="problem">
-      <h2>Le casse-tête des distinctions</h2>
-      <p>Après chaque concours, il faut retrouver quels archers ont franchi un palier, dans quelle discipline, avec quel arc et dans quelle catégorie. Puis vérifier le stock, commander ce qui manque, et ne pas oublier de le remettre. Dans un tableur, c'est long et on en rate forcément.</p>
+    <div class="stripe"></div>
+
+    <div class="wall">
+      <div class="wrap">
+        <p>Salle, TAE, Campagne, 3D, Nature, Beursault : toutes les distinctions fédérales.</p>
+        <ul class="badges" aria-label="Exemples de distinctions FFTA">
+          <li><img src="images/distinctions/salle-vert.png" alt="Distinction Salle verte" loading="lazy"></li>
+          <li><img src="images/distinctions/campagne-ecureuil-or-rouge.png" alt="Écureuil or sur fond rouge (Campagne)" loading="lazy"></li>
+          <li><img src="images/distinctions/salle-bleu.png" alt="Distinction Salle bleue" loading="lazy"></li>
+          <li><img src="images/distinctions/taedn-classique-archer-or.png" alt="Archer d'Or (TAE Distances Nationales)" loading="lazy"></li>
+          <li><img src="images/distinctions/taedi-rouge.png" alt="Distinction TAE DI rouge" loading="lazy"></li>
+          <li><img src="images/distinctions/beursault-3-marmots.png" alt="3 marmots (Beursault)" loading="lazy"></li>
+          <li><img src="images/distinctions/salle-3-etoiles.png" alt="Salle 3 étoiles" loading="lazy"></li>
+          <li><img src="images/distinctions/campagne-marcassin-or-noir.png" alt="Marcassin or sur fond noir (Campagne)" loading="lazy"></li>
+          <li><img src="images/distinctions/taedi-jaune.png" alt="Distinction TAE DI jaune" loading="lazy"></li>
+          <li><img src="images/distinctions/campagne-ecureuil-or-bleu.png" alt="Écureuil or sur fond bleu (Campagne)" loading="lazy"></li>
+          <li><img src="images/distinctions/taedi-1-etoile.png" alt="TAE DI 1 étoile" loading="lazy"></li>
+        </ul>
+        <p class="more"><a href="/distinctions">Toutes les distinctions et leurs barèmes →</a></p>
+      </div>
+    </div>
+
+    <section class="block">
+      <div class="wrap">
+        <div class="problem">
+          <div class="num" aria-hidden="true">?!</div>
+          <div>
+            <h2>Le casse-tête des distinctions</h2>
+            <p>Après chaque concours, il faut retrouver quels archers ont franchi un palier, dans quelle discipline, avec quel arc et dans quelle catégorie. Puis vérifier le stock, commander ce qui manque, et ne pas oublier de le remettre. Dans un tableur, c'est long et on en rate forcément.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section>
-      <h2>Ce que fait distinctarc</h2>
-      <ul class="features">
-        <li><strong>Import des résultats</strong><span>Vous importez l'export CSV des résultats FFTA, avec un aperçu avant de valider.</span></li>
-        <li><strong>Calcul automatique</strong><span>Les distinctions obtenues sont détectées selon le barème fédéral de chaque discipline.</span></li>
-        <li><strong>Suivi jusqu'à la remise</strong><span>Chaque distinction passe de «&nbsp;à commander&nbsp;» à «&nbsp;à remettre&nbsp;» puis «&nbsp;remise&nbsp;».</span></li>
-        <li><strong>Stock de distinctions</strong><span>La liste de commande tient compte des distinctions déjà en stock au club.</span></li>
-        <li><strong>Un espace par archer</strong><span>Chaque archer consulte ses résultats et ses distinctions.</span></li>
-      </ul>
-      <ul class="disciplines" aria-label="Disciplines prises en charge">
-        <li>Salle</li>
-        <li>TAE Distances Internationales</li>
-        <li>TAE Distances Nationales</li>
-        <li>Campagne</li>
-        <li>3D</li>
-        <li>Nature</li>
-        <li>Beursault</li>
-      </ul>
+    <section class="block" style="padding-top: 0">
+      <div class="wrap">
+        <h2>Ce que fait distinctarc</h2>
+        <ul class="features">
+          <li>
+            <div class="ico gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></div>
+            <strong>Import des résultats</strong><span>Vous importez l'export CSV des résultats FFTA, avec un aperçu avant de valider.</span>
+          </li>
+          <li>
+            <div class="ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+            <strong>Calcul automatique</strong><span>Les distinctions obtenues sont détectées selon le barème fédéral de chaque discipline.</span>
+          </li>
+          <li>
+            <div class="ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></div>
+            <strong>Suivi jusqu'à la remise</strong><span>Chaque distinction passe de «&nbsp;à commander&nbsp;» à «&nbsp;à remettre&nbsp;» puis «&nbsp;remise&nbsp;».</span>
+          </li>
+          <li>
+            <div class="ico black"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg></div>
+            <strong>Stock de distinctions</strong><span>La liste de commande tient compte des distinctions déjà en stock au club.</span>
+          </li>
+          <li>
+            <div class="ico white"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div>
+            <strong>Un espace par archer</strong><span>Chaque archer consulte ses résultats et ses distinctions.</span>
+          </li>
+          <li class="feature-link">
+            <a href="/distinctions">
+              <div class="ico gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18M9 5v14"/></svg></div>
+              <strong>Barèmes en accès libre →</strong><span>Toutes les distinctions FFTA et les scores à atteindre, consultables par tous les archers.</span>
+            </a>
+          </li>
+        </ul>
+        <ul class="disciplines" aria-label="Disciplines prises en charge">
+          <li><a href="/distinctions#salle">Salle</a></li>
+          <li><a href="/distinctions#tae">TAE Distances Internationales</a></li>
+          <li><a href="/distinctions#tae">TAE Distances Nationales</a></li>
+          <li><a href="/distinctions#campagne">Campagne</a></li>
+          <li><a href="/distinctions#3d">3D</a></li>
+          <li><a href="/distinctions#nature">Nature</a></li>
+          <li><a href="/distinctions#beursault">Beursault</a></li>
+        </ul>
+      </div>
     </section>
 
     <section class="proof">
-      <h2>Déjà en service</h2>
-      <p>distinctarc est né au sein de la 1<sup>re</sup> Compagnie d'Arc de Grenoble, qui l'utilise pour suivre les distinctions de ses archers.</p>
+      <div class="wrap">
+        <div>
+          <h2>Déjà en service</h2>
+          <p>distinctarc est né au sein de la 1<sup>re</sup> Compagnie d'Arc de Grenoble, qui l'utilise pour suivre les distinctions de ses archers.</p>
+          <p style="margin-top: 1rem"><a style="color: var(--gold)" href="https://1cie-grenoble.distinctarc.fr">Espace du club →</a></p>
+        </div>
+        <svg class="mini" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15.5" fill="#fff"/><circle cx="16" cy="16" r="12.4" fill="#2a303a"/><circle cx="16" cy="16" r="9.3" fill="#00a6d6"/><circle cx="16" cy="16" r="6.2" fill="#ea3344"/><circle cx="16" cy="16" r="3.1" fill="#ffd83d"/></svg>
+      </div>
     </section>
 
     <section class="contact" id="contact">
-      <h2>Votre club est intéressé&nbsp;?</h2>
-      <p>Écrivez-nous, on vous présente l'outil.</p>
-      <a class="cta" href="mailto:contact@distinctarc.fr">contact@distinctarc.fr</a>
+      <div class="wrap">
+        <h2>Votre club est intéressé&nbsp;?</h2>
+        <p>Écrivez-nous, on vous présente l'outil.</p>
+        <a class="btn btn-dark" href="mailto:contact@distinctarc.fr">contact@distinctarc.fr</a>
+      </div>
     </section>
   </main>
 
-  <footer class="wrap">
-    distinctarc est un service indépendant, non affilié à la Fédération Française de Tir à l'Arc. Les distinctions sont calculées selon le règlement fédéral en vigueur.
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="brand"><span>distinct<b>arc</b></span></div>
+      <p>distinctarc est un service indépendant, non affilié à la Fédération Française de Tir à l'Arc. Les distinctions sont calculées selon le règlement fédéral en vigueur.</p>
+      <p>Visuels des distinctions Salle, TAE DI et Campagne : badges brodés par <a href="https://commons.wikimedia.org/wiki/User:Nhhi" rel="noopener">Nhhi</a> via <a href="https://commons.wikimedia.org/wiki/Category:Archery_in_France" rel="noopener">Wikimedia Commons</a>, licence <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.fr" rel="noopener">CC BY-SA 4.0</a>. Visuels TAE DN et Beursault : règlement FFTA.</p>
+    </div>
   </footer>
 </body>
 </html>

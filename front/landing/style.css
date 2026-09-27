@@ -1,0 +1,116 @@
+/* distinctarc — feuille commune à la landing (index.html) et au référentiel
+   (distinctions.html). Palette : les couleurs des zones du blason World Archery. */
+
+:root {
+  --gold: #ffd83d;
+  --gold-deep: #f2b600;
+  --red: #ea3344;
+  --blue: #00a6d6;
+  --blue-deep: #00739a;
+  --black: #111418;
+  --ink: #141a24;
+  --ink-soft: #4d5566;
+  --paper: #fcfbf7;
+  --card: #ffffff;
+  --line: #e7e4dc;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(20, 26, 36, 0.06), 0 8px 24px rgba(20, 26, 36, 0.07);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.05rem/1.6 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+img { max-width: 100%; }
+a { color: var(--blue-deep); }
+
+.wrap { max-width: 68rem; margin: 0 auto; padding-inline: 1.25rem; }
+@media (max-width: 30rem) { .wrap { padding-inline: 1rem; } }
+
+h1, h2, h3, .brand {
+  font-family: 'Darker Grotesque', 'Inter', sans-serif;
+  line-height: 1.02;
+  margin: 0;
+}
+
+/* ── Bandeau ─────────────────────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(252, 251, 247, 0.9);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 4rem;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  font-size: 1.75rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand svg { width: 1.9rem; height: 1.9rem; flex: none; }
+.brand b { color: var(--red); }
+.site-nav { margin-left: auto; display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.site-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+}
+.site-nav a:hover, .site-nav a[aria-current="page"] { background: #f1eee5; }
+@media (max-width: 40rem) {
+  .site-nav .nav-optional { display: none; }
+  .brand { font-size: 1.5rem; }
+}
+
+/* ── Boutons ─────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.85rem 1.35rem;
+  border-radius: 999px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn-gold { background: var(--gold); color: var(--black); box-shadow: 0 4px 0 var(--gold-deep); }
+.btn-gold:hover { box-shadow: 0 6px 0 var(--gold-deep); }
+.btn-ghost { color: var(--ink); border: 2px solid var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: #fff; }
+.btn-dark { background: var(--black); color: #fff; }
+.btn-dark:hover { background: #2a303a; }
+
+/* Bande tricolore (jaune / rouge / bleu) */
+.stripe {
+  height: 8px;
+  background: linear-gradient(90deg, var(--gold) 0 33.33%, var(--red) 33.33% 66.66%, var(--blue) 66.66%);
+}
+
+/* ── Pied de page ────────────────────────────────────────────────────── */
+.site-footer {
+  background: var(--black);
+  color: #b9c0cc;
+  font-size: 0.88rem;
+  padding-block: 2.5rem 3rem;
+}
+.site-footer a { color: #fff; }
+.site-footer .brand { color: #fff; font-size: 1.5rem; margin-bottom: 1rem; }
+.site-footer p { margin: 0.4rem 0; max-width: 48rem; }

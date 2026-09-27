@@ -6,6 +6,14 @@ import { Menubar } from 'primeng/menubar';
 import { AuthenticationService } from './services/auth_service_firebase';
 import { AppStore } from './services/app.store';
 import { Archer } from './archer-details/archers-details';
+/** Référentiel public des distinctions, hébergé sur la landing distinctarc.fr. */
+const BAREMES_ITEM: MenuItem = {
+  label: 'Barèmes',
+  icon: 'pi pi-table',
+  url: 'https://distinctarc.fr/distinctions',
+  target: '_blank',
+};
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -46,15 +54,9 @@ export class AppComponent {
   }
 
   private buildMenu() {
-    // Archer (non-admin) : menu réduit à l'accueil et à sa propre fiche.
+    // Archer (non-admin) : menu réduit à sa propre fiche et aux barèmes publics.
     if (!this.isAdmin()) {
-      this.items = [
-        {
-          label: 'Accueil',
-          icon: 'pi pi-home',
-          routerLink: '/',
-        },
-      ];
+      this.items = [];
       if (this.archer?.id) {
         this.items.push({
           label: 'Mon profil',
@@ -62,16 +64,12 @@ export class AppComponent {
           routerLink: ['/archer', this.archer.id],
         });
       }
+      this.items.push(BAREMES_ITEM);
       return;
     }
 
     // Admin : menu complet.
     this.items = [
-      {
-        label: 'Accueil',
-        icon: 'pi pi-home',
-        routerLink: '/',
-      },
       {
         label: 'Archers',
         icon: 'pi pi-users',
@@ -126,6 +124,7 @@ export class AppComponent {
           },
         ],
       },
+      BAREMES_ITEM,
       {
         label: 'Refresh Cache',
         icon: 'pi pi-refresh',

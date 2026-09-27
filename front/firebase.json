@@ -14,7 +14,7 @@
     {
       "site": "distinctarc",
       "public": "landing",
-      "ignore": ["**/.*"],
+      "ignore": ["**/.*", "src/**", "build.mjs", "**/README.md"],
       "cleanUrls": true
     }
   ],
