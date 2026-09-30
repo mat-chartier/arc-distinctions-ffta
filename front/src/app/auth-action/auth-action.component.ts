@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../services/auth_service_firebase';
+import { safeContinueUrl } from '../model/continue-url';
 
 /**
  * Page d'action Firebase personnalisée (issue #41).
@@ -19,7 +20,10 @@ import { AuthenticationService } from '../services/auth_service_firebase';
  * page brandée, deux champs (mot de passe + confirmation), messages clairs.
  *
  * L'« action URL » configurée dans la console Firebase doit pointer vers
- * `/auth/action`. Firebase y ajoute les paramètres `mode` et `oobCode`.
+ * `/auth/action`. Firebase y ajoute les paramètres `mode`, `oobCode` et, si
+ * l'envoi en a fourni une, `continueUrl` : la page de connexion du club
+ * émetteur, vers laquelle on renvoie l'archer (l'action URL étant commune à
+ * tous les clubs, #45).
  */
 @Component({
   selector: 'app-auth-action',
@@ -42,6 +46,8 @@ export class AuthActionComponent implements OnInit {
   mode: string | null = null;
   email = ''; // email associé au code (affiché à titre indicatif)
   private oobCode: string | null = null;
+  /** Page de connexion du club émetteur (validée), sinon celle du site courant. */
+  loginUrl: string | null = null;
 
   form: FormGroup = this.fb.group(
     {
@@ -59,6 +65,7 @@ export class AuthActionComponent implements OnInit {
     const params = this.route.snapshot.queryParamMap;
     this.mode = params.get('mode');
     this.oobCode = params.get('oobCode');
+    this.loginUrl = safeContinueUrl(params.get('continueUrl'), window.location.origin);
 
     if (this.mode !== 'resetPassword' || !this.oobCode) {
       this.error =

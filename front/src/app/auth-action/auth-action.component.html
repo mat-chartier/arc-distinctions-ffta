@@ -14,7 +14,8 @@
       <!-- Erreur bloquante (lien invalide/expiré, mode non géré) -->
       <div *ngIf="!verifying && error && !success && !email" class="text-center">
         <div class="alert alert-danger">{{ error }}</div>
-        <a routerLink="/login" class="btn btn-outline-primary">Retour à la connexion</a>
+        <a *ngIf="loginUrl; else retourLocal" [href]="loginUrl" class="btn btn-outline-primary">Retour à la connexion</a>
+        <ng-template #retourLocal><a routerLink="/login" class="btn btn-outline-primary">Retour à la connexion</a></ng-template>
       </div>
 
       <!-- Succès -->
@@ -22,7 +23,8 @@
         <div class="alert alert-success">
           Votre mot de passe a été enregistré. Vous pouvez maintenant vous connecter.
         </div>
-        <a routerLink="/login" class="btn btn-primary">Se connecter</a>
+        <a *ngIf="loginUrl; else connexionLocal" [href]="loginUrl" class="btn btn-primary">Se connecter</a>
+        <ng-template #connexionLocal><a routerLink="/login" class="btn btn-primary">Se connecter</a></ng-template>
       </div>
 
       <!-- Formulaire (lien valide) -->

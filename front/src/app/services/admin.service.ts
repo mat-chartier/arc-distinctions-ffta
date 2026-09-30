@@ -8,6 +8,7 @@ import {
 import { environment } from '../../environments/environment';
 import { FirestoreService } from './firestore.service';
 import { ArcherDoc } from '../model/firestore-types';
+import { buildContinueUrl } from '../model/continue-url';
 
 /**
  * Administration des comptes (issue #32).
@@ -51,7 +52,7 @@ export class AdminService {
     }
 
     // 2. Envoyer l'invitation (mail de définition de mot de passe) via l'app principale.
-    await sendPasswordResetEmail(getAuth(getApp()), email);
+    await sendPasswordResetEmail(getAuth(getApp()), email, { url: buildContinueUrl(window.location.origin) });
 
     // 3. Lier le compte à l'archer (un seul document, atomique).
     await this.firestore.createUserAccount(uid, { archerId: archer.id, role, email });
@@ -59,7 +60,7 @@ export class AdminService {
 
   /** Renvoie l'email d'invitation / de réinitialisation de mot de passe. */
   async resendInvite(email: string): Promise<void> {
-    await sendPasswordResetEmail(getAuth(getApp()), email);
+    await sendPasswordResetEmail(getAuth(getApp()), email, { url: buildContinueUrl(window.location.origin) });
   }
 
   /** Change le rôle d'un compte (effectif à la prochaine connexion de la cible). */

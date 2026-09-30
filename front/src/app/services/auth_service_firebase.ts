@@ -27,6 +27,7 @@ import {
   Firestore
 } from 'firebase/firestore';
 import { environment } from '../../environments/environment';
+import { buildContinueUrl } from '../model/continue-url';
 
 @Injectable({
   providedIn: 'root',
@@ -236,7 +237,7 @@ export class AuthenticationService {
    */
   async sendPasswordReset(email: string): Promise<void> {
     try {
-      await sendPasswordResetEmail(this.auth, email);
+      await sendPasswordResetEmail(this.auth, email, { url: buildContinueUrl(window.location.origin) });
     } catch (error: any) {
       if (error.code === 'auth/user-not-found') {
         return; // même comportement qu'un compte existant (message neutre)
